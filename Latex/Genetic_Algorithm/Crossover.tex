@@ -1,0 +1,44 @@
+\subsection{Crossover}
+Once the parents are selected, to generate offspring we take parts from each and combine them to make new chromosomes. Other than a few exceptions these don't generate new values: just re-arrange the existing ones. Repeatedly doing just crossovers only covers a limited section of the search space, so isn't sufficient to find an optimal solution. Crossover methods can be combined and altered: for example, a Single Point crossover followed by Blending, or only considering a subset of indices for Extrapolation.
+
+Only the first three crossovers are applicable to the Binary Genetic\\ Algorithm. Crossovers for ordering problems are detailed in a separate section.
+
+\subsubsection{Single Point}
+This breaks each parent into two parts, and creates offspring by swapping the second part for each. A random number \(0\leq n < L\) is generated, and used to split the chromosomes. L is the length of the binary string / number of genes for binary and continuous genetic algorithms respectively. Using slice notation, this can be shown as: 
+
+\begin{align}
+    Child_1 &= Parent_1[0:n] + Parent_2[n:end] \nonumber\\
+    Child_2 &= Parent_2[0:n] + Parent_1[n:end] \nonumber
+\end{align}
+
+\subsubsection{Double Point}
+This breaks each parent into 3 parts, and swaps the middle parts for each. This middle section is denoted by two crossover points, which are the start and end of the section respectively. These follow \(0\leq n_1 < n_2 \leq L\). Using slice notation, this can be shown as: 
+
+\begin{align}
+    Child_1 &= Parent_1[0:n_1] + Parent_2[n_1:n_2] +  Parent_1[n_2:end] \nonumber\\
+    Child_2 &= Parent_2[0:n_1] + Parent_1[n_1:n_2] + Parent_2[n_2:end] \nonumber
+\end{align}
+
+\subsubsection{Uniform Crossover}
+This uses a variable $\mu \in (0,1)$ to determine how much crossover occurs. For each index of the binary string/gene tuple, generate a random number n $\in (0,1)$. If $n < \mu$, the bit/gene in that index is swapped in the children, otherwise are directly copied from the parent. The addition of $\mu$ gives us a tuning parameter, but if it's too high or low effectively no crossover will happen (no swaps or all swaps).
+
+\subsubsection{Blending}
+This uses a variable $\beta \in (0,1)$ to combine the genes from the parents (P) into new values as below:
+
+\begin{align}
+    Child_1[i] &= \beta * P_1[i] + (1-\beta) * P_2[i] \nonumber\\
+    Child_2[i] &= \beta * P_2[i] + (1-\beta) * P_1[i] \nonumber  
+\end{align}
+
+These values are in the range (P\_1[i], P\_2[i]), so while these generate new values they are still limited to a subset of the search space. $\beta$ can change from generation to generation, etc. 
+
+\subsubsection{Extrapolation}
+This also uses a variable $\beta$, but there's no limit on its value. Children are generated using the below:
+
+\begin{align}
+    Diff_i &= abs(P_1[i] - P_2[i]) \nonumber \\
+    Child_1[i] &= P_1[i] - \beta * Diff_i \nonumber\\
+    Child_2[i] &= P_2[i] + \beta * Diff_i \nonumber  
+\end{align}
+
+With some re-arrangement these are the same equations as Blending, but as there's no limit on $\beta$ this can explore the entire search space without mutation.  $\beta$ can change from generation to generation, and if needed we can artificially limit the range of values generated. 

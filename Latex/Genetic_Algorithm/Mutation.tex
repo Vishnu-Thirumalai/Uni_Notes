@@ -1,0 +1,25 @@
+\subsection{Mutation}
+Mutation is the process that actually drives evolution: by changing the chromosomes into new values, new solutions can be evaluated and used. It is possible to have an algorithm that consists entirely of mutations: this would perform very similar to random walk or (1+1)ES. Crossovers move the genes into potentially better solutions, mutations discover new solutions. 
+
+\subsubsection{How many Mutations?}
+Mutation is determined using a mutation rate, $\mu$. To prevent good solutions from being mutated, we can designate the top n chromosomes as \emph{elite}, and not consider them for mutation. n can be left as 0, in which case any chromosome can be mutated. 
+
+With $N_{pop}$ as the size of the population, the standard formula is:
+
+\begin{equation}
+    M = (N_{pop} - n) * \mu * N_{bits}
+\end{equation}
+
+$N_{bits}$ is the length of the binary string for a chromosome for BGA, and the number of genes in a chromosome for CGA.
+
+\subsubsection{Binary Mutation}
+Disregarding the top n chromosomes, choose M bits randomly across the population and flip them (0$\rightarrow$1, 1$\rightarrow$0). 
+
+\subsubsection{Numeric Mutation}
+This uses a variable $\sigma$ to control how much a gene mutates. Disregarding the top n chromosomes, choose M genes randomly and apply:
+
+\[
+    Gene = Gene + \sigma * N_n(0,1)
+\]
+
+$N_n$ is a random number generator, but generates numbers according to a standard distribution. 

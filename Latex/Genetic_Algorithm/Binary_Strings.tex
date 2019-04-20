@@ -1,0 +1,63 @@
+\subsection{Binary Strings}
+For the \textbf{Binary Genetic Algorithm}, we also have to determine how to convert to and from binary strings. Using binary strings is mostly historical, back when the memory used by each chromosome was important. It's also fairly simple to implement.
+
+\subsubsection{Binary String Length}
+The overall length of the binary string is dependent on the number of possible values our gene can take. For example: for an equation \(f(x,y)\), if x has 100 possible values and y has 30, the overall length of the binary string representation will be \(7+5=12\). 
+\\
+Normally though, we're given a range and precision that our genes must adhere to. Re-phrasing our earlier example: \(0 \leq x \leq 1\) with a precision of 2 decimal places, \(5 \leq y \leq 8\) with a precision of 1 decimal place. To convert from these to the above, we use the following equation:
+
+\begin{equation}
+    Number\_of\_Values = \frac{x_{hi} - x_{lo}}{10^{-d}} 
+\end{equation}
+
+This equation is the same as saying \( integer\_range * 10^{decimal\_places}\). Now that we have the number of possible values a gene can take, we need to find the minimum length of a binary string that can represent that many distinct values. A binary string of length \textbf{n} can represent \(2^n-1\) distinct values. 
+
+For example: using the above equation, we see there are 30 distinct values for y. \(2^4-1\) is 15, \(2^5-1\) is 31. Therefore we choose a binary string of length 5 to represent y. We could have also calculated this as \( ceil(log_2(30))\).
+
+The above can be also be summarised as: 
+
+\begin{equation}
+    \frac{x_{hi} - x_{lo}}{10^{-d}}  \le 2^m - 1 
+\end{equation}
+
+Where m is the required length. To get the full string, do this for each variable and add them together.
+
+\subsubsection{Binary Encoding and Decoding}
+Our binary representation roughly contains one unique string for each possible value. It's not going to be a perfect match though, as binary can't perfectly split decimal. To ease in the conversion, we calculate the \textbf{Binary Value}:
+
+\[
+   \frac{x_{hi} - x_{lo}}{2^m - 1}
+\]
+
+This gives us the decimal value of a 1 in the binary string, and we'll represent it as $b$. Representing the binary string as $BS$ and the decimal value as $D$, the conversions are:
+
+\begin{align}
+    Encoding&:  BS = binary(round(\frac{D -  x_{lo}}{b}))\\
+    Decoding&:  D  = x_{lo} + decimal(BS) * b
+\end{align}
+
+With these, $x_{lo}$ is represented as 0\dots0 and $x_{hi}$ as 1\dots1 for every gene. The complete binary string for a chromosome is just the concatenation of the strings for each gene.
+
+\subsubsection{Grey Codes}
+One problem with binary strings is adjacent numbers can have very different representations. For example: 3 and 4 have a difference of 1 in decimal, but their binary representations have every bit different (011 and 100). We can quantify this as the \textbf{Hamming Distance}, which is the number of bits that are different between two binary numbers (e.g 011 and 100 have a h.d of 3, 001 and 101 have a h.d of 1). 
+
+Grey codes are an alternate representation that guarantee consecutive numbers to have a Hamming Distance of 1. Representing the binary string as $b$ and the grey code as $g$, both with length $n$, the conversions are as follows:
+
+Binary to Grey:
+\begin{equation}
+    g[i] = 
+      \begin{cases}
+      b[i], & \text{if}\ i = n \\
+      b[i]\, XOR\, g[i+1], & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+Grey to Binary:
+\begin{equation}
+    b[i] = 
+      \begin{cases}
+      g[i], & \text{if}\ i = n \\
+      b[i+1]\, XOR\, g[i], & \text{otherwise}
+    \end{cases}    
+\end{equation}
+

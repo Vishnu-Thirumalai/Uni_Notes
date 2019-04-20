@@ -1,0 +1,37 @@
+\subsection{Pair Selection}
+This part of the algorithm determines how chromosomes are paired up for crossovers (creating new chromosomes). This pairing up is important as it can influence how genes spread throughout the population, and can prevent good genes being overshadowed by poor ones. All of the below are independent of the cost function.i.e they don't require it to be of a certain form, such as differentiable. 
+
+\subsubsection{Adjacency}
+Just pair adjacent chromosomes from top to bottom. If the population is sorted, this pairs chromosomes according to their ranks, which produces chromosomes without introducing much diversity (exploitation as opposed to exploration). It's very simple to implement, and every chromosome is used in crossovers. 
+
+\subsubsection{Random}
+Randomly choose pairs. To generate the pair, a chromosome is chosen randomly, twice. This gives us unmatched diversity (exploration over exploitation), which gives a higher chance to find better quality offspring. Again very simple to implement, but for a completely random selection there's a chance we choose the same chromosome twice in a single pair.
+
+\subsubsection{Rank-Weighted Roulette}
+Choose pairs with probabilities according to their ranks.  To generate the pair, two chromosomes are chosen according to the probabilities and paired together. If random can be taken as given each chromosome an equal chance to be chosen, Rank Weighted Pairing gives each chromosome a chance proportional to their rank in the population, which requires us to sort the population. This favours chromosomes with better costs. With a population of size $N_{keep}$, this probability for chromosome $C_n$ of rank n is calculated as:
+
+\begin{equation}
+    P(C_n) = \frac{N_{keep} + 1 - n}{\sum_{i=1}^{N_{keep}} i}
+\end{equation}
+
+This gives probability \(1/sum(N_{keep})\) to the last chromosome and \(N_{keep}/sum(N_{keep})\) to the first. This gives a large difference in probability between adjacent chromosomes, regardless of their actual weights. For small populations, this gives a very skewed probability.
+
+\subsubsection{Cost-Weighted Roulette}
+Choose pairs with probabilities according to their weights. This doesn't need us to sort the population, but we do need to account that some costs may be negative. This is fixed by normalising the costs:
+
+\begin{equation}
+    NCost(C_n) = Cost(C_n) - C_{N_{keep}+1} +1
+\end{equation}
+
+ $C_{N_{keep}+1}$ is the cost of the best chromosome not chosen. For $X_{rate}$ selection this is obvious, for threshold selection or where $N_{keep} = 0$, instead use 2 * the cost of the lowest chromosome. As this value is guaranteed to be $\geq$ the lowest chromosome, subtracting it guarantees that all Ncosts are $<$ 0. With the normalised costs, probability for each chromosome is calculated as:
+ 
+\begin{equation}
+    P(C_n) = \frac{NCost(C_n)}{\sum_{i=1}^{N_{keep}} NCost(C_n)}
+\end{equation} 
+
+This gives a more accurate reflection of the relationships between the weights of the chromosomes, but is more computationally expensive. 
+
+\subsection{Tournament Selection}
+A small subset of chromosomes is randomly chosen, and the best performing chromosome from this subset. This is done twice to get a pair, and the size of each subset is normally 2-3. A variation involves taking a larger subset, ranking them and then performing \emph{rank-weighted roulette} to choose two chromosomes.
+
+Both variations favour chromosomes with better costs. Also, since in each instance only a trivial subset has to be sorted, it reduces computation on sorting and thus works well for problems with large populations. 

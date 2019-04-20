@@ -1,0 +1,13 @@
+\section{Genetic Algorithms}
+
+Genetic Algorithms work by evolving a pool of candidate solutions, optimising them in the process till it eventually converges to an optimal enough solution. Optimising \textit{usually} means minimising, unless otherwise specified, and this is the assumption throughout these notes. To convert from a maximisation to a minimisation problem, just multiply the cost function by -1
+Each solution is represented as a \textbf{chromosome}, which contains values for the variables of the given problem (each variable is known as a \textbf{gene}). For example, if we're optimising a function of the form \( f(x,y) \), then each chromosome contains two genes. \textbf{Binary Genetic Algorithms} represent chromosomes as a binary string, \textbf{Continuous Genetic Algorithms} represent them as a tuple (or list or array) of genes.
+\\ \\
+The general form of a genetic algorithm has 4 main parts:
+\begin{enumerate}
+    \item Natural Selection
+    \item Pair Selection
+    \item Crossover
+    \item Mutation
+\end{enumerate}
+

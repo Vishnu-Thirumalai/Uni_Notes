@@ -1,0 +1,12 @@
+\subsection{Natural Selection}
+This part of the algorithm determines which chromosomes are carried forward to the next generation.
+
+\subsubsection{$X_{rate}$}
+Only the best survive. The top (lowest cost) $N_{keep}$ chromosomes are chosen, and the rest discarded. This method guarantees a fixed amount from each generation are kept, though this can be varied by changing $X_{rate}$ (a user-defined percentage) at each iteration. With $N_{pop}$ as the size of the population, $N_{keep}$ can be calculated as:
+
+\[
+    N_{keep} = N_{pop} * X_{rate}
+\]
+
+\subsection{Thresholding}
+Only chromosomes with a score below a given threshold survive. This has the advantage of not having to sort and rank the chromosomes, but there is no guarantee on how many chromosomes survive. This can be fixed by changing the threshold at each iteration, either to an average or to a reasonable value.
