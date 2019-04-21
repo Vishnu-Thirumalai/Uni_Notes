@@ -1,0 +1,109 @@
+\section{Evolution Strategies}
+Evolution Strategies are similar to Genetic Algorithms, with two main differences: 
+
+\begin{enumerate}
+    \item ES can only handle real values
+    \item ES uses a set of values, called \textbf{Strategy Parameters} to handle mutations for each gene
+\end{enumerate}
+The overall flow of the algorithm is: 
+\begin{enumerate}[label=\Alph*]
+\item Create a random initial population and strategy parameters
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item Create pairs via Pair Selection
+    \item Make new chromosomes via Crossover
+    \item Apply Mutation to the children and parameters
+    \item Select new population 
+\end{enumerate}
+\item Select the best performing chromosome as the solution\\
+\end{enumerate}
+
+\subsection{Strategy Parameters}
+Strategy Parameters ($\sigma$) for ES are the same as the step size in gradient descent. One is created for each variable in the optimisation problem: so there will be an equal number of parameters and genes. 
+
+A larger $\sigma$ will move further in the current population direction, exploiting a good trend, and a smaller $\sigma$ will search locally to find a good new direction to move the population. The $\sigma$ are mutated alongside the population, and the mutations apply even if the offspring are rejected.
+
+\subsection{ES Notation}
+Evolution strategies are depicted with the $(\mu, \lambda)$ or $(\mu + \lambda)$ notation. $\mu$ represents the size of the population at each generation, and $\lambda$ is the number of children generated at each stage.
+
+The , and + represent two methods of selection. With , the new population is selected only from the children, and with + the new population is selected from a combination of the parents and children. e.g. (1,1)ES will always choose the child (effectively random walk), and (1+1)ES will choose the better of the child and parent (smarter random walk). 
+
+For , notation, $\lambda$ must be $\geq$ than $\mu$: otherwise the population requirement won't be hit. $(\mu, \lambda)$ results in faster convergence, $(\mu + \lambda)$ gives more exploration. 
+
+\subsection{Crossovers}
+Some variations don't use crossovers (the children are just the parents), but otherwise there are four main types of crossovers. They can be distinguished in the following categories:
+
+\begin{itemize}
+    \item Source:
+    \begin{description}
+        \item [Local] 2 parents, 1 child
+        \item [Global] $>$2 parents, 1 child
+    \end{description}
+    \item Output:
+    \begin{description}
+        \item [Discrete] Children contain elements from the parents
+        \item[Intermediate] Children contain elements derived from the parents, such \\ as a weighted average.
+    \end{description}
+\end{itemize}
+
+To generate more children, the order of the parents is changed. Examples are shown below: 
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+ & Discrete & Intermediate \\ \hline
+Local & Uniform Crossover & Blending \\ \hline
+Global & Non-Uniform Crossover  & Uniform Blending \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Non-Uniform Crossover}
+Rather than using a single $\mu$, a rank-based cost roulette is used amongst the parents. The top-ranked parent ($P_1$) has $P =0.5$, and the others are generated according to: 
+\[
+P(P_2) > P(P_3) > \dotso > P(P_n)
+\]
+
+\subsubsection{Uniform Blending}
+\[
+Child[i] = \frac{1}{\text{Num. of Parents}} * \sum_{k=1}^{n} parent_k[i] 
+\]
+
+\subsection{Mutation}
+\subsubsection{Chromosomes}
+For a chromosome c, the mutation of each gene c[i] depends on the strategy parameter $\sigma_i$. This is similar to CGA, but as $\sigma_i$ adjusts as well it allows for dynamic growth, allowing the algorithm to choose between exploring and exploiting. As before, $N_n$ gives a random number according to a gaussian distribution.
+
+\begin{equation}
+    c[i] = c[i] + \sigma_i * N_n(0,1)
+\end{equation}
+
+\subsubsection{Strategy Parameters}
+These change according to how well the population is doing: if the quality of the solutions is steadily improving then the algorithm's speed is increased, and if solutions aren't improving then the speed is decreased in favour of local search. Determining an improvement could be checking if the average cost lowers, or if more children are chosen than parents.
+
+\begin{equation}
+    \sigma_i(t+1) = 
+    \begin{cases}
+    \sigma_i(t) * e^(\frac{1}{3}), & \text{if t=0 or previous mutation was successful} \\
+    \sigma_i(t) * e^(\frac{-1}{12}), & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+\subsection{(1+1)ES}
+Effectively a smarter random walk, this chooses the better of the parent and child at each generation. No crossover occurs, and the offspring is simply a copy of the parent with mutation.
+
+\subsubsection{Parameter Mutation Variants}
+\begin{enumerate}
+    \item No mutation: this is similar to a GA
+    \item If in the last X generations the good mutation rate $\geq$ 20\%: increase the parameter. Else, decrease it.
+    \item With $n_x$ being the number of genes, $n_m $ being the number of mutations in the last $10n_x$ generations and $0<\alpha<1$,  perform the following every $10n_x$ generations:
+    \[
+    \sigma_i(t+1) = 
+    \begin{cases}
+        \sigma_i(t) * \alpha, &  n_m < 2n_x\\
+        \sigma_i(t) / \alpha, &  n_m > 2n_x\\
+        \sigma_i(t),  &  n_m = 2n_x
+    \end{cases}
+    \]
+\end{enumerate}
+
+\subsection{($\mu$+1)ES}
+The population only potentially changes by 1 individual each time. Since there are multiple chromosomes, the offspring is obtained by crossover and thus there is a diversity in output. 

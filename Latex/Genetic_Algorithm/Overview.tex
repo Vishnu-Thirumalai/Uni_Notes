@@ -23,3 +23,12 @@ Combining all of these together, the overall flow of the algorithm is:
 \item Select the best performing chromosome as the solution\\
 \end{enumerate}
 For problems that have constraints or multiple objectives to be optimised, having the cost function be a weighted sum of each individual requirement is sufficient. Note that all must be maximisation/minimisation: these can be converted with negative weights if required. Constraints should degrade the cost if not met (e.g add a large integer with absolute value higher than the lowest possible cost), and should be designed such that a solution violating a constraint cannot have a lower cost than a function that satisfies it. There is no such restriction for preferences. 
+
+\subsection{Stopping Criteria}
+Any/all of the below can be used: it depends on the situation:
+\begin{enumerate}
+    \item An acceptable (low enough cost) solution has been found
+    \item The mean/standard deviation/range of the chromosomes is within a target value
+    \item No change in chromosomes/best/cost/worst cost after X iterations
+    \item N iterations have elapsed
+\end{enumerate}
