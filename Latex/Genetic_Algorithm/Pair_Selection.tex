@@ -26,7 +26,7 @@ Choose pairs with probabilities according to their weights. This doesn't need us
  $C_{N_{keep}+1}$ is the cost of the best chromosome not chosen. For $X_{rate}$ selection this is obvious, for threshold selection or where $N_{keep} = 0$, instead use 2 * the cost of the lowest chromosome. As this value is guaranteed to be $\geq$ the lowest chromosome, subtracting it guarantees that all Ncosts are $<$ 0. With the normalised costs, probability for each chromosome is calculated as:
  
 \begin{equation}
-    P(C_n) = \frac{NCost(C_n)}{\sum_{i=1}^{N_{keep}} NCost(C_n)}
+    P(C_n) = \frac{NCost(C_n)}{\sum_{i=1}^{N_{keep}} NCost(C_i)}
 \end{equation} 
 
 This gives a more accurate reflection of the relationships between the weights of the chromosomes, but is more computationally expensive. 

@@ -18,8 +18,8 @@ Disregarding the top n chromosomes, choose M bits randomly across the population
 \subsubsection{Numeric Mutation}
 This uses a variable $\sigma$ to control how much a gene mutates. Disregarding the top n chromosomes, choose M genes randomly and apply:
 
-\[
+\begin{equation}
     Gene = Gene + \sigma * N_n(0,1)
-\]
+\end{equation}
 
 $\sigma$ is usually a constant, but for a dynamic system can be changed between generations. $N_n$ is a random number generator, but generates numbers according to a standard distribution (i.e 0.5 is most likely to be generated, 0 and 1 are very unlikely). 
