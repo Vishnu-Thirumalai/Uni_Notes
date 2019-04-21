@@ -1,0 +1,53 @@
+\subsection{Schema Theorem}
+This theorem is used to demonstrate that GAs are effective in discovering good solutions, and increase the quality of the solutions with more generations. The proof uses the binary genetic algorithm, but the result proves effectiveness for all GAs.
+
+\subsubsection{What is a Schema}
+A schema (or scheme) is a template that represents binary strings, similar to how regular expressions represent regular strings. They consist of '0','1' and '*' (wildcard).
+
+The order of a schema is the number of fixed positions it contains (O(s)), and the defining length ($\delta$(s)) is the distance between the first and last fixed positions. e.g.
+
+\begin{align}
+    **00&**0*** \nonumber \\
+    Order&: 3 \nonumber \\
+    \text{Defining Length}&: 7-3 = 4  \nonumber \\
+    \text{Examples of matching Strings}&: 1100010101, 0000000000, 0100100111 \nonumber
+\end{align}
+
+For this proof, we define the average cost of a schema s at  generation t (f(s,t)) as the average cost of all the chromosomes that match the schema at that generation, and n(s,t) is the number of chromosomes at t that match s.
+
+\subsubsection{Schema Pair Selection}
+Using cost-weighted roulette, the probability that a chromosome C is chosen is \(\frac{Cost(C)}{\sum_{i=1}^{N_{keep}} Cost(C_i)} \).
+Therefore, for a chromosome matching a schema at the generation, the average \\probability of being chosen is  \(\frac{f(s,t)}{\sum_{i=1}^{N_{keep}} Cost(C_i)} \). The probability for \textbf{any} chromosome \\ matching the schema being chosen is \(\left(n(s,t) * \frac{f(s,t)}{\sum_{i=1}^{N_{keep}} Cost(C_i)} \right)\).\\
+This selection happens $N_{pop}$ times. If we assume that only selection takes place and no crossover/mutation occurs, we obtain:
+\begin{equation}
+    n(s,t+1) = n(s,t) * \frac{f(s,t)}{\sum_{i=1}^{N_{keep}} Cost(C_i)} * N_{pop} = n(s,t) * \frac{f(s,t)}{\text{Avg. Cost at gen t}} 
+\end{equation}
+With some re-arrangement, we can re-write these as the following:
+\begin{align}
+    n(s,t+1) &= n(s,t) * (1 + \varepsilon(s,t)) \\
+             &= n(s,t-1) * (1+\varepsilon(s,t-1)) * (1+\varepsilon(t)) \nonumber \\ 
+             &= n(s,1) * \prod_{i=1}^{t}(1+\varepsilon(s,t)) \\
+    \varepsilon(s,t) &= \frac{f(s,t)-Avg.cost(t)}{Avg.cost(t)} 
+\end{align}
+
+\subsubsection{Schema Crossover}
+After being selected as a parent, a schema is said to survive a crossover if one of the child chromosomes also matches it. The only circumstance a schema breaks in single-point crossover is if the break point is inside the defined length of the schema: as the externals are wild cards it doesn't matter. Using this, and the knowledge that the last index can't be selected for a single-point crossover, the probability that a schema survives a single-point crossover is: 
+\begin{equation}
+    P(survival) = 1- \frac{\delta(s)}{len(s)-1}
+\end{equation}
+
+\subsubsection{Schema Mutation}
+Schemas are resilient to mutation as wildcards match both 0 and 1, so they only break if one of the fixed positions is mutated. If $P_m$ is the probability for a bit to be mutated, the probability a schema survives mutation is:
+\begin{equation}
+    P(survival) = (1 - P_m)^{O(s)}
+\end{equation}
+
+\subsubsection{Conclusion}
+Combining the above three sections, we obtain the schema growth equation:
+
+\begin{align}
+    P(survival) &= n(s,t) * (1 + \varepsilon(s,t)) * \left(1- \frac{\delta(s)}{len(s)-1} \right) * (1 - P_m)^{O(s)} \\
+    &= n(s,t) * \frac{\text{Avg.Cost of Matches}}{\text{Overall Avg. Cost}} * (1- \frac{Defining Length}{Schema Length}) * (1- P_m) ^ {Order(s)}
+\end{align}
+
+Therefore, we can say that above-average, short, low-order schema propagate well. The more above average the better, so with enough generations eventually the weaker solutions disappear and the more optimal ones remain. 
