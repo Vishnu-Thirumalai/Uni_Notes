@@ -1,0 +1,101 @@
+\subsection{Permutation Problems}
+Certain problems (such as the \textbf{Travelling Salesman Problem}) require their solution to be an ordering of a given set of variables. This means traditional mutation and crossover methods won't work, since they change the values and discover new ones respectively. Chromosomes take the form of a tuple of values, similar to CGA, but every chromosome has the same values in a different order.
+
+
+
+\subsubsection{Partially Matched Crossover}
+Perform two-point crossover, then swap duplicated genes \emph{outside} of the two points. This can be done by going through the children, and swapping the first duplicate in Child$_1$ with the first in Child$_2$ and so on .e.g.
+
+\begin{align}
+    Parent 1: (3,4,6,2,1,5)\; &; \;  Parent 2: (4,1,5,3,2,6) \nonumber \\
+    Chosen Points&: 1, 3 \nonumber \\
+    Initial Children&: (3|1,5|2,1,5); (4|4,6|4,2,6) \nonumber \\
+    Fixed Children&: (3,1,5,2,4,6); (1,4,6,3,2,5) \nonumber 
+\end{align}
+
+This doesn't preserve the existing ordering in the slightest: so two very good orderings could potentially produce two terrible ones. 
+
+\subsubsection{Ordered Crossover}
+Similar to two-point crossover, choose two points and add the middle section to the children. Then fill in the empty spaces with the genes from the parent starting at the first crossover point, skipping the duplicates. e.g.
+
+\begin{align}
+    Initial &: Parents - (3|46|215), (4|15|326) \nonumber \\
+    Phase 1 &: Children - (x|15|xxx), (x|46|xxx) \nonumber \\
+    Phase 2 &: Children - (4|15|623), (1|46|532) \nonumber 
+\end{align}
+
+For Child$_1$, the x's are filled in with 4623 (starting at crossover point 1, skipping duplicates, looping around at the end). For Child 2, 1532 is taken from the parent. An alternative is to delete the duplicates from the parents then directly fill in the children, which saves skipping the duplicates.
+
+This method preserves the relative ordering, but not the absolute. For TSP this is fine since the start is irrelevant, and the sequence can just be rotated to get the desired start point.
+\newpage
+\subsubsection{Cycle Crossover}
+Swap the left-most genes, then keep swapping duplicates from left to right in child$_1$ till there are none left. This method has a relatively simple implementation, as only child$_1$ is checked for duplicates and the checking index only advances from left to right (looping around if necessary).e.g.
+
+\begin{align}
+    Initial &: Parents - (|346215), (|415326) \nonumber \\ 
+    Swap 1 &: Children - (4|46215), (3|15326) \nonumber \\
+    Swap 2 &: Children - (41|6215), (34|5326) \nonumber \\
+    Swap 3 &: Children - (41622|5), (34531|6) \nonumber \\
+    Swap 4 &: Children - (4163|25), (3452|16) \nonumber 
+\end{align}
+
+\subsubsection{Coding for Crossovers}
+Rather than a direct crossover method, the chromosomes are encoded to a numeric string, can then have any crossover method applied to them, then decoded back to a chromosome. \\ \\
+Encoding:
+\begin{enumerate}[label=\Alph*]
+\item Make a reference list of the genes
+\item For idx in range(0,len(chromosome)):
+\begin{enumerate}[label=\arabic*]
+    \item coded[idx] = index of chromosome[idx] in reference list
+    \item remove chromosome[idx] from the reference list
+\end{enumerate}
+\end{enumerate}
+e.g. 
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Epoch & Coded & Chromosome & Reference List \\ \hline
+1 &  & 346215 & 1,2,3,4,5,6 \\ \hline
+2 & 3 & 46215 & 1,2,4,5,6 \\ \hline
+3 & 33 & 6215 & 1,2,5,6 \\ \hline
+4 & 334 & 215 & 1,2,5 \\ \hline
+5 & 3342 & 15 & 1,5 \\ \hline
+6 & 33421 & 5 & 5 \\ \hline
+7 & 334211 &  &  \\ \hline
+\end{tabular}
+\end{table}
+Decoding:
+\begin{enumerate}[label=\Alph*]
+\item Make a reference list of the genes
+\item For idx in range(0,len(coded)):
+\begin{enumerate}[label=\arabic*]
+    \item chromosome[idx] = index of coded[idx] in reference list
+    \item remove coded[idx] from the reference list
+\end{enumerate}
+\end{enumerate}
+e.g. 
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Epoch & Coded & Chromosome & Reference List \\ \hline
+1 &  351311 & & (,2,3,4,5,6 \\ \hline
+2 &  51311 & 3 & 1,2,4,5,6\\ \hline
+3 &  1311 & 3,6 & 1,2,4,5\\ \hline
+4 &  311 & 3,6,1 & 2,4,5\\ \hline
+5 &  11 & 3,6,1,5 & 2,4\\ \hline
+6 &  1 & 3,6,1,5,2 & 4\\ \hline
+7 &  &  3,6,1,2,5,4 & \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Mutation}
+As generating new values breaks the problem, the following methods can be used:
+
+\begin{enumerate}
+    \item Invert/Reverse a randomly selected subset of the chromosome
+    \item Move/Swap a randomly selected subset within the chromosome
+    \item Randomly swap positions: this may break an encoded chromosome, so it must be decoded first
+\end{enumerate}
+

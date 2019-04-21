@@ -1,6 +1,6 @@
 \section{Genetic Algorithms}
 
-Genetic Algorithms work by evolving a pool of candidate solutions, optimising them in the process till it eventually converges to an optimal enough solution. Optimising \textit{usually} means minimising, unless otherwise specified, and this is the assumption throughout these notes. To convert from a maximisation to a minimisation problem, just multiply the cost function by -1
+Genetic Algorithms work by evolving a pool of candidate solutions, optimising them in the process till it eventually converges to an optimal enough solution. Optimising \textit{usually} means minimising, unless otherwise specified, and this is the assumption throughout these notes. To convert from a maximisation to a minimisation problem, just multiply the cost function by -1 .
 Each solution is represented as a \textbf{chromosome}, which contains values for the variables of the given problem (each variable is known as a \textbf{gene}). For example, if we're optimising a function of the form \( f(x,y) \), then each chromosome contains two genes. \textbf{Binary Genetic Algorithms} represent chromosomes as a binary string, \textbf{Continuous Genetic Algorithms} represent them as a tuple (or list or array) of genes.
 \\ \\
 The general form of a genetic algorithm has 4 main parts:
@@ -8,6 +8,18 @@ The general form of a genetic algorithm has 4 main parts:
     \item Natural Selection
     \item Pair Selection
     \item Crossover
-    \item Mutation
+    \item Mutation\\ 
 \end{enumerate}
-
+Combining all of these together, the overall flow of the algorithm is: 
+\begin{enumerate}[label=\Alph*]
+\item Create a random initial population
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item Filter population with Natural Selection
+    \item Create pairs via Pair Selection
+    \item Make new chromosomes via Crossover
+    \item Apply mutation to the population
+\end{enumerate}
+\item Select the best performing chromosome as the solution\\
+\end{enumerate}
+For problems that have constraints or multiple objectives to be optimised, having the cost function be a weighted sum of each individual requirement is sufficient. Note that all must be maximisation/minimisation: these can be converted with negative weights if required. Constraints should degrade the cost if not met (e.g add a large integer with absolute value higher than the lowest possible cost), and should be designed such that a solution violating a constraint cannot have a lower cost than a function that satisfies it. There is no such restriction for preferences. 

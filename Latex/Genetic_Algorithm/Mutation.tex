@@ -1,5 +1,5 @@
 \subsection{Mutation}
-Mutation is the process that actually drives evolution: by changing the chromosomes into new values, new solutions can be evaluated and used. It is possible to have an algorithm that consists entirely of mutations: this would perform very similar to random walk or (1+1)ES. Crossovers move the genes into potentially better solutions, mutations discover new solutions. 
+Mutation is the process that actually drives evolution: by changing the chromosomes into new values, new solutions can be evaluated and used. It is possible to have an algorithm that consists entirely of mutation: this would perform very similar to random walk or (1+1)ES. Crossovers move the genes into potentially better solutions, mutations discover new solutions. 
 
 \subsubsection{How many Mutations?}
 Mutation is determined using a mutation rate, $\mu$. To prevent good solutions from being mutated, we can designate the top n chromosomes as \emph{elite}, and not consider them for mutation. n can be left as 0, in which case any chromosome can be mutated. 
@@ -22,4 +22,4 @@ This uses a variable $\sigma$ to control how much a gene mutates. Disregarding t
     Gene = Gene + \sigma * N_n(0,1)
 \]
 
-$N_n$ is a random number generator, but generates numbers according to a standard distribution. 
+$\sigma$ is usually a constant, but for a dynamic system can be changed between generations. $N_n$ is a random number generator, but generates numbers according to a standard distribution (i.e 0.5 is most likely to be generated, 0 and 1 are very unlikely). 
