@@ -1,0 +1,101 @@
+\section{Differential Evolution}
+Differential Evolution is similar to Evolution Strategies, but uses a guided form of mutation rather than adding a randomised value. It does this by generating difference vectors, and using these to mutate the generated offspring.\\
+Unlike previous algorithms, this allows chromosomes to work together to achieve a \\solution: previously each chromosome was independent, now their mutation is interdependent. Another crucial difference is that each chromosome is now regarded as a point/particle in an n-dimensional space (n being the number of genes). This has no effect on the structure of the chromosome (it's still a tuple of values), but allows us to use vector arithmetic on it (any point in space is a vector from the origin to that point). \\ \\
+The overall flow of the algorithm is: 
+\begin{enumerate}[label=\Alph*]
+\item Create a random initial population and control parameters
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item Apply mutation to each parent to generate a trial vector
+    \item Make new chromosomes via Crossover with parent+trial vector
+    \item Select new population from parents and offspring
+\end{enumerate}
+\item Select the best performing chromosome as the solution\\
+\end{enumerate}
+
+The two control parameters are the scale factor ($\beta$) and the crossover parameter ($P_r$). These are detailed in the following sections. DE hybrids are discussed in a later chapter. 
+
+\subsection{Mutation}
+A mutated vector, known as a \textbf{trial vector}, is generated for each parent. The basic skeleton is:
+
+\begin{align}
+    U_i(t) &= X_{i_1}(t) + \beta * (X_{i_2}(t) - X_{i_3}(t)) \\
+   \text{Trial Vector} &= \text{Target Vector + Scale Factor * Difference Vector} \nonumber     
+\end{align}
+
+Where i is the index of the parent vector, and $i_1$, $i_2$ and $i_3$ are the indices randomly selected vectors from the population $\neq$ i. $\beta$ can take any positive value, but is usually in the range (0.5,2).\\ 
+This mutation automatically scales between exploration and exploitation, as the difference vector shrinks as the particles get closer together. The scale factor helps with this, but early on in the search the difference vectors will be large and may dramatically spread the particles out. Another disadvantage is that the trial vector has nothing to do with the parent, though it is combined with the parent to make the offspring.  
+
+\subsection{Crossover}
+Once the trial vector is generated, it is mated with the parent vector to produce an offspring. Though standard methods like Uniform Crossover, Blending or Double Point Crossover can be used, the usual method for DE is:
+
+\begin{equation}
+    X'_{ij}(t) = 
+    \begin{cases}
+    X_{ij}(t) &,\, \text{if j$\in$J} \\
+    U_{ij}(t) &,\, \text{otherwise}
+    \end{cases}
+\end{equation}
+
+Where $X_{ij}(t)$ is the $j^{th}$ gene of the parent, and $U_{ij}(t)$ is the $j^{th}$ gene of the trial vector. J is a list of indices, and generation methods are shown below (most of which use $P_r$). This method limits the overall amount of change, as opposed to uniform crossover, and blends the entire vector together, as opposed to clearly defined subsections being from each vector. Later in the search  we can expect most genes to be roughly correct, and $P_r$ gives us a tuning parameter to reduce the amount of trial vector influence.
+
+\subsubsection{Random Generation}
+J is a random list of indices $ \in (0, n_x)$, where $n_x$ is the number of genes. In extreme cases this may include every/no indices, and there's no tuning parameter.
+
+\subsubsection{Binomial Crossover (bin)}
+Add a random index to J from $(0, n_x)$, then for every other value $ \in (0, n_x)$ if rand(0,1) $< P_r$ add it to J as well. This guarantees at least one value in J, and $P_r$ gives us a tuning parameter: a high $P_r$  means mostly the offspring is mostly from the parent, a low $P_r$ means mostly from the trial vector. This is fairly similar to Uniform Crossover.
+
+\subsubsection{Exponential Crossover (exp)}
+This provides an adjacent sequence of indices (similar to Double Point Crossover), but this range is generated using $P_r$. 
+\begin{enumerate}
+    \item Randomly add a value i $ \in (0, n_x-1)$ to J
+    \item Do
+    \begin{enumerate}
+        \item Add i+1 to J
+        \item i = (i+1)\%$n_x$
+    \end{enumerate}
+    \item [] while (rand() $< P_r$ and len(J) $< n_x$ )
+\end{enumerate}
+This is exponential as a sequence of length 2 has probability $(P_r)^0$, of length 3 has $(P_r)^1$, and length n $(P_r)^{n-2}$. A high $P_r$ gives us more influence from the parent vector, a low $P_r$ more influence from the trial vector.
+
+\subsection{DE Notation}
+Differential Evolution methods are denoted as DE x/y/z, where x is the method of selecting the target vector in mutation, y is the number of difference vectors and z is the crossover method used.
+
+\subsubsection{Target Vector Selection}
+It was previously mentioned that the target vector for mutation was randomly selected (rand), but this isn't fixed. Another popular method is selecting the best vector ($\hat{X}$)from the population (best).\\
+Rand-to-Best sets the target vector as \(\alpha*\hat{X} + (1-\alpha) * X_{i_1}(t)  \) : $\alpha$ then allows us to tune between exploration (the random vector) and exploitation (the best vector). $\alpha$ can be set to dynamically increase from 0 to 1 as generations increase.\\
+Lastly, current-to-best sets it as \(\beta * (\hat{X} - X_{i_p}(t)) \), where $X_{i_p}(t)$ is the parent vector. This allows the parent to influence the trial vector, and minimises the divergence.
+
+\subsubsection{Difference Vectors}
+The basic formula has a single difference vector, but any number can be chosen, denoted as $n_v$. Using the current-to-best target vector adds another difference, so this is denoted as $1+n_v$.
+
+\subsubsection{Examples}
+\begin{enumerate}
+    \item DE rand-to-best/2/exp
+    \begin{description}
+    \item [Trial Vector Equation] \(\alpha*\hat{X} + (1-\alpha) * X_{i_1}(t) + \beta * (X_{i_2}(t) - X_{i_3}(t)) + \beta * (X_{i_4}(t) - X_{i_5}(t)) \)
+    \end{description}
+    
+    \item DE current-to-best/4/bin
+    \begin{description}
+    \item [Trial Vector Equation] \(\beta * (\hat{X} - X_{i_p}(t)) + \beta * (X_{i_2}(t) - X_{i_3}(t)) + \beta * (X_{i_4}(t) - X_{i_5}(t)) + \beta * (X_{i_6}(t) - X_{i_7}(t)) \)
+    \end{description}
+\end{enumerate}
+
+\subsection{Switching DE}
+Studies have shown that DE rand/1/bin is good for exploring and DE current-to-best/2/bin is good for exploiting. We could swap between them after a fixed number of generations, but the usual method uses probabilities $P_1$ and $P_2 (= 1-P_1)$ to decide which method to use at a generation.
+
+Also defined are $n_1$ and $n_2$ (the total number of offspring used after methods 1 and 2 respectively) and $f_1$ and $f_2$ (the total number of offspring discarded after methods 1 and 2 respectively). 
+
+The first X (normally 50) generations are set as a learning period, with $P_1 = P_2 = 0.5$ and recording values for $n_1, n_2,f_1\text{ and }f_2$. After generation X, the following equations are used:
+
+\begin{align}
+    P_1 &= \frac{n_1 * (n_2+f_2)}{n_1 * (n_2+f_2) + n_2 * (n_1+f_1)} \\
+    P_2 &= 1-P_1 \nonumber
+\end{align}
+
+With some re-arrangement, this is simply \(P_1 = \frac{\text{Method 1 success \%}}{\text{Method 1 success \% + Method 2 success \%}}\)
+
+
+
+

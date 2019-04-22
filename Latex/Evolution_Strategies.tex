@@ -82,8 +82,8 @@ These change according to how well the population is doing: if the quality of th
 \begin{equation}
     \sigma_i(t+1) = 
     \begin{cases}
-    \sigma_i(t) * e^(\frac{1}{3}), & \text{if t=0 or previous mutation was successful} \\
-    \sigma_i(t) * e^(\frac{-1}{12}), & \text{otherwise}
+    \sigma_i(t) * e^{\frac{1}{3}}, & \text{if t=0 or previous mutation was successful} \\
+    \sigma_i(t) * e^{\frac{-1}{12}}, & \text{otherwise}
     \end{cases}
 \end{equation}
 
@@ -93,8 +93,8 @@ Effectively a smarter random walk, this chooses the better of the parent and chi
 \subsubsection{Parameter Mutation Variants}
 \begin{enumerate}
     \item No mutation: this is similar to a GA
-    \item If in the last X generations the good mutation rate $\geq$ 20\%: increase the parameter. Else, decrease it.
-    \item With $n_x$ being the number of genes, $n_m $ being the number of mutations in the last $10n_x$ generations and $0<\alpha<1$,  perform the following every $10n_x$ generations:
+    \item If, in the last X generations, the good mutation rate $\geq$ 20\%, then increase $\sigma$. Else, decrease it.
+    \item With $n_x$ being the number of genes, $n_m $ being the number of good mutations in the last $10n_x$ generations and $0<\alpha<1$,  perform the following every $10n_x$ generations:
     \[
     \sigma_i(t+1) = 
     \begin{cases}
