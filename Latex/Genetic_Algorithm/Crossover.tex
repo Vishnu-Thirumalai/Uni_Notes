@@ -30,7 +30,7 @@ This uses a variable $\beta \in (0,1)$ to combine the genes from the parents (P)
     Child_2[i] &= \beta * P_2[i] + (1-\beta) * P_1[i] \nonumber  
 \end{align}
 
-These values are in the range (P\_1[i], P\_2[i]), so while these generate new values they are still limited to a subset of the search space. $\beta$ can change from generation to generation, etc. 
+These values are in the range $(P\_1[i], P\_2[i])$, so while these generate new values they are still limited to a subset of the search space. $\beta$ can change from generation to generation, etc. 
 
 \subsubsection{Extrapolation}
 This also uses a variable $\beta$, but there's no limit on its value. Children are generated using the below:

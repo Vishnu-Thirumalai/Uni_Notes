@@ -1,0 +1,62 @@
+\section{Ant Colony Optimisation}
+An type of swarm optimisation where the agents mimic ants, using sign-based stigmergy. Though the base form solves shortest path and TSP problems, a large number of problems can be reduced to these forms.\\
+Problems are given in a graph structure, with each edge (i,j) having a cost/length and pheromone concentration ($\tau_{ij}(t)$) associated with it. Also defined are $L^k(t)$, which is the length of the path taken by ant k at generation t, and $N^i_k(t)$, the list of nodes reachable from node i for ant k at gen t. The latter two will become more clear in the next section. \\
+The overall flow of the algorithm is: 
+\begin{enumerate}[label=\Alph*]
+\item Create random initial pheromone concentrations ($\tau_{ij}(0)$)
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item Create and evaluate a path for each ant 
+    \item Evaporate the Pheromones
+    \item Apply feedback to the Pheromones 
+\end{enumerate}
+\item Select the path with the most ants/ the most optimal path\\
+\end{enumerate}
+
+\subsection{Creating an Ant Path}
+At each generation/iteration, a path is created for each ant according to the transition probabilities. These probabilities vary for each method (and are detailed later), but the overall method for shortest path problems is:\\
+\begin{enumerate}
+    \item [I] $X^k(t)$ = \{start\_node\}, i = start\_node
+    \item While i != goal\_node:
+    \begin{enumerate}
+        \item If $N^i_k(t)$ is empty, append the predecessor nodeto i
+        \item Select a node j from $N^i_k(t)$ according to the transition probabilities
+        \item Append (i,j) to $X^k(t)$, i \,=  \,j
+    \end{enumerate}
+    \item Remove all loops from $X^k(t)$
+    \item Calculate $L^k(t)$
+\end{enumerate}
+Removing the loops from $X^k(t)$ affects $L^k(t)$, so care must be taken: for example, there may be two conflicting loops of different lengths, so depending on which one is removed this changes the attractiveness of the path. 
+
+\subsection{Simple Ant Colony Optimisation}
+
+\subsubsection{Transition Probability}
+SACO just uses a pheromone-weighted roulette for its transition probabilities: these are evaluated at each node while creating a path. The probability that ant k chooses edge (i,j) from node i at generation t is:
+
+\begin{equation}
+    P_{ij}^k(t) = 
+    \begin{cases}
+         $$ \frac{\tau_{ij}(t)}{\sum_{ab \in N^i_k(t)} \tau_{ab}(t)} $$ &, if $$ j \in N^i_k(t) $$ \\
+        0 &, otherwise
+    \end{cases}
+\end{equation}
+
+\subsubsection{Pheremone Evaporation}
+This uses a variable, $\rho \in (0,1)$, to determine how much the pheremones evaporate at each stage. The evaporation removes the effects of older pheromones on current probabilities, so for a path to be consistently picked the pheromones on it need to be reinforced.
+
+\begin{equation}
+    \tau_{ij}(t) = (1-\rho) * \tau_{ij}(t)
+\end{equation}
+
+\subsubsection{Pheremone Updates}
+SACO uses a simple update system: pheromones for an edge are increased based on the number of ants that included that edge in their path (path for ant k is $X^k(t)$), and this increase is based on the quality of the ants' solutions. It uses a constant, Q, to moderate the increase in the pheremones. 
+
+\begin{align}
+    \tau_{ij}(t+1) &= \tau_{ij}(t) + \sum_{k \in ants} \Delta \tau_{ij}^k(t) \\
+    \Delta \tau_{ij}^k(t) &= 
+    \begin{cases}
+         $$ \frac{Q}{L^k(t)}  $$ &, if $$ (i,j) \in X^k(t) $$ \\ 
+        0 &, otherwise
+    \end{cases}    
+\end{align}
+

@@ -58,14 +58,15 @@ Global & Non-Uniform Crossover  & Uniform Blending \\ \hline
 \end{table}
 
 \subsubsection{Non-Uniform Crossover}
-Rather than using a single $\mu$, a rank-based cost roulette is used amongst the parents. The top-ranked parent ($P_1$) has $P =0.5$, and the others are generated according to: 
+Rather than using a single $\mu$, a rank-based cost roulette is used amongst the parents. Otherwise this is the same as uniform crossover, selecting each index of the children from a parent. The top-ranked parent ($P_1$) has $P = 0.5$, and the others are generated according to: 
 \[
 P(P_2) > P(P_3) > \dotso > P(P_n)
 \]
 
+
 \subsubsection{Uniform Blending}
 \[
-Child[i] = \frac{1}{\text{Num. of Parents}} * \sum_{k=1}^{n} parent_k[i] 
+Child[i] = \frac{1}{\text{Num. of Parents}} * \sum_{k=1}^{n} parent_k[i]
 \]
 
 \subsection{Mutation}

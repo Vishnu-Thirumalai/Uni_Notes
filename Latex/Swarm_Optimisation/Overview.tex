@@ -1,0 +1,28 @@
+\section{Swarm Optimisation}
+Swarm optimisation/intelligence takes DE a step further: rather than a group of solutions deriving from each other, a group of simple agents collectively find a single optimal solution. A highlight of this method is there is no central control or global model: each agent is a simple individual, and their local interactions cause global patterns to emerge. Some further characteristics are:
+\begin{description}
+\item [Flexible] it can handle internal/external problems and unexpected events
+\item [Resilient] even if some agents fail to complete, the overall system will continue
+\item [Self-Organised] Paths to solutions aren't predefined: the system discovers the correct method 
+\end{description}
+
+\subsection{Self-Organisation}
+By using simple individual mechanisms, the interactions of the agents form structures on the global level of the system without external planning or control. 
+\begin{enumerate}
+    \item Positive Feedback: good solutions are highlighted and reinforced
+    \item Negative Feedback: introduce a time scale to the algorithm by reducing the effects of older feedback, prevents early/premature convergence on local optima
+    \item Exploration and diversity are amplified, by moving randomly then falling into the positive feedback loops
+    \item Agents communicate with each other, directly or indirectly
+\end{enumerate}
+
+\subsection{Stigmergy}
+Stigmergy is a method of indirect agent communication by modifying the environment the agents are in. These may trigger certain actions from the receiving agents, or simply be positive/negative feedback. There are two main types:
+\begin{description}
+    \item[Sematectonic] Communicate via changing the physical environment (the current state of the solution).e.g. well-travelled routes show more wear and tear
+    \item[Sign-Based] Communicate via signalling mechanisms.e.g laying a trail of breadcrumbs on the travelled route
+\end{description}
+
+\subsection{Binary Bridge Experiment}
+An example of the above is the binary bridge experiment: there are two paths from the start to the goal, one longer than the other. The agents in this case are ants, which leave a pheromone behind them as they travel (Sign-Based Stigmergy). This pheromone attracts other ants, which increases the probability that future ants pick that path.\\
+The ants reach the goal then return to the source via the same path. As the shorter path will have ants completing their journey faster, more pheromones will be deposited, which attracts more ants until eventually every agent takes the shorter path. The pheromones dissipate after a while (negative feedback), so the longer path will slowly lose attractiveness while the shorter is constantly reinforced.\\ 
+There is no guarantee that the ants will always pick the path with more pheromones though: a small random chance is added to pick a previously  unexplored path, to prevent a scenario where the initial ants only traverse the longer path, and all ants only pick that path.

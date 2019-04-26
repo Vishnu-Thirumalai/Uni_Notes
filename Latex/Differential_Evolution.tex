@@ -43,7 +43,15 @@ Where $X_{ij}(t)$ is the $j^{th}$ gene of the parent, and $U_{ij}(t)$ is the $j^
 J is a random list of indices $ \in (0, n_x)$, where $n_x$ is the number of genes. In extreme cases this may include every/no indices, and there's no tuning parameter.
 
 \subsubsection{Binomial Crossover (bin)}
-Add a random index to J from $(0, n_x)$, then for every other value $ \in (0, n_x)$ if rand(0,1) $< P_r$ add it to J as well. This guarantees at least one value in J, and $P_r$ gives us a tuning parameter: a high $P_r$  means mostly the offspring is mostly from the parent, a low $P_r$ means mostly from the trial vector. This is fairly similar to Uniform Crossover.
+This approach is similar to uniform crossover, but uses $P_r$ as opposed to $\mu$. This approach guarantees at least one value in J (so some mutation), and $P_r$ gives us a tuning parameter: a high $P_r$  means mostly the offspring is mostly from the parent, a low $P_r$ means mostly from the trial vector. 
+\begin{enumerate}
+    \item Randomly add a value x $ \in (0, n_x)$ to J
+    \item for i in range(0, $n_x$):
+    \begin{enumerate}
+        \item if ( i!= x \&\& rand() $< P_r$)
+        \item [] \texttt{   Add i to J}
+    \end{enumerate}
+\end{enumerate}
 
 \subsubsection{Exponential Crossover (exp)}
 This provides an adjacent sequence of indices (similar to Double Point Crossover), but this range is generated using $P_r$. 
@@ -73,12 +81,12 @@ The basic formula has a single difference vector, but any number can be chosen, 
 \begin{enumerate}
     \item DE rand-to-best/2/exp
     \begin{description}
-    \item [Trial Vector Equation] \(\alpha*\hat{X} + (1-\alpha) * X_{i_1}(t) + \beta * (X_{i_2}(t) - X_{i_3}(t)) + \beta * (X_{i_4}(t) - X_{i_5}(t)) \)
+    \item [Trial Vector Equation] \(\alpha*\hat{X} + (1-\alpha) * X_{i_1}(t) + [\beta * (X_{i_2}(t) - X_{i_3}(t)) + \beta * (X_{i_4}(t) - X_{i_5}(t))] \)
     \end{description}
     
-    \item DE current-to-best/4/bin
+    \item DE current-to-best/1+2/bin
     \begin{description}
-    \item [Trial Vector Equation] \(\beta * (\hat{X} - X_{i_p}(t)) + \beta * (X_{i_2}(t) - X_{i_3}(t)) + \beta * (X_{i_4}(t) - X_{i_5}(t)) + \beta * (X_{i_6}(t) - X_{i_7}(t)) \)
+    \item [Trial Vector Equation] \(\beta * (\hat{X} - X_{i_p}(t)) + [\beta * (X_{i_2}(t) - X_{i_3}(t)) + \beta * (X_{i_4}(t) - X_{i_5}(t))]\)
     \end{description}
 \end{enumerate}
 

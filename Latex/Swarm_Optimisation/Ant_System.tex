@@ -1,0 +1,60 @@
+\newpage
+
+\subsection{Ant System}
+AS builds off SACO by adding more heuristics for the transition probability and implementing elitism. Most versions also pre-process a list of connections from each node rather than calculating the probability for every edge at every node (even the obviously unreachable ones). 
+
+\subsubsection{Transition Probability}
+As the system pre-processes $ N^i_k(t)$, this doesn't need to be checked at each stage. Instead it uses the inverse of the cost ($\eta_{ij}(t)$ = 1/cost(i,j)) and tuning parameters $\alpha$ and $\beta$. There are two possible methods, both of which are weighted roulettes using $\tau_{ij}(t)$ and $\eta_{ij}(t)$: 
+
+\begin{description}
+\item [Exponent-Based]
+\begin{equation}
+ P_{ij}^k(t) = \frac{\tau_{ij}(t)^\alpha * \eta_{ij}(t)^\beta}{\sum_{ab \in N^i_k(t)} \tau_{ab}(t)^\alpha * \eta_{ab}(t)^\beta} 
+\end{equation}
+\item [Fraction-Based]
+\begin{equation}
+ P_{ij}^k(t) = \frac{\alpha * \tau_{ij}(t) + (1- \alpha) * \eta_{ij}(t)}{\sum_{ab \in N^i_k(t)} \alpha * \tau_{ab}(t) + (1- \alpha) * \eta_{ab}(t)} 
+\end{equation}
+\end{description}
+
+
+\subsubsection{Pheremone Updates}
+AS keeps the same overall equation, but uses a different calculation for $\Delta \tau_{ij}^k(t)$. Again there are three different calculations, each gives slightly different results:
+
+\begin{description}
+\item[Regular (Ant-Cycle)]     
+\begin{equation}
+ \Delta \tau_{ij}^k(t) =  
+    \begin{cases}
+         $$ \frac{Q}{L^k(t)}  $$ &, if $$ (i,j) \in X^k(t) $$ \\ 
+        0 &, otherwise
+    \end{cases}    
+\end{equation}
+
+\item[Density-Based] 
+\begin{equation}
+    \Delta \tau_{ij}^k(t) =  
+    \begin{cases}
+         $$ Q  $$ &, if $$ (i,j) \in X^k(t) $$ \\ 
+        0 &, otherwise
+    \end{cases} 
+\end{equation}
+\item[Quantity-Based]  
+\begin{equation}
+\Delta \tau_{ij}^k(t) =  
+    \begin{cases}
+         $$ \frac{Q}{cost(i,j)}  $$ &, if $$ (i,j) \in X^k(t) $$ \\ 
+        0 &, otherwise
+    \end{cases}    
+\end{equation}
+\end{description}
+
+\subsubsection{Elite Pheromone Updates}
+On top of one of the above updates, AS also gives a special bonus to edges that were on the best path ($X^e(t)$). This is achieved by adding $n_e * \Delta_{ij}^e(t)$ to all paths, where $n_e$ is the number of ants that took the best path. 
+\begin{equation}
+\Delta_{ij}^e(t) = 
+\begin{cases}
+\frac{Q}{L^{X^e}(t)} &, if (i,j) \in X^e(t) \\
+0 &, otherwise
+\end{cases}
+\end{equation}
