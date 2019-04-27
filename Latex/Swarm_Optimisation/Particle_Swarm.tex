@@ -1,0 +1,108 @@
+\section{Co-ordinated Collected Behaviour}
+CCB a behaviour model that was proposed to interpret the movement of swarms or groups of animals (such as a flock of birds or herd of cows). The individuals in these groups only have local knowledge, limited mental facilities and are bound by the laws of physics, but can seamlessly make complicated decisions as a group (for an example, see Starlings in BBC's The Code). By following three simple rules, the behaviour of these groups can be modelled:
+\begin{description}
+\item[Separation] If an agent is too close to a neighbour, it moves away
+\item[Alignment] Each agent aligns itself towards the average alignment of its neighbours (tries to face the average direction)
+\item[Cohesion] Each agent tries to move towards the average position of its neighbours
+\end{description}
+When using this technique in optimisation we can share more data between agents than physical animals can, so agents can use alignments and positions from non-neighbouring agents to find a more optimal solution.
+
+\subsection{Particle Swarm Optimisation}
+PSO is another type of swarm optimisation, but is closer to DE in that each agent is a particle/vector in n-dimensional space and a potential solution. Each agent also has a velocity associated with it, which guides the speed and direction of the search.
+
+The overall flow of the algorithm is: 
+\begin{enumerate}[label=\Alph*]
+\item Create initial agents (with random positions and zero velocities), find the best agent from these
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item Update velocities for each agent
+    \item Update positions for each agent
+    \item Find the personal best for each agent and the local/global best agents
+\end{enumerate}
+\item Select the best agent as the solution\\
+\end{enumerate}
+As previously mentioned, since the algorithm has the data for all of the agents data can be shared between non-neighbouring agents, or neighbours of an agent don't have to be restricted by distance. 
+
+\subsubsection{Global Best PSO}
+Every agent receives information from the entire swarm: this converges quicker (exploitation over exploration). In the implementation of the algorithm, the best particle of each generation ($\hat{y}(t)$) is tracked. Each particle also keeps a track of its personal best position($y_i(t)$ for particle i) since the first generation. Global Best uses less memory and involves less computation than Local Best.
+
+\subsubsection{Local Best PSO}
+Each agent only receives information from its neighbours: this is achieved by forming sub-swarms of particles that share information amongst themselves. The local best for each neighbourhood ($\hat{y_s}(t)$ for neighbourhood s) is tracked, along with the personal best for each particle. As mentioned before, neighbourhoods can be formed in multiple ways:
+\begin{enumerate}
+    \item Agents are grouped by their indices: these groups are easily formed, and groups can share information from all over the search space 
+    \item Agents are grouped by spacial similarity: this is very computationally expensive (usually k-means clustering is used), but groups stay close together and often converge faster
+\end{enumerate}
+Neighbourhoods can also be generated through other methods, by following architectures like Von Neumann/Pyramid or even randomly. The number of neighbourhoods to be generated is another tuning lever (1 neighbourhood is the same as global best) Agents can also be part of multiple neighbourhoods at once: this spreads information between groups for faster convergence. Local Best gives more diversity to solutions and is less likely to be trapped in local minima.
+
+\subsubsection{Velocity Updates}
+An n-dimensional agent has n velocities, and these are all updated at the same time. With $V_i(t)$ as an agent's velocity, $X_i(t)$ as the agent's position and $C_1$ and $C_2$ as acceleration constants, the following is applied to every velocity j of every agent:
+\begin{equation}
+    V_{ij}(t+1) = V_{ij}(t) + C_1 * rand(0,1) * (y_{ij}(t) - X_{ij}(t)) + C_2 * rand(0,1) * (\hat{y}_{j}(t) - X_{ij}(t)) 
+\end{equation}
+$\hat{y}(t)$ is either the local or global best, depending on the variant. The first addition is the \emph{cognitive component} (using the agent's personal best), and the second is the \emph{social component} (using data from other agents). 
+
+\subsubsection{Position Updates}
+Like velocity updates, position updates happen to all agents simultaneously.
+\begin{equation}
+    X_i(t+1) = X_i(t) + V_i(t+1)
+\end{equation}
+
+\subsubsection{Best Updates}
+First, the personal bests for all agents are updated. As optimisation problems are generally regarded as minimisation, a lower valued agent is considered as more optimal.
+\begin{equation}
+    y_i(t+1) =
+    \begin{cases}
+        x_i(t+1) &, f(x_i(t+1)) < f(y_i(t)) \\
+        y_i(t) &, otherwise
+    \end{cases}
+\end{equation}
+The global/local bests are both generated the same way: local best does it once per neighbourhood, global best does it once for the entire swarm. Note that they take the best \emph{personal best}, not the best current agent: it is entirely possible that the global/local best stays constant over multiple generations.
+\begin{equation}
+    \hat{y_i}(t+1) = arg\, min_{a  \in swarm}(f(y_a(t+1)))
+\end{equation}
+
+\subsubsection{Stopping Criteria}
+\begin{enumerate}
+    \item X iterations have been run
+    \item An acceptable solution has been found
+    \item No change in the global best after Y iterations
+    \item Global swarm radius (with global best at center) $\leq$ R .i.e the agents have converged 
+    \item For local best, average sub-swarm size $\geq$ S .i.e agents have converged enough into groups
+    \item Rate of change of global best (\(\frac{f(\hat{y}(t)) - f(\hat{y}(t-1))}{f(\hat{y}(t))}\)) $\leq \varepsilon$
+\end{enumerate}
+
+\subsubsection{Velocity Clamping}
+A control mechanism for PSO, this prevents the velocity from getting too large. As the velocity only grows at each stage (V(t+1) = V(t) + ...), after enough generations velocities will explode in size and cause agents to heavily diverge and only search the boundaries of the solution space. This can be limited with the following step after velocity updates:
+\begin{equation}
+    V_{ij}(t+1) = min(V_{max\,j}, V_{ij}(t+1))
+\end{equation}
+While this stops velocities from becoming too large, it also means that after a point, the magnitude of the velocities becomes constants: this gives agents a limited number of position updates, so doesn't search the entire solution space. $V_{max}$ can be dynamically updated:
+\begin{enumerate}
+    \item If $\hat{y}(t)$ doesn't improve after X generations, reduce $V_{max}$, so the algorithm uses local search to find a better direction
+    \item Exponentially decay the maximum velocity using $n_t$ (max number of generations) and $\alpha$ (user value $>$ 0)
+    \begin{equation}
+        V_{max\,j}(t+1) = \left( 1 - \left(\frac{t}{n_t}\right)^\alpha \right) * V_{max\,j}(t) \nonumber
+    \end{equation}
+\end{enumerate}
+Alternatively, to cap the velocities at $V_{max}$ but still allow some variance (effectively \\ normalise them to the range [0, $V_{max}$]), the following formula is used:
+\begin{equation}
+    V_{ij}(t+1) = V_{max\,j} * \tanh{\left( \frac{V_{ij}(t+1)}{V_{max\,j}} \right)} \nonumber
+\end{equation}
+
+\subsubsection{Inertia Weight}
+Inertia Weight is another control mechanism for PSO to prevent velocity explosions, but unlike Velocity Clamping it doesn't outright restrict the maximum velocity. Using an inertia weight $\omega$, the velocity update step is changed to the following:
+\begin{equation}
+    V_{ij}(t+1) = \omega * V_{ij}(t) + \dots 
+\end{equation}
+Usually $\omega$ is kept less than 1, to decrease the velocity memory of the system, but by making $\omega > 1$ the velocity growth rate can be temporarily increased to speed up the search. Some methods for dynamically updating $\omega$ are:
+\begin{enumerate}
+    \item Randomly changing it at each generation
+    \item Linearly decreasing it from $\omega(0)$ to $\omega(n_t)$, where $n_t$ is again the max. number of generations
+    \begin{equation}
+        \omega(t) = \omega(n_t) + \frac{n_t-t}{n_t} * (\omega(0) - \omega(n_t)) \nonumber
+    \end{equation}
+    \item Non-linearly decreasing with $\omega(0) = X_1$ (e.g 0.9) and another user value $X_2$(e.g 0.4) to control the decrease
+    \begin{equation}
+        \omega(t+1) = \frac{ (\omega(t)-X_2) * (n_t - t) }{ (n_t + X_2)} \nonumber
+    \end{equation}
+\end{enumerate}

@@ -1,5 +1,5 @@
 \section{Ant Colony Optimisation}
-An type of swarm optimisation where the agents mimic ants, using sign-based stigmergy. Though the base form solves shortest path and TSP problems, a large number of problems can be reduced to these forms.\\
+An type of swarm optimisation where the agents mimic ants, using sign-based stigmergy. Though the base form solves shortest path and TSP problems, a large number of problems can be reduced to these forms. Unlike previous methods, the paths taken by the ants are the solutions, not the ants themselves.\\
 Problems are given in a graph structure, with each edge (i,j) having a cost/length and pheromone concentration ($\tau_{ij}(t)$) associated with it. Also defined are $L^k(t)$, which is the length of the path taken by ant k at generation t, and $N^i_k(t)$, the list of nodes reachable from node i for ant k at gen t. The latter two will become more clear in the next section. \\
 The overall flow of the algorithm is: 
 \begin{enumerate}[label=\Alph*]
