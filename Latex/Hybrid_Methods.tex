@@ -1,0 +1,126 @@
+\section{Hybrid Methods}
+As we've seen throughout, many of the algorithms are fairly similar in nature and thus we can apply teachings from one to the other. This section focuses on Hybrid methods for Differential Evolution, but some things can go both ways.
+
+\subsection{Gradient-Based Differential Evolution}
+This method uses the base DE, but adds two more steps: \textbf{Acceleration}, which uses gradient descent to converge faster without compromising on diversity; and \textbf{Migration} which increases the population diversity to escape local minima.
+
+With the new steps, the overall flow of the algorithm is: 
+\begin{enumerate}[label=\Alph*]
+\item Create a random initial population and control parameters
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item \textbf{Apply migration if necessary }
+    \item Apply mutation to each parent to generate a trial vector
+    \item Make new chromosomes via Crossover with parent+trial vector
+    \item Select new population from parents and offspring
+    \item \textbf{Apply acceleration if necessary }
+\end{enumerate}
+\item Select the best performing chromosome as the solution\\
+\end{enumerate}
+
+\subsubsection{Acceleration}
+This method requires the cost function to be differentiable: the gradient of the cost function (f) is represented as $\nabla f$, and a learning rate $\eta(t)$ is also tracked. Acceleration is done right after selection, so chromosomes from generation t and t+1 are both available. With the usual notation of $\hat{x}(t)$ as the best chromosome of a generation, a new vector x(t) is generated:
+
+\begin{equation}
+    x(t) = 
+    \begin{cases}
+        \hat{x}(t+1) &, \text{if $f(\hat{x}(t+1)) < f(\hat{x}(t))$} \\
+        \hat{x}(t+1) - \eta(t)*\nabla f  &,\text{otherwise}
+    \end{cases}
+\end{equation}
+
+The worst vector of generation t+1 is then replaced with x(t): this either duplicates the best vector, or uses gradient descent to find a potentially better one. If the second option is used and it still isn't better than $\hat{x}(t)$, $\eta(t)$ is reduced: once it becomes too small, acceleration is halted since it won't make a difference. 
+\newpage
+\subsubsection{Migration}
+Before mutation, if the population diversity is too low, migration is applied to spread the vectors out. 'Too low' is based on two user constants: $\varepsilon_1$ and $\varepsilon_2$ and the following formulae:
+\begin{align}
+    l_{ij}(t) &= 
+    \begin{cases}
+        1 &, if \frac{(x_{ij}(t) - \hat{x}_j(t))}{\hat{x}_j(t)} > \varepsilon_2 \\
+        0 &, otherwise
+    \end{cases} \\
+    diversity(t) &= \frac{\sum_{i\in vectors(t)-\hat{x}} \sum_{j \in n_x} l_{ij}(t)}{n_x * (n_s-1)}
+\end{align}
+While this looks complex, it can be boiled down fairly simply. $l_{ij}(t)$ is 1 if gene j of vector i is diverse enough from gene j of the best vector, and 0 otherwise. $diversity(t)$ is the fraction of diversity, considering every gene except those in the best vector. If \(diversity(t) < \varepsilon_1\), then migration is applied.\\
+The migration operator itself diversifies around the best vector: if it is applied it means that a majority of vectors are already close enough, so it evenly distributes them in a radius around it. This radius is defined by ($x_{min\, j} and x_{max\, j}$), which are the min and max values for gene j respectively. Using these values, the following formulae are applied to genes/vectors as often as required:
+
+\begin{align}
+    P_j(t) &= \frac{\hat{x}_j(t) - x_{min\, j}}{x_{max\, j} - x_{min\, j}} \nonumber \\
+    x'_{ij}(t) &= 
+    \begin{cases}
+        \hat{x}_j(t) + rand(0,1) * (x_{min\, j} - \hat{x}_j(t)) &, if\; rand() < P_j(t) \\
+        \hat{x}_j(t) + rand(0,1) * (x_{max\, j} - \hat{x}_j(t)) &, \text{otherwise}
+    \end{cases}
+\end{align}
+
+\subsection{Evolutionary/DE Hybrids}
+\begin{enumerate}
+    \item Use bin/exp crossovers in BGA/CGA/ES - as mentioned before these are similar to Uniform and Double Point crossover
+    \item Use CGA/ES mutation to add noise to trial vectors in DE ($X_{max\, j}$ and $X_{min\, j}$ are max/min values for gene j): 
+    \begin{equation}
+        U_{ij}(t) = U_{ij}(t) + (X_{max\, j} - X_{min\, j}) * N_n(0,1)  \nonumber
+    \end{equation}
+    \item Rank-Based Crossover Mutation: effectively a DE with crossover before mutation, like GA/ES. Offspring vectors are generated through crossovers, mutated, then the usual selection takes place.
+\end{enumerate}
+
+\subsubsection{Rank-Based DE Crossovers}
+The vectors are ranked according to cost ascending (i.e for any i, i+1 has a worse cost, and). For $N_s$ there is no i+1, so index 1 is used arbitrarily (to cycle around). $U_{ij}(t)$ is assigned the better of the parent and the offspring. 
+\begin{align}
+    child_{ij}(t) &= X_i(t) + rand(0,1) * (X_{i+1}(t) - X_i(t)) \nonumber \\
+    U_{ij}(t) &= arg\; min (f(X_i(t)), f(child_{ij}(t)))
+\end{align}
+
+\subsubsection{Rank-Based DE Mutation}
+After mutation, selection continues as usual. The mutation is designed to occur less for higher-ranked chromosomes (rank denoted with i) and to mutate a smaller amount for later generations (denoted by t, $n_t$ is max generations). 
+
+\begin{align}
+    P_i &= \frac{N_s +1 -i}{N_s} \nonumber \\
+    X'_{ij}(t) &= 
+    \begin{cases}
+        X_{ij}(t) &, if\; rand(0,1) > P_i \\
+        \begin{cases}
+        X_{ij}(t) + rand(0,1) * e^{\frac{-2t}{n_t}} * (X_{max \, j} - X_{ij}(t)) &, if\; rand(0,1) > 0.5 \\
+        X_{ij}(t) + rand(0,1) * e^{\frac{-2t}{n_t}} * (X_{min \, j} - X_{ij}(t)) &, otherwise
+        \end{cases} &,otherwise
+    \end{cases} 
+\end{align}
+
+\subsection{Particle Swarm DE}
+\begin{enumerate}
+    \item Using the same population, swap/alternate between PSO and DE 
+    \item Update PSO Personal Bests using DE Mutation.
+\end{enumerate}
+
+\subsubsection{PSO Personal Bests with DE Mutation}
+After performing the usual personal best ($y_i(t)$) updates, this method generates a new value using DE mutation and potentially updates the personal best. It uses a user constant $P_m$, which controls the probability of mutating the personal best to be relative to the global best. The personal best for the next generation still checks if the DE mutation produces a better vector before switching to it, so this method can't degrade the solution quality. 
+\begin{align}
+    y'_{ij}(t) &= 
+    \begin{cases}
+        \hat{y_j}(t) + 0.5 * (y_{1j}(t) - y_{2j}(t)) &, if rand() < P_m \\
+        y_{ij}(t) &, otherwise
+    \end{cases} \\
+    y_i(t+1) &= arg \; min(\, f(y_i(t)),\; f(y'_i(t) \,) \nonumber
+\end{align}
+
+
+
+\subsection{Adaptive Differential Evolution}
+
+\subsubsection{Dynamic $\beta$ and $P_r$}
+These decrease as time goes on: reduces the size of difference vectors and crossovers favour the trial vector. Uses a user variable X and max. generations $n_t$.
+\begin{align}
+    P_r(t) &= P_r(t-1) - \frac{P_r(0) - X}{n_t} \\
+    \beta_r(t) &= \beta(t-1) - \frac{\beta(0) - X}{n_t}
+\end{align}
+
+\subsubsection{Self-Adaptive $\beta$}
+$\beta$ is the parameter that controls how much effect the differential vectors have on the trial vectors. Therefore, if the population is close to converging then the trial vectors should be small: so $\beta$ needs to be reduced. We can tell if the population is converging by calculating $abs(\frac{f_{max}}{f_min})$, or  $abs(\frac{f_{min}}{f_max})$ where $f_{max}$ and $f_{min}$ are the lowest and highest costs of the population. As these values start to approach 1 we can infer the population is converging, and thus reduce $\beta$. Two values are used as the costs could be positive, negative or a mix of the two: using a single value requires more complex formulae.
+\begin{equation}
+    \beta(t) = 
+    \begin{cases}
+        max(\beta_{min}, 1- abs(\frac{f_{max}}{f_min})) &, \text{if } abs(\frac{f_{max}}{f_min}) < 1 \\
+        max(\beta_{min}, 1- abs(\frac{f_{min}}{f_max})) &, \text{otherwise}   
+    \end{cases}
+\end{equation}
+
+
