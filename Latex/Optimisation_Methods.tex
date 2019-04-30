@@ -1,0 +1,138 @@
+\section{Analytical Optimisation}
+For any derivable function f(x), we can find the global minima by using f'(x) and f''(x). The extreme points of any functions can be found at f'(x) = 0, and these are local maxima/minima if f''(x) $<0$/$>0$ respectively. If f''(x) = 0, this is a saddle point and we ignore it. To find the global minima, we can simply solve for every extreme point, identify the minima, and choose the lowest value. e.g.
+\begin{align}
+    f(x) &= 5x^3 + 2x^2 - 3x \nonumber \\
+    f'(x) &= 15x^2 + 4x - 3 \nonumber \\
+    & \textbf{This is zero at x = $-3/5$ and x = 1/3.} \nonumber \\
+    f''(x) &= 30x + 4 \nonumber\\
+    & \textbf{f''(-3/) = -14 , f''(1/3) = 14} \nonumber\\
+    & \textbf{f''(1/3) $> 0$, therefore x = 1/3 is the global minima.} \nonumber 
+\end{align}
+
+\subsection{Constrained Optimisation}
+If there are constraints as well (g(x)=c), we can convert the whole problem to a Lagrange function to be solved:
+\begin{equation}
+    L(x, \lambda) = f(x) + \lambda * (g(x) -c)
+\end{equation} 
+
+\subsection{Advantages and Disadvantages}
+\textbf{Advantages:}
+\begin{itemize}
+    \item Very quick
+    \item Will give a perfect answer
+    \item Based off existing math (calculus)
+\end{itemize}
+\textbf{Disadvantages:}
+\begin{itemize}
+    \item Doesn't work with discrete values
+    \item Function must be differentiable
+    \item Every maxima/minima has to be checked
+    \item Doesn't have an easy way to set boundaries
+\end{itemize}
+\newpage
+\section{Numerical Methods}
+
+\subsection{Exhaustive Search}
+This method simply searches the entire space to find the global minima. Obviously, this can only be done on a search space that's finitely large: if a precision isn't given for real numbers, this method can go on infinitely. To reduce the amount of values searched a coarser sample can be taken to find a promising region, then the search refined in that area.\\
+
+This method can't get stuck in local minima, makes no assumptions on the cost function, and can handle discrete/continuous values, but takes a very long time. It also might miss the global minima if the coarser sample chooses the wrong region.
+
+\subsection{Nelder-Mead Downhill Simplex}
+Unlike later methods, this doesn't need f(x) to be differentiable, but does need continuity. It can be applied to an N-dimensional problem (N is the number of inputs to the problem), but this explanation only covers 2-dimensional (f(x,y)). The algorithm keeps track of 3 points at each stage (the simplex), and adjusts these as required till an acceptable solution has been found. These adjustments are detailed in the following sections, followed by the algorithm flow.
+
+At each stage the 3 points are ranked: B(est), G(ood) and W(orst) respectively. Also calculated are M = (B+G)/2 (the midpoint of the line BG), and R = 2M-W (the reflection of W in BG). 
+
+\subsubsection{Simplex Flip}
+Since we've assumed that optimisation problems are minimisation, W will have a higher value than B or G. Therefore, the reflection of W in BG should have a lower value: so the algorithm sets W = R. Flipping follows the gradient of the problem, but doesn't directly use it.
+
+\subsubsection{Simplex Extend}
+If the algorithm would flip, but finds that the new direction is a good one (continuing in it gives further optimisation), it can extend the simplex further in that direction by setting W = 2R-M (effectively 3M-W).
+
+\subsubsection{Contraction}
+If flipping leads to a worse result, that goes against the gradient of the problem: but since it usually follows it, that means that the simplex is near/surrounds a local minima. The algorithm brings W closer to BG by setting it to either (W+M)/2 or (R+M)/2. This either contracts W towards BG, or flips it then contracts it: since it's not sure which side of BG the minima is, the algorithm checks both.
+
+\subsubsection{Shrinking}
+If the point the algorithm would obtain by contraction is worse than leaving it where it is, the algorithm simply shrinks the simplex towards B: it sets W and G to the midpoints of WB and GB respectively.
+
+\subsubsection{Overall Flow}
+\begin{enumerate}[label=\Alph*.]
+    \item Start the simplex in a random position and rank the points as B(est),G(ood),W(orst)
+    \item While f(B) $> const_1$ AND step\_num $< const_2$ :
+    \begin{enumerate}[label=\arabic*.]
+        \item Calculate M = (B+G)/2, R = 2M-W
+        \item if f(R) $<$ f(G) \emph{(is it worth flipping)}
+            \begin{enumerate}
+                \item if f(R) $<$ f(B) \&\& f(2R-M) $<$ f(B) \emph{(is it worth extending)}\\
+                    \textbf{EXTEND} (W = 2R-M)
+                \item else \\
+                    \textbf{FLIP} (W=R)
+            \end{enumerate}
+        \item else
+            \begin{enumerate}
+                \item if f(R) $<$ f(W) \emph{(which side is better for contraction)}\\
+                    \textbf{W=R}
+                \item C = (W+M)/2 \emph{(contraction point)}
+                \item if f(c) $<$ f(w) \emph{(does contraction improve the simplex)}\\
+                    \textbf{CONTRACT} (W=C)
+                \item else \\
+                    \textbf{SHRINK} (W = (W+B)/2, G = (G+B)/2)
+            \end{enumerate}        
+    \end{enumerate}
+    \item take B as the optimised solution
+\end{enumerate}
+
+
+\subsection{Gradient Descent}
+This method requires f(x) to be differentiable, and simply follows the gradient of the search space down to a minima in multiple steps. With $X_k$ being the considered value at step k, $h_k$ being the step size (a scaling factor $> 0$) and $\nabla f(x)$ being the derivative of f(x):
+\begin{equation}
+    X_{k+1} = X_k - h_k * \nabla f(X_k)
+\end{equation}
+The algorithm stops when a set number of generations has passed or $\nabla f(X_k)$ becomes small enough (indicating convergence). Determining $h_k$ is tricky: too small and the search will take a long time, too large and the algorithm may never converge. Gradient Descent has no way to overcome local minima, though a large step size may unintentionally overcome them.
+\newpage
+\subsection{Line Minimisation}
+This is similar to Gradient Descent, but $h_k$ is determined rather than being a user constant. The proof is as below:
+\begin{center}
+    \textbf{Expanding the Taylor series at point $f(X_k)$ and ignoring higher order terms:} \\
+\end{center}
+\begin{align}
+    f(x) &= f(x_k) + f'(x_k) * (x-x_k) + 1/2 * f''(x_k) * (x-x_k)^2 \nonumber \\
+    \frac{f(x) - f(x_k)}{x-x)k} &= f'(x_k) + 1/2 * f''(x_k) * (x-x_k) \nonumber \\
+    \frac{d(f(x))}{dx} &= f'(x_k) + 1/2 * f''(x_k) * (x-x_k) \nonumber 
+\end{align}
+\begin{center}
+    \textbf{The minima of f(x) must be at $\frac{d(f(x))}{dx} = 0$. On re-arranging the above:} \\
+    $X = X_k - \frac{f'(x_k)}{f''(x_k)}$ \\
+\end{center}
+Therefore at each step we can use $X_{k+1} = X_k - \frac{f'(x_k)}{f''(x_k)}$. Comparing this to gradient descent, $h_k = \frac{1}{f''(x_k)}$ . \\
+Line Minimisation is robust and the steps are clearly explained/easy to influence, but as it uses a gradient it also gets stuck in local minima and requires a continuous differentiable f(x).
+ 
+ \newpage
+\section{Random Optimisation}
+
+\subsection{Random Walk}
+This algorithm tracks one point in the N-dimensional space. At each iteration, this algorithm chooses a random direction/step size and compares the result of using it to the current position. If it provides a better result it moves the algorithm's position, if it's worse then there's a chance that it does move. This chance (C) can break the algorithm out of local minima, and can be changed at each generation: if it reduces as the generations increase, the algorithm becomes simulated annealing. \\
+
+For an N-dimensional problem, D (direction) is an NxN diagonal matrix with values of 1 or -1 and h (step size) is a vector of length N. The two are combined by the following equation:
+\begin{equation}
+    X_{k+1} = X_k + D_k \cdot h_k
+\end{equation}
+If $X_{k+1}$ would be outside of the search space, it is either re-done with new random values or set to the closest boundary value. The algorithm stops when a maximum number of generations has been made, the change in X $< \varepsilon_1$, or the change in f(X) $\varepsilon_2$: the latter two usually indicate a plateau in the data, and the random walk will continuously iterate with no improvement. \\ \\
+The overall flow of the algorithm is:
+\begin{enumerate}[label=\Alph*]
+\item Create a random initial point $X_0$, $X_{best} = X_0$
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item Generate $D_k$ and $h_k$, 
+    \item \(T = X_k + D_k \cdot h_k\)
+    \item if f(T) $>$ f($x_k$) \&\& rand(0,1) $<$ C \emph{(Worse point but random chance to move)}\\
+          $x_{k+1}$ = T
+    \item Else 
+    \begin{enumerate}
+    \item $x_{k+1}$ = T
+    \item if f($X_{best}$) > f(T)
+          $x_{best}$ = T
+    \end{enumerate}
+\end{enumerate}
+\item $X_{best}$ is the most optimal solution found
+\end{enumerate}
+As mentioned in the title, random optimisation is very unpredictable: it might provide great results, but there's no guarantee and it could completely miss every minima of the search space. Most of the following algorithms work to use randomness in a controlled manner.

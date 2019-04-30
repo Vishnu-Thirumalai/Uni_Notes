@@ -1,0 +1,35 @@
+\section{What is Optimisation?}
+Optimisation is adjusting the inputs to a problem to find an optimal output. Putting this into mathematical terms, given a function $f(x)$ find a value for x that maximises or minimises $f(x)$. This value is normally subject to various constraints ($g(x)$). Most optimisation algorithms deal with minimisation, so to convert a maximisation problem to a minimisation we simply multiply it by -1 .i.e $-1*f(x)$ . 
+
+\subsection {Local vs. Global Minima}
+Optimisation methods try to find the \textbf{global minima} for a problem: this is the lowest value of $f(x)$ in the search space (the range of values permitted by the constraints). However, while doing so they may find \textbf{local minima}, which are the lowest value of $f(x)$ according to their neighbours. A real-world example is the lowest point on earth: a well is lower than its immediate surroundings, but it's very shallow compared to the Mariana Trench. If an optimisation method finds a local minima, it may assume that it is the global minima and stop searching: so algorithms have to take care to avoid this.
+
+\subsection{Exploitation vs. Exploration}
+All guided searching algorithms try to strike a balance between these.\\
+\emph{Exploitation} is taking known factors and using them to intensify them search: for example, on finding a good potential solution, search the area around it for better solutions. This allows us to follow trends in the search space, but often leads to being stuck in local minima.
+\emph{Exploration} involves diversifying the search by visiting previously unknown areas and trying different values to discover potentially better solutions. Doing this too much leads to an effectively random search, but in moderation this allows us to identify and break out of local minima.
+
+\subsection{Example: Least Squares Problem}
+\begin{center}
+    Minimise \(f(x) = \| Ax-B \|_2^2  \) \\
+    Where A, x and B are vectors/matrices, and $\|x\|_p^q = (\sqrt[\leftroot{-3}\uproot{3}p]{\sum_{x \in X}x^p})^q$
+\end{center}
+Since we're using squares, we can safely say the minimum value of $f(x)$ is 0: so if we can find $x \Rightarrow f(x)=0$, we've found the global minima. Using matrix maths:
+
+\begin{align}
+    f(x) &= (Ax - B)^T \cdot (Ax - B) = (x^TA^T-B^T) \cdot (Ax-B) \nonumber \\
+        &= x^TA^TAx - x^TA^TB - B^TAx + B^TB \nonumber \\
+        &= x^TA^TAx - 2* x^TA^TB + B^TB \;(x^TA^TB = B^TAx \text{ in scalar values i.e f(x)}) \nonumber \\
+\triangle f(x) &= \frac{\triangle x^TA^TAx}{ \triangle x} - \frac{\triangle 2* x^TA^TB}{ \triangle x} + \frac{\triangle B^TB}{ \triangle x} \nonumber \\  
+&= x \cdot (A^TA + AA^T) - 2* A^TB = 2 * ( xA^TA - A^TB) \nonumber \\
+&= 0 \text{ at } x = (A^TA)^{-1} A^TB \nonumber 
+\end{align}
+
+Therefore for this problem, rather than using an algorithm we can simply solve for \(x = (A^TA)^{-1} A^TB\) . For more complex problems (e.g find the best pairing of body features for an insect to survive the Sahara Desert), this isn't quite as simple.
+
+\subsection{Example: Linear Programming}
+\begin{center}
+    Minimise f(x) subject to constraints g(x) \\
+    Where f(x) = $C^Tx$, $i \geq 0\; \forall i \in x$ and constraints are of the form \(a^Tx \leq b\)
+\end{center}
+There are efficient analytical methods to solve to solve linear programming problems, but are out of scope.

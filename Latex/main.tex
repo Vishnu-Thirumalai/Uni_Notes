@@ -22,11 +22,8 @@
 
 \maketitle
 
-\section{Exploitation vs. Exploration}
-All guided searching algorithms try to strike a balance between these.
-\emph{Exploitation} is taking known factors and using them to intensify them search: for example, on finding a good potential solution, search the area around it for better solutions. This allows us to follow trends in the search space, but often leads to being stuck in local minima.
-
-\emph{Exploration} involves diversifying the search by visiting previously unknown areas and trying different values to discover potentially better solutions. Doing this too much leads to an effectively random search, but in moderation this allows us to identify and break out of local minima.
+\include{Optimisation_Overview}
+\include{Optimisation_Methods}
 
 \include{Genetic_Algorithm/Overview}
 \include{Genetic_Algorithm/Binary_Strings}
@@ -39,6 +36,7 @@ All guided searching algorithms try to strike a balance between these.
 \include{Genetic_Algorithm/Schema_Theorem}
 
 \include{Evolution_Strategies}
+
 \include{Differential_Evolution}
 
 \include{Swarm_Optimisation/Overview}
