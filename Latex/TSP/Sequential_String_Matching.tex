@@ -1,0 +1,78 @@
+\section{Sequential String Matching}
+Checking if a string x is present in string y. This can be done naively in O($|x||y|$), by checking x against each position of y. If there is a mismatch, we increment the checking position of x by 1 and check again.
+
+
+\subsection{MP Algorithm}
+Since we know that that the prefix of s repeats on per(s), we can instead shift by the per of the portion of the string that matched. Since we know that the shifted part matches, we don't need to check it again, so we can then just start checking from the border of the string. In the algorithm, we generate the border for each substring of x and use that to shift/check.\\ \\
+\textbf{Border Algorithm} (where border[i] represents the border for substring x[0:i]):
+\begin{enumerate}[label=\Alph*]
+    \item Border[0] = -1 \emph{(This is where the string doesn't match at all, so we start checking from the beginning.)}
+    \item for i in range (0, $|x|$):
+\begin{enumerate}[label=\arabic*]
+    \item j = border[i] \emph{(We know that any border is either border(s) or a border for border(s), so we can use previous values to speed up the search)}
+    \item while j$\geq0$ and x[i]$\neq$x[j]: 
+    \item[ ] $\;$j = border[j]    
+    \item border[i+1]=j+1 
+\end{enumerate}    
+\end{enumerate}
+In the algorithm, we 'shift' x to the border[$|s|$], were s was the length of the match between x and y. This effectively moves the start of x by per(s), and the next iteration checks from after the matching section. \\ \\
+\textbf{MP(x,y)}:
+\begin{enumerate}[label=\Alph*]
+    \item i = 0, j = 0 \emph{(i tracks the position in x, j tracks the position in y)}
+    \item while j $<$ $|y|$:
+\begin{enumerate}[label=\arabic*]
+    \item while $i=|x|$ or $x[i]\neq x[j]$ : \emph{($i=|x|$ to move per(x) after finding a full match, $x[i]\neq x[j]$ for a mismatch)}
+    \item[ ] $\;$ j = border[j]    
+    \item border[i+1]=j+1 
+\end{enumerate}    
+\end{enumerate}
+e.g.
+x = abacabacab, y = ababacadab, u = matching substring \\
+j=0, i=0 $\rightarrow$ u=a \\
+j=1, i=1 $\rightarrow$ u=ab \\
+j=2, i=2 $\rightarrow$ u=aba \\
+j=3, i=3 $\rightarrow$ mismatch: i = border[3] = 1 \\
+j=4, i=2 $\rightarrow$ u = ab \\
+\vdots \\
+j=8, i=6 $\rightarrow$ u = abacaba \\
+j=9, i=7  $\rightarrow$ mismatch: i = border[7] = 3 \\
+j=10, i=4 $\rightarrow$ mismatch: i = border[4] = 1 \\
+\vdots
+
+\subsection{KMP Algorithm}
+The KMP Algorithm uses strict borders and interrupted periods, but is otherwise the same. 
+\begin{description}
+    \item[Interrupted Period] A period of the string where the repeat doesn't finish $(|s| - |strict\_border(s)|)$
+    \item[Strict Border] For a string x and substring u, w is a strict border for u if:
+    \begin{enumerate}
+        \item w is a border for u
+        \item wt is a prefix for x, ut is not (t is a single character)
+    \end{enumerate}
+    Effectively, a strict border is one where the border doesn't continue past the end of the string. If we consider u=x, all borders are strict borders. 
+\end{description}
+\textbf{Strict Border Algorithm} (where KMP\_next[i] represents the strict border for substring x[0:i]):
+\begin{enumerate}[label=\Alph*]
+    \item kmp\_next[0] = -1, k = 0 \emph{(This is where the string doesn't match at all, so we start checking from the beginning.)}
+    \item for i in range (0, $|x|$):
+\begin{enumerate}[label=\arabic*]
+    \item if x[i] = x[k]: 
+    \begin{enumerate}
+        \item kmp\_next[i] = kmp\_next[k] 
+    \end{enumerate}
+    \item else:
+    \begin{enumerate}
+        \item kmp\_next[i] = k
+        \item do\\      
+             $\; \; \; \; k = kmp\_next[k]$\\
+             while $k\geq 0$ and $x[i]\neq x[k]$    
+    \end{enumerate}
+    \item k = k+1
+\end{enumerate} 
+\item kmp\_next[m] = k
+\end{enumerate}
+\textbf{k} marks the end of the border as a prefix, \textbf{i} as a suffix: if they're the same it's not a strict border so we can re-use values, if they're different that means we've found a strict border, but have to re-calculate the distance between k and i.
+
+\subsection{String Matching Automaton}
+To find the string x in y, we make an automaton that accepts the sequence x, then give in the letters of y till a match is found. For space efficiency, we try to find the smallest automaton possible. Forward transitions imply a match, and backward transitions occur on a mismatch: we can make these smarter using periods and borders. \\
+
+Each state of the automaton represents u, a prefix of x, and the transitions each represent a letter t. Forward arcs go from u to ut if ut is a prefix of x, and to the initial state ($\varepsilon$) otherwise. Backward arcs go to vt, where vt is the longest suffix of ut that is a prefix of x (effectively a strict border of u).

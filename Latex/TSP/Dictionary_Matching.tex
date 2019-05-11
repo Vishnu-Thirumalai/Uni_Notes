@@ -1,0 +1,35 @@
+\section{Dictionary Matching}
+Rather than matching a single string, this method matches multiple strings (a dictionary) from a known language. The output is the full set of occurrences of every string in the dictionary in the given string. 
+\begin{description}
+    \item[Trie ($\tau(X)$)] A tree where each node represents a prefix of a string from X (a list of strings): it essentially matches to every string in X
+    \item[Dictionary Matching Automaton (D(X))] An automaton where each state is a \\prefix of a string in X, terminal states represent the strings in X, and arcs are in the form: (source, transition, destination) \\
+        The destination for a transition T from a source U is the longest suffix of UT that matches prefix of a string in X. It's effectively a multiple string matching automaton.
+\end{description}
+
+\subsection{DMA With Failure Function}
+In a basic DMA, a lot of links are repeated, so we can reuse them using relations between the nodes. If we get to a node U that doesn't have a forward transition for T, we can go to fail[U] and apply T there, rather than directly moving to h(UT). fail[U] is pre-computed for every U with \textbf{TargetByFail}(fail[u], a), and is done in a breadth-first manner (a is the last character of U). The generation algorithm is: \\ \\
+\textbf{TargetByFail(U,T)}:
+\begin{enumerate}[label=\Alph*]
+    \item while $u \neq Nil$ and $transition(U,T) = None$ \emph{(U is a non-empty string which doesn't have a transition for T)}
+\begin{enumerate}[label=\arabic*]
+    \item [] U = fail[U]
+\end{enumerate}    
+    \item if $U = Nil$
+ \begin{enumerate}[label=\arabic*]
+    \item [] return Initial State \emph{(The algorithm is unable to find a match, return to the empty string)}
+\end{enumerate} 
+    \item [] else
+ \begin{enumerate}[label=\arabic*]
+    \item [] return transition(U,T) \emph{(We found a match, so apply T and move on)}
+\end{enumerate} 
+\end{enumerate}
+Nil is a constant which means 'go to initial state', and we set fail[$\varepsilon$]= Nil. \\  This method also easily allows us to identify terminal states: if fail[X] is a terminal state, then X is a terminal state. \\ \\ Rather than separately checking if there is a valid transition, the algorithm calls \\ TargetByFail at each step since if there is a valid transition it will just apply it.\\ \\
+To further optimise transitions:
+\begin{enumerate}
+    \item If fail[x] doesn't have the required transition, we can set fail[x] = fail[fail[x]]
+    \item If every transition from x and fail[x] all lead to the same place, we can set fail[x] = fail[fail[x]
+\end{enumerate}
+
+
+
+

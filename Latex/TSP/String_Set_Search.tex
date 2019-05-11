@@ -1,0 +1,94 @@
+\section{Searching through a Set of Strings}
+The inverse of dictionary searching, this takes a lexicographically (alphabetically) sorted set of strings (L) and either:
+\begin{itemize}
+    \item Searches for a string X, and if not present finds where it would be placed
+    \item Finds the strings that have a string X as a prefix
+\end{itemize}
+The methods use LCP(a,b), which is the longest common prefix between strings a and b.
+
+\subsection{Binary Search}
+An simple method that uses constant space and is $O(|x|*log|L|)$ is binary search.\\
+\textbf{Binary Search(L, X)} 
+\begin{enumerate}[label=\Alph*]
+    \item d=-1, f=$|L|$
+    \item while $d+1<f$:
+\begin{enumerate}[label=\arabic*]
+    \item \(i = int((d+f)/2)\), \( l = lcp(x,L[i]) \)
+    \item if $l= |x|$ and $l= |L[i]|$:
+ \begin{enumerate}
+    \item [] return i \emph{(The LCP of both strings = length of both strings, so they're equal)}
+\end{enumerate} 
+    \item [] else if $l= |L[i]|$ OR ($l\neq |x|$ and $L[i][l] < x[l]$):
+ \begin{enumerate}
+    \item [] d = i \emph{(L[i] matches but is shorter than X OR L[i] partially matches, and the next character is smaller in L[i] than X $\rightarrow$ X is lexicographically greater than L[i])}
+\end{enumerate} 
+    \item [] else 
+ \begin{enumerate}
+    \item [] f = i 
+\end{enumerate} 
+\end{enumerate}  
+\item return (d,f) \emph{(X isn't in the list of strings, but if it was would be between d and f (f=d+1))}
+\end{enumerate}
+
+\subsection{Binary Search Tree}
+To make the above easier for multiple searches, and for use in the next algorithm, we can make a binary search tree of indices. Each node is of the form(d,f).
+\begin{description}
+    \item [Root:] (-1, $|L|$)
+    \item [Children:] (int(d+f/2),f) , (d,int(d+f/2))
+    \item [Leaves:] (x,x+1)
+\end{description}
+
+
+\subsection{LCP Search}
+Effectively the Binary Search with some extensions, this method reduces the overall number of iterations and comparisons by making more use of LCPs. In addition to d, f and i, the algorithm keeps track of $l_d$ and $l_f$, the LCP between X and L[d]/L[f] respectively.\\ \\
+The algorithm uses the following three cases, all of which assume that \(l_d < x < l_f\) (x is somewhere between d and f) and use $l_{if} = lcp(L[i],L[f])$:
+\begin{enumerate}
+    \item \(l_d \leq l_{if} < l_f \rightarrow\) x has more in common with f than i does with f $\rightarrow$ move d=i \\
+    X is somewhere between i and f, and $l_i$ = $l_{if}$
+    \item \(l_d \leq l_f < l_{if} \rightarrow\) x has less in common with f than i does with f $\rightarrow$ move f=i \\     
+    X is somewhere between d and i, and $l_i$ = $l_{f}$
+    \item \(l_d \leq l_f < l_{if} \rightarrow\) f has the same prefix for x and i $\rightarrow$ check L[i] and x from index $l_f$         
+\end{enumerate}
+These cases can also be flipped, checking against d rather than f. \\ \\
+\textbf{LCP Search(L, X)} 
+\begin{enumerate}[label=\Alph*]
+    \item d=-1, f=$|L|$, $l_d$=0, $l_f$=0 \\ \emph{(Since L[d] and l[f] don't exist, lcp with anything is 0 by default)}
+    \item while $d+1<f$:
+\begin{enumerate}[label=\arabic*]
+    \item \(i = int((d+f)/2)\), \( l_{if} = lcp(L[i],L[f]), l_{id} = lcp(L[i],L[d])  \)
+    \item if \(l_d \leq l_{if} < l_f\): \emph{(Case 1)}
+ \begin{enumerate}
+    \item [] d=i, $l_d$=$l_if$ \emph{(Move d up, $l_d=l_i=l_{if}$)}
+\end{enumerate} 
+    \item [] else if \(l_d \leq l_f < l_{if}\): \emph{(Case 2)}
+ \begin{enumerate}
+    \item [] f = i \emph{(Move f down, $l_f$ already equals $l_i$)}
+\end{enumerate} 
+    \item [] else if \(l_f \leq l_{id} < ld\): \emph{(Case 1 flipped for d)}
+ \begin{enumerate}
+    \item [] f=i, $l_f$=$l_id$ \emph{(Move f down, $l_f=l_i=l_{id}$)}
+\end{enumerate} 
+    \item [] else if \(l_f \leq ld < l_{id}\): \emph{(Case 2 flipped for d)}
+ \begin{enumerate}
+    \item [] d = i \emph{(Move d up, $l_d$ already equals $l_i$)}
+\end{enumerate} 
+    \item [] else \emph{(Case 3 for both, so a manual check)}
+ \begin{enumerate}
+    \item $l = max(l_d,l_f)$ 
+    \item $l = l +$ lcp(x[l:],L[i][l:]) \emph{(We know the first $l$ match, so check after that)}
+    \item if $l= |x|$ and $l= |L[i]|$:
+ \begin{enumerate}
+    \item [] return i 
+\end{enumerate} 
+    \item [] else if $l= |L[i]|$ OR ($l\neq |x|$ and $L[i][l] < x[l]$):
+ \begin{enumerate}
+    \item [] d = i, $l_d=l$
+\end{enumerate} 
+    \item [] else 
+ \begin{enumerate}
+    \item [] f = i, $l_f=l$ 
+\end{enumerate} 
+\end{enumerate} 
+\end{enumerate}  
+\item return (d,f) \emph{(X isn't in the list of strings, but if it was would be between d and f)}
+\end{enumerate}

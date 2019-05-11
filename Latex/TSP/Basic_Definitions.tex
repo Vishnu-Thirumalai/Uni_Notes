@@ -1,0 +1,90 @@
+\section{Alphabet and String descriptions}
+
+\subsection{Foundations}
+An \textbf{alphabet} ($\sum$) is a finite non-empty set. Members of an alphabet are  called \textbf{letters}. A sequence of letters is called a \textbf{string}.
+
+The set of all possible strings from an alphabet $\sum$ is represented with $\sum^*$: this includes the \textbf{empty string} (a sequence of length 0), which is denoted with $\varepsilon$. Lastly, the length of a string s is denoted as $|s|$, which means strings can be indexed with s[i] \emph{(zero-indexed)}. \textbf{e.g.}
+
+\begin{align}
+    \sum\nolimits^* \text{ for } \sum\nolimits = {0,1} &: {\varepsilon,0,1,00,01,10,11,000,\dots,01100011,1001010,\dots} \nonumber\\
+    \text{Strings of length 2 from} \left(\sum\nolimits = {a,b,c}\right) &:  {aa,ab,ac,ba,bb,bc,ca,cb,cc} \nonumber
+\end{align}
+
+\subsubsection{String Operators/Definitions}
+x, y, u and v are strings for all of the below.
+ 
+\begin{description}
+    \item[Identity] \emph{x=y}, which denotes: \(|x|=|y|\) and \(x[i] = y[i]\; \forall i \in[0, |x|)\) \\
+        \textbf{e.g} decaf=decaf, han $\neq$ hands
+    \item[Concatenation] xy denotes the letters of x followed by the letters of y \\
+        \textbf{e.g} concat(play,ground) = playground
+    \item[Factor/Substring] x is a factor of y if y can be written as uxv for some u,v \\
+        \textbf{e.g} port is a factor of sports: s + port + s
+    \item[Proper Factor] x is a factor of y and $x\neq y$ (i.e u and v aren't both $\varepsilon$)\\
+         \textbf{e.g} hall is a factor of hall, all is a proper factor
+    \item[(Proper) Superstring] If x is a (proper) factor of y, y is a (proper) superstring of x\\
+        \textbf{e.g} hikers is a superstring of hikers and a proper superstring of ike
+    \item[Prefix] x is a prefix of y if y can be written as xv for some v\\
+        \textbf{e.g} boy is a prefix of boyfriend
+    \item[Suffix] x is a suffix of y if y can be written as ux for some u\\
+        \textbf{e.g} ring is a suffix of earring    
+    \item[Occurrence] if x is a factor of y, x \emph{occurs} in y. We can mark these occurrences by the start position (first letter of x in y) or end position (last letter of x in y). \\ \textbf{e.g} ab occurs in abacbab at (0,6) for start positions and (1,7) for end positions
+\end{description}
+\newpage
+\subsection{Powers and Primitives}
+
+\begin{description}
+    \item[Powers] For a string x, $x^0$ is $\varepsilon$ and $x^k$ is $x^{k-1}$: essentially, $x^n$ is x repeated n times, so is undefined for negative numbers.\\
+     Similar to real numbers, if $x^a = y^b$ and $a>0, b>0 $ then x and y are both powers of another string z.\\
+        \textbf{e.g} ab$^3$ = ababab, aa$^2$ = aaaa$^1$ \text{(both are powers of a)} 
+    \item[Primitive] A primitive string is one that isn't a power of any other string (i.e if x=$a^b$, then a =x and b=1). A test for this is if the string x only appears twice (as a prefix and suffix) in x$^2$
+    \item[Root and Exponent] A non-empty string x can be written as $(root)^{exponent}$, where the root is a primitive string.\\
+        \textbf{e.g} abc = abc$^1$ , abababab = ab$^4$ 
+\end{description}
+
+\subsection{Conjugate Strings}
+Two non-empty strings x and y are conjugate if they can be written if x = uv and\\ y = vu for some strings v,u (Implying that x and y are the same length). v or u can be $\varepsilon$, but not both. 
+\begin{align}
+    \text{x and y are conjugate} &\iff \text{root(x) and root(y) are conjugate} \nonumber \\ 
+    \text{x and y are conjugate} &\iff \text{there is a z such that xz=zy} \nonumber 
+\end{align}
+
+Proof of the first:
+\begin{enumerate}
+    \item [$\implies$] Given: x = uv = a$^n$, y = vu = b$^m$. \\This implies a has the same prefix as u and suffix as v
+    \item [$\impliedby$] Given root(x) = ab , root(y) = ba $\rightarrow$ x = (ab)$^n$, y=(ba)$^n$.\\ We can write these as x = a(ba)$^{n-1}$b, (ba)$^{n-1}$ba.\\ With u = a and v = (ba)$^{n-1}$b, x=uv and y = vu.    
+\end{enumerate}
+
+Proof of the second:
+\begin{enumerate}
+    \item [$\implies$] Given: x = uv, y = vu. By appending u: xu = uvu, uy = uvu $\rightarrow$ z = u
+    \item [$\impliedby$] Given: xz = zy. Therefore we know that either x and z have a common prefix, or x is a prefix for z $\rightarrow$ x = ab, z = $x^{n}a$ (n=0 means common prefix, else x is prefix). 
+    \begin{align}
+        xz &= zy \; \; \; \; \emph{(Expanding z)}\nonumber \\
+        xx^{n}a &= x^{n}ay \; \; \; \; \emph{(Removing $x^{n}$ from prefix of both sides)}\nonumber \\
+        xa &= ay \; \; \; \; \emph{(Expanding x)} \nonumber \\
+        aba &= ay \; \; \; \; \emph{(Removing a from prefix of both sides)} \nonumber \\
+        ba &= y \nonumber
+    \end{align}
+\end{enumerate}
+
+\subsection{Periods and Borders}
+\begin{description}
+    \item[Period] p such that x[i] = x[i+p] $\forall i \in [0,x-p)$ . i.e the length of a substring that repeats itself within x (note that it need not finish repeating). By definition, $|x|$ is a period of x for any string x.
+    \item[per(x)] The smallest period of a string.
+    \item[Border] a proper factor of x that is a prefix and a suffix (these can overlap)
+    \item[border(x)] The longest border of a string.
+    \item[*] per(x) + $|border(x)|$ = $|x|$
+\end{description}
+e.g. x = abbacabba $\rightarrow$ Periods = [6,10]; Borders:[$\varepsilon$, a, abba] \\
+e.g. x = aabaabaa $\rightarrow$ Periods = [3,6,7,8]; Borders:[$\varepsilon$, a, aabaa] \\ \\
+Using the above descriptions, we can say that any border for a string s is either:
+\begin{itemize}
+    \item border(s)
+    \item A border of border(s)
+\end{itemize}
+We can also describe a period p of a string s as:
+\begin{itemize}
+    \item s is a prefix of y$^k$, where y is a string of length p
+    \item s = yw = wz, where y and z are strings of length p and w is the border
+\end{itemize}

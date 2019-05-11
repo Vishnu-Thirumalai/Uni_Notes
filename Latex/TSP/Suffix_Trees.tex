@@ -1,0 +1,137 @@
+\section{Suffix Trees}
+For a string X, a suffix tree is a Trie for the set of suffixes of X (normally represented as $X_{[0\dots n]}$). One application of such a tree is string matching: any substring of X has to be a prefix of a string in $X_{[0\dots n]}$. \\ \\
+Naively constructing a tree gives $O(n^2)$ nodes: the following algorithm brings that to $O(n)$, with the following assumptions/constraints:
+\begin{itemize}
+    \item The alphabet's size is constant
+    \item All the nodes that represent a suffix will be leaves
+    \item No suffix is a prefix for another suffix : this can be achieved by adding a new character that is not part of the language (usually \$) to the end of the string \\
+\end{itemize}
+Some notation for the rest of the section:
+\begin{description}
+    \item [$\boldsymbol{S_u}$] String represented by node u
+    \item [child(u,c)] node connected from u where the connecting edge starts with character c
+    \item [parent(u)] node that connects to u
+    \item [depth(u)] $|S_u|$
+    \item [start(u)] starting position of $S_u$ in X
+    \item[$\boldsymbol{S_u} =$] T[start(u) : start(u)+depth(u)-1]
+    \item [edge(parent(u), u) = ] $S_u$[depth(parent(u) : ] 
+\end{description}
+
+\subsection{Locus}
+In the context of a suffix tree, a locus is a pair (u,d) where: 
+\begin{equation}
+    depth(parent(u)) < d \leq depth(u) \nonumber
+\end{equation}
+Effectively, it represents the node (and string) that would be at depth d along the edge (parent(u), u) in the uncompacted tree. Every factor of X has a locus in the suffix tree.
+
+\subsection{Brute Force Construction}
+To make a tree, we add in suffixes one at a time, starting from the longest:
+\begin{enumerate}
+    \item If the new suffix has a prefix in common with an existing suffix, we find the locus where they diverge, make a new node there, then make a leaf connected to that
+    \item Otherwise, or if there are no existing nodes, we make a leaf connected to the root \\
+\end{enumerate}
+
+\textbf{BruteForce($T_{[0\dots n]}$)}:
+\begin{enumerate}[label=\Alph*]
+    \item root = empty\_node(), depth(root) = 0
+    \item u=root, d=0
+    \item for i in range(0, n):
+\begin{enumerate}[label=\arabic*]
+    \item while $d = depth(u)$ and $child(u,T[i+d])\, exists$: \emph{(Common Prefix)}
+    \begin{enumerate}
+        \item u = child(u,T[i+d]), d+=1
+        \item while $d < depth(u)$ and T[start(u)+d] = T[i+d]: \emph{(Traverses till it finds the difference)}
+        \begin{enumerate}
+            \item [] d+=1
+        \end{enumerate} 
+    \end{enumerate}
+    \item if $d < depth(u)$:
+    \begin{enumerate}
+        \item [] u = CreateNode(u,d)
+    \end{enumerate}    
+    \item CreateLeaf(i,u,d)
+    \item u=root, d=0
+\end{enumerate}    
+\end{enumerate}
+In the brute-force algorithm, to add a suffix S, if it finds a node (say N) with a common prefix it traverses $S_N$ till it finds a difference or reaches the end of the string. If it finds a difference it creates the new node then a leaf, otherwise it creates a leaf node at the end. \\ \\
+However, if it reaches the end of the string that means S=$S_N$ (which is impossible, two suffixes can't be identical) or S is a prefix of $S_N$ (also impossible due to our assumption). It only reaches the end of a string after it breaks out of the loop in 1: if it fully matches a string before that it means a locus so it just loops, and so there are no issues. \\ \\
+
+\subsection{Suffix Links}
+For a node u, slink(u) is the node n where $S_n$ is the longest proper suffix of $S_u$ . For the root, this is undefined, but set as slink(root) = root. \\
+If we take slink(u) = $S_u$[1:] for all u, depth(slink(u)) = depth(u)-1. Below is the proof that this exists for all u:
+
+\begin{itemize}
+    \item Leaf Nodes: Every suffix is present, so this is trivially true
+    \item Internal Nodes: If an internal node u exists, there's a division after a character c between two edges. This character (and split) will re-appear in any suffix of $S_u$ that contains c: including $S_u[1:]$, so a node $S_u[1:]$ will be created
+\end{itemize}
+\newpage
+\textbf{ComputeSuffixLink(u)}:
+\begin{enumerate}[label=\Alph*]
+    \item d = depth(u), v = slink(parent(u))
+    \item while $depth(v) < d-1$:
+        \begin{enumerate}
+            \item [] v = child(v, X[start(u)+depth(v)+1]) \emph{The next node in the substring u[1:]}
+        \end{enumerate}     
+    \item if $depth(v) > d-1$: \emph{If the algorithm overshot and s[1:] doesn't exist yet}
+        \begin{enumerate}
+            \item [] Create the node s[1:], v = new node
+        \end{enumerate}     
+    \item slink(u) = v    
+\end{enumerate}        
+The algorithm effectively goes to the suffix link for the parent, then traverses nodes to find the required suffix link. If it hasn't been created yet, it finds the first node that overshoots (i.e u[s:1]+x) then inserts a new node before that.
+
+\subsection{McCreight's Algorithm}
+Effectively the Brute-Force algorithm with a single improvement: rather than searching from the node at each iteration, it instead goes to the suffix link of the leaf's parent (which by definition will be a prefix of the next suffix to be added to the tree) and finds the divergence from there. If the leaf's parent doesn't have a suffix link, it creates one at the same time it creates the leaf.
+
+\textbf{BruteForce($T_{[0\dots n]}$)}:
+\begin{enumerate}[label=\Alph*]
+    \item root = empty\_node(), depth(root) = 0
+    \item u=root, d=0, slink(root) = root
+    \item for i in range(0, n):
+\begin{enumerate}[label=\arabic*]
+    \item while $d = depth(u)$ and $child(u,T[i+d])\, exists$: \emph{(Common Prefix)}
+    \begin{enumerate}
+        \item u = child(u,T[i+d]), d+=1
+        \item while $d < depth(u)$ and T[start(u)+d] = T[i+d]: \emph{(Traverses till it finds the difference)}
+        \begin{enumerate}
+            \item [] d+=1
+        \end{enumerate} 
+    \end{enumerate}
+    \item if $d < depth(u)$:
+    \begin{enumerate}
+        \item [] u = CreateNode(u,d)
+    \end{enumerate}    
+    \item CreateLeaf(i,u,d)
+    \item if slink(u) =  null:
+        \begin{enumerate}
+        \item [] slink(u) = ComputeSuffixLink(u)
+    \end{enumerate}  
+    \item u=slink(u), d=max(d-1,0)
+\end{enumerate}    
+\end{enumerate}
+d = max(d-1,0) is the same as d = depth(slink(u)), since the suffix link is either one shorter or the root, 
+
+\subsection{Generalised Suffix Tree}
+To create a single suffix tree for multiple strings, just use a different ending character (e.g $\$_1$,$\$_2$) for each. Both the brute-force and McCreight's algorithms can be used.
+
+\subsection{Suffix Tree Applications}
+
+\subsubsection{String Matching}
+As mentioned before, string matching on the string becomes trivial. If x is the string to be found, simply find how many leaf nodes are descendants of x: that gives the number of occurrences of x in the string.
+
+\subsubsection{Number of Distinct Substrings}
+This method requires an uncompacted tree: the number of nodes is the number of distinct substrings. In a compacted tree, the number of nodes + the number of loci, since loci are effectively uncompacted tree nodes. 
+
+\subsubsection{Longest non-unique substring}
+Since we know that all leaves are unique, and the closer to the start of the tree the shorter the string, the longest repeating substring is the deepest internal node. Any internal node implies that the string is a prefix for two (or more) substrings, so we know that it's non-unique.
+
+\subsubsection{Common Substrings}
+In a generalised suffix tree, each string has a unique ending character (e.g $\$_1$,$\$_2$). If an internal node is an ancestor of leaves with different ending characters, it's a common substring to the string corresponding to each character. Similary, the longest common substring is the deepest internal node with leaves with each ending character. 
+
+\subsubsection{Matching Suffix Arrays}
+If we've pre-processed $T_{[0...N]}$, we can efficiently match $S_{[0...N]}$ against it. i.e if each suffix of S is present in T. The standard would be to just try to match each string, but since we know that $S_{n+1} = S_n[1:]$, we can use suffix links.
+
+The algorithm follows $S_n$ as far as possible: when it hits a mismatch at depth j (i.e S[n:j]), take the suffix link of node at j (i.e S[n+1:j]). If there is no mismatch, then all $S_m$ where $m > n$ are present.
+
+\subsubsection{Longest Common Prefix Between Suffixes}
+For two suffixes of S, namely $S_i$ and $S_j$, the longest common prefix is the deepest internal node that leads to both leaves. For more than two suffixes, it's the deepest internal node that lead to all the leaves.
