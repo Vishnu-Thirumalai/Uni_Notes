@@ -49,6 +49,7 @@ After that, we compute d(u) for each u: first we try to find the periods (Case 1
     \end{enumerate}  
 \end{enumerate}    
 \end{enumerate}
+
 \newpage
 \subsubsection{Bad-Character}
 Unlike every other table so far, this stores a value DA for each character in $\sum$. DA[c] for a character c in x is index of the right-most occurrence in $x[0:|x|-2]$, \textbf{with the indices reversed }.i.e the distance between the right-most occurrence in $x[0:|x|-2]$ and the end of $x[0:|x|-2]$. This guarantees that $DA[c] \geq 2$ If c doesn't appear in x, DA[c]=$|x|$.\\
@@ -56,4 +57,84 @@ To convert from DA[c] to the shift:
 \begin{equation}
     Shift = DA[c]-|x|+1+i 
 \end{equation}
-Where i is the mismatched position in x (this is the regular index, even though the checking is done from left to right), and c is the mismatched character in y. 
+Where i is the mismatched position in x (this is the regular index, even though the checking is done from right to left), and c is the mismatched character in y. 
+
+\subsection{Algorithm + Performance}
+With the pre-processed shifts the algorithm is relatively simple: it checks each window from right to left, then uses whichever shift gives it a larger right shift.\\
+\textbf{BM(x,y)}:
+\begin{enumerate}[label=\Alph*]
+    \item \(j = 0  \)
+    \item while \(j < |y| - |x|\):
+\begin{enumerate}[label=\arabic*]
+    \item i = $|x|-1$ \emph{(j/i are for y/x respectively)}
+    \item while $i \geq 0$ and $x[i]=y[i+j]$: \emph{(Checking left to right)}
+    \begin{enumerate}
+        \item [] i++
+    \end{enumerate}    
+    \item if $i = -1$: 
+    \begin{enumerate}
+        \item print(X is present in Y at j)
+        \item j+=per(x)
+    \end{enumerate}      
+    \item else:
+    \begin{enumerate}
+        \item [] j+= max(D[i], DA[y[j+i]]-m+i+1)
+    \end{enumerate}  
+\end{enumerate}    
+\end{enumerate}
+At worst, this is $O(|x||y|)$: but it's usually closer to $3|y|$, and at best can be $\frac{|y|}{|m|}$. It's better than MP/KMP for natural language processing, but for periodic sequences like DNA it's worse.
+
+\newpage
+\section{Karp-Robin Algorithm}
+One weakness of most algorithms is that they have to check each character of x and y at each stage. The Karp-Robin instead hashes x, then compares it with the hash of the window in y: only if they're the same (so the strings are similar) does it compare the actual characters. \\ 
+An immediate downside of this is that the window can only be shifted by 1 each time, since we can't use periods/borders/any other shortcuts on the string, However, by building a hash such that each hash can be constructed from the previous one, this algorithm can become very efficient: even O(n) on average.
+
+\subsection{Constructing the Hash}
+A hash is a function that converts from some range of values to a limited set of integers. Using a modulus is a  popular hash function, as x\%y converts any integer x to the range (0,y-1). It's not perfect though, as \(x\%y=z\%y\) does not imply $x=y$, which might provide false positives. \\
+A useful property of the modulus is: 
+\begin{equation}
+    ((x\%q) + (y\%q)) \% q  = (x+y) \% q \nonumber
+\end{equation}
+Using this property, we can make a hash such that the hash of $x[i_1:i_2]$ can be used to generate the hash of $x[i_1+1:i_2+1]$. The hash for a string s, using user-parameters d and q, is:
+\begin{equation}
+    hash(s) = (\sum_{i=0}^{|s|-1} (int)s[i] * d^{m-1-i})\; \boldsymbol{\%}\; q \nonumber
+\end{equation}
+Effectively, convert each character to a number (this could be ASCII, or more likely custom-based on the language), multiply it by the appropriate power of d (so each position has a weight . i.e $hash(ab)\neq hash(ba)$), then modulus the whole thing. The weight to each position and each character having a custom value makes the hash for each string quite unique before modulus, but without the modulus the numbers could quickly become very large. \\
+To generate the next hash (removing s[0] and adding c, the next character in the searched string):
+\begin{equation}
+    new\_hash = ((hash(s) - ((int)s[i]*d^{m-1})) * d + (int) c)\; \boldsymbol{\%}\; q \nonumber
+\end{equation}
+Effectively, remove the first term (which has weight $d^{m-1}$), increase each character's weight in the hash by one position, then add in the new character with weight 1 (implying the last position) and modulus the whole hash. By the above modulus properties, this is the same as just generating the new hash, but is $O(1)$ rather than $O(n)$.
+\newpage 
+\subsection{Algorithm + Performance}
+Again, with the hash the algorithm is relatively simple: shift the window by 1 at each iteration, and if the hashes are equal check the characters.
+\textbf{KR(x,y,d,q)}:
+\begin{enumerate}[label=\Alph*]
+    \item \(h_x=0, h_y=0, D = d^{|x|-1}  \)
+    \item for i in range(0, $|x|-1$): \emph{(Generating hash(x) and initial hash(y))}
+    \begin{enumerate}
+        \item \(h_x = h_x * d + (int) x[i] \)
+        \item \(h_y = h_y * d + (int) y[i] \)
+    \end{enumerate}    
+    \item for j in range(0,\(|y|-|x|\)): \emph{(Since the window starts at j, we don't need windows starting at the last $|x|$ chars)}
+\begin{enumerate}[label=\arabic*]
+    \item if $h_x$ = $h_y$
+    \begin{enumerate}
+        \item i = 0
+        \item while $i < |x|$ and $x[i]=y[i+j]$: \emph{(Checking left to right)}
+        \begin{enumerate}
+            \item [] i++
+        \end{enumerate}      
+        \item if $i = |x|$: 
+        \begin{enumerate}
+           \item print(X is present in Y at j)
+        \end{enumerate}          
+    \end{enumerate}
+    \item if \(j!= |y|-|x|\): \emph{(y[i+j] is out of bounds)}
+    \begin{enumerate}
+        \item \(h_y = (h_y - (y[j]* D) )* d + (int) y[i] \)
+    \end{enumerate}  
+\end{enumerate}    
+\end{enumerate}
+Again, at worst this is $O(|x||y|)$ if the hash is terrible (e.g. hash(s) = 1). However, if $q \geq m$ and assuming that the strings are evenly distributed in the range (0,q) by \textbf{\%q}, then the number of false positives is at worst n/q (all the strings with equal hashes are false matches). The algorithm is then $O(n + \frac{nm}{q})$, so overall $O(n)$. \\
+This algorithm is also great for multiple string searching: we generate a hash for each string to be found, and they can all be compared at the same time, rather than running through and checking for each string separately. 

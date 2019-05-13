@@ -23,7 +23,11 @@ In the algorithm, we 'shift' x to the border[$|s|$], were s was the length of th
 \begin{enumerate}[label=\arabic*]
     \item while $i=|x|$ or $x[i]\neq x[j]$ : \emph{($i=|x|$ to move per(x) after finding a full match, $x[i]\neq x[j]$ for a mismatch)}
     \item[ ] $\;$ j = border[j]    
-    \item border[i+1]=j+1 
+    \item i++, j++
+    \item if $i==|x|$
+    \begin{enumerate}
+        \item print(X occurs in Y at (j-i)))
+    \end{enumerate}
 \end{enumerate}    
 \end{enumerate}
 e.g.
