@@ -1,0 +1,59 @@
+\section{Boyer-Moore Algorithm}
+One of the most generally efficient string matching algorithms, variations of this are often used in text editor for find/replace. Unlike previous algorithms, it checks the pattern from \textbf{right to left}. It still looks for the pattern from the beginning of the string (moves the window \textbf{left to right}), but within the window it checks from right to left. \\
+When the algorithm finds a mismatch/matches the entire string, it uses one of two shifts to move the window to the right. For both of these, we take the original/search strings as y/x, the left-most position of the window as j (i.e y[j] is compared against x[0]), and $|x|$ as m. 
+
+\subsection{Good-Suffix Shift}
+Assuming the mismatch happens at x[i] (y[i+j]), we can say that the substrings\\ x[i+1:m-1] and y[j+i+1:j+m-1] are equal. This string is stored as u, and the mismatched character from y as c. The window is shifted so that the right-most occurrence of u in x with a different preceding character lines up with y[j+i+1:j+m-1]. This occurrence is normally to the left of the currently aligned u, so the window is shifted to the right to align it with u in y. The right-most is to prevent accidentally skipping over a match. \\
+If there isn't such an occurrence, instead find the longest suffix of u that matches a prefix of x and align them: x is shifted to the right to match u in y. U is a suffix of x, and we're trying to align it with a prefix of x: this is finding a border, so we shift by per(x).
+
+\subsection{Bad-Character Shift}
+Again assuming the mismatch happens at x[i] (y[i+j]), we store the mismatched character from y as c. The window is shifted to align y[i+j] with the right-most occurrence of in x[0:m-2]. Again, the right-most is to prevent accidentally skipping over a match. If there is no occurrence of c in x, j is set to j+m+1: effectively shifting the entire string by its full length.
+
+\subsection{Pre-Processing}
+Both of these shifts can be pre-processed for the search string (x), and the algorithm checks the table for both to decide which gives the larger shift. 
+
+\subsection{Good-Suffix}
+Since this uses suffixes of x, we denote each suffix of x as $U_i$. We then define d(u) = $min|z|$ such that:
+\begin{enumerate}
+    \item TUZ is a suffix of X, but TU isn't a suffix of x
+    \item [] OR
+    \item x is a suffix of uz
+\end{enumerate}
+Z is a string matching one of these conditions, T is an single character belonging to $\sum$. Using the above, we get d(u) = per(uz).\\ \\
+Proof of the above:
+\begin{enumerate}
+    \item Since uz and u are both suffixes of x, and $uz > u$, u is a suffix of uz $\rightarrow$ therefore also a border of uz, and z is a period for uz. \\ Also, since we're searching left to right, and TU isn't a suffix of x, T can't be the character that caused the mismatch. Therefore this gives us the an occurrence of u to the left of the current position that has a different preceding character. Since we're looking for $min|z|$, this gives us the first occurrence.  
+    \item Since u is a suffix of x and x is a suffix of uz, u is also a suffix of uz $\rightarrow$ This means u is a border of uz, so z is a period of uz. \\
+    This gives us the a suffix of u that matches a prefix of x. Since we're looking for $min|z|$, this gives us the longest suffix.
+\end{enumerate}
+Z effectively shifts U to the left, to align it with a new occurrence or find the longest prefix. Since this new occurrence is to the left in X, we shift X to the right to line it up with Y. Since U shifts by $|z|$, and we have to shift all of X to align U in the same way, we shift $|x|-|z|$: in rare cases this might be less than 0, so we set the shift to min(0, $|x|$-$|z|$). \\
+
+\noindent To efficiently compute this, we compute the suffix table for x (see section \ref{sec:Suffix_Table}). 
+After that, we compute d(u) for each u: first we try to find the periods (Case 1), and then check to see if it's more efficient to find prefixes of x in its suffix (Case 2).\\ \\
+\textbf{Compute\_D(suff)}:
+\begin{enumerate}[label=\Alph*]
+    \item \(|X| = m, j=0, D[i] = m\; \forall\; i \)
+    \item for i in range(m-1, 0):
+\begin{enumerate}[label=\arabic*]
+    \item if $ \text{suff}[i] = i+1 $:  \emph{This is a border: see the bottom of \ref{sec:Suffix_Table}}
+    \begin{enumerate}
+        \item [] while \( j < m-i-1\) \emph{i+1 is a border, $|x|-i-1$ is a period. This loop runs through the length of this period.}
+        \begin{enumerate}
+            \item D[j] = m-i-1 \emph{Sets each member of the period string to the period (Case 1) (i.e the shift to get the same character)}
+            \item j ++
+        \end{enumerate}    
+    \end{enumerate}    
+    \item for i in range(0, m-2)
+    \begin{enumerate}
+        \item D[m-suff[i]-1] = m-i-1 \emph{m-suff[i]-1 is the appearance of that character at x[m-i-1] in the suffix of the prefix x[0:1] (Case 2) (m-i-1 is the shift to match them)}
+    \end{enumerate}  
+\end{enumerate}    
+\end{enumerate}
+\newpage
+\subsubsection{Bad-Character}
+Unlike every other table so far, this stores a value DA for each character in $\sum$. DA[c] for a character c in x is index of the right-most occurrence in $x[0:|x|-2]$, \textbf{with the indices reversed }.i.e the distance between the right-most occurrence in $x[0:|x|-2]$ and the end of $x[0:|x|-2]$. This guarantees that $DA[c] \geq 2$ If c doesn't appear in x, DA[c]=$|x|$.\\
+To convert from DA[c] to the shift:
+\begin{equation}
+    Shift = DA[c]-|x|+1+i 
+\end{equation}
+Where i is the mismatched position in x (this is the regular index, even though the checking is done from left to right), and c is the mismatched character in y. 

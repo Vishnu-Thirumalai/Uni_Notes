@@ -1,0 +1,82 @@
+\section{Table of Prefixes}
+A \textbf{Prefix Table} for a string X is a table t such that:
+\begin{equation}
+    t[i] = | lcp( X, X[i:]) | \nonumber
+\end{equation}
+i.e the length of the lcp between X and suffix $X_i$. Naively, this can be constructed in $O(n^2)$, but by using previously computed values this can be $O(n)$. \\ \\
+
+\subsection{Proofs for Algorithm}
+For $i > 1$:
+\begin{align}
+    g &= max(j+t[j], 0< j <i) \nonumber \\ 
+    f &= j \emph{(This is the j from g)} \nonumber
+\end{align}
+Using the above values, X[f:g-1] is a prefix of X of length t[j] (g-1-f = t[j], and we know t[j] is the length of a match). Therefore, X[f:g-1] is a border of X[0:g-1]. \\ \\
+Using the above, if $\boldsymbol{i < g}$ we can say that:
+\begin{equation}
+    t[i] = 
+    \begin{cases}
+        pref[i-f] &, if pref[i-f] < g-i \\
+        g-i &, if pref[i-f] > g-i \\
+        g-i + |lcp(x[g-i:|x|-1], x[g:|x|-1]| &, otherwise
+    \end{cases} \nonumber
+\end{equation}
+As a border, x[0:t[f]]=x[f:f+t[f]-1]. Since f+t[f]=g and $i<g$, i $\in$ x[0:t[f]].  
+\begin{enumerate}
+    \item If t[i-f] $<$ g-i, then the entire match occurs within x[0:t[f]]. The same match will occur for t[i] since it's the same string, so we just copy the value. 
+    \item g-i is the distance between i and the mismatch. The same match occurs for t[i], so we know that the new string only matches till g as well, so the length of the match is g-i.
+    \item The match occurs to the end of the substring in the original, but we don't know if it ends or continues to match, so we check the remainder.
+\end{enumerate}
+\newpage
+\subsection{Prefix Table Algorithm}
+\textbf{Prefixes(X)}:
+\begin{enumerate}[label=\Alph*]
+    \item \(pref[0]= |X|, g=0, f = undefined\)
+    \item for i in range(1, n):
+\begin{enumerate}[label=\arabic*]
+    \item if $ i < g$ and $pref[i-f] \neq g-i $:
+    \begin{enumerate}
+        \item [] pref[i] = min(pref[i-f],g-i) \emph{(Case 1 and 2)}
+    \end{enumerate}    
+    \item else:
+    \begin{enumerate}
+        \item g = max(g,i),   f=i \emph{(if $i < g$ Case 3, otherwise regular comparison)}
+        \item while \( g < |x| \) and \( x[g] = x[g+f]\)
+        \begin{enumerate}
+            \item [] g++ 
+        \end{enumerate}   
+        \item pref[i] = g-f
+    \end{enumerate}  
+\end{enumerate}    
+\end{enumerate}
+This algorithm runs in $O(|x|)$: ii can run at most $|x|$ times across the entire run since g only increases, and B only runs $|x|$ times, so the total is $O(2|x|-1)$. \\ \\
+This algorithm can also be used for string matching: append the pattern to be found P to the string S, then find pref[i]=len(P).
+
+\subsection{Suffix Table + Algorithm} \label{sec:Suffix_Table}
+Similar to the prefix table, a \textbf{Suffix Table} is a table t for a string X such that:
+\begin{equation}
+    t[i] = | lcs( X, X[0:i]) | \nonumber
+\end{equation}
+i.e the length of the longest common suffix between X and prefix X[0:i]. Using a similar method to the prefix table, this can be generated in O(n). \\ \\
+\textbf{Suffixes(X)}:
+\begin{enumerate}[label=\Alph*]
+    \item \(|X| = m, \text{suff}[m-1]= m, g = m-1 , f = undefined \)
+    \item for i in range(m-2, 0):
+\begin{enumerate}[label=\arabic*]
+    \item if $ i > g $ and $\text{suff}[i + m - f -1] \neq i-g $:
+    \begin{enumerate}
+        \item [] pref[i] = min(\text{suff}[i + m - f -1] ,i-g) \emph{(Case 1 and 2)}
+    \end{enumerate}    
+    \item else:
+    \begin{enumerate}
+        \item g = min(g,i),   f=i \emph{(if $i > g$ Case 3, otherwise regular comparison)}
+        \item while \( g > 0 \) and \( x[g] = x[g+m-f-1]\)
+        \begin{enumerate}
+            \item [] g -= 1 
+        \end{enumerate}   
+        \item \text{suff}[i] = f-g
+    \end{enumerate}  
+\end{enumerate}    
+\end{enumerate}
+One thing to note about the suffix table is if that suff[i]=i+1, then x[0:i] is a border: if the longest common suffix between x and the prefix x[0:i] is the prefix itself (the length of the prefix is i+1), then that's a border.
+

@@ -83,7 +83,7 @@ The algorithm effectively goes to the suffix link for the parent, then traverses
 \subsection{McCreight's Algorithm}
 Effectively the Brute-Force algorithm with a single improvement: rather than searching from the node at each iteration, it instead goes to the suffix link of the leaf's parent (which by definition will be a prefix of the next suffix to be added to the tree) and finds the divergence from there. If the leaf's parent doesn't have a suffix link, it creates one at the same time it creates the leaf.
 
-\textbf{BruteForce($T_{[0\dots n]}$)}:
+\textbf{McCreight($T_{[0\dots n]}$)}:
 \begin{enumerate}[label=\Alph*]
     \item root = empty\_node(), depth(root) = 0
     \item u=root, d=0, slink(root) = root
