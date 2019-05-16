@@ -7,7 +7,7 @@ Assuming the mismatch happens at x[i] (y[i+j]), we can say that the substrings\\
 If there isn't such an occurrence, instead find the longest suffix of u that matches a prefix of x and align them: x is shifted to the right to match u in y. U is a suffix of x, and we're trying to align it with a prefix of x: this is finding a border, so we shift by per(x).
 
 \subsection{Bad-Character Shift}
-Again assuming the mismatch happens at x[i] (y[i+j]), we store the mismatched character from y as c. The window is shifted to align y[i+j] with the right-most occurrence of in x[0:m-2]. Again, the right-most is to prevent accidentally skipping over a match. If there is no occurrence of c in x, j is set to j+m+1: effectively shifting the entire string by its full length.
+Again assuming the mismatch happens at x[i] (y[i+j]), we store the mismatched character from y as c. The window is shifted to align y[i+j] with the right-most occurrence of c in x[0:m-2]. Again, the right-most is to prevent accidentally skipping over a match. If there is no occurrence of c in x, j is set to j+m+1: effectively shifting the entire string by its full length.
 
 \subsection{Pre-Processing}
 Both of these shifts can be pre-processed for the search string (x), and the algorithm checks the table for both to decide which gives the larger shift. 
@@ -22,9 +22,9 @@ Since this uses suffixes of x, we denote each suffix of x as $U_i$. We then defi
 Z is a string matching one of these conditions, T is an single character belonging to $\sum$. Using the above, we get d(u) = per(uz).\\ \\
 Proof of the above:
 \begin{enumerate}
-    \item Since uz and u are both suffixes of x, and $uz > u$, u is a suffix of uz $\rightarrow$ therefore also a border of uz, and z is a period for uz. \\ Also, since we're searching left to right, and TU isn't a suffix of x, T can't be the character that caused the mismatch. Therefore this gives us the an occurrence of u to the left of the current position that has a different preceding character. Since we're looking for $min|z|$, this gives us the first occurrence.  
+    \item Since uz and u are both suffixes of x, and $uz > u$, u is a suffix of uz $\rightarrow$ therefore also a border of uz, and z is a period for uz. \\ Also, since we're searching left to right, and TU isn't a suffix of x, T can't be the character that caused the mismatch. Therefore this gives us the an occurrence of u to the left of the current position that has a different preceding character. Since we're looking for $min|z|$, this gives us the rightmost occurrence.  
     \item Since u is a suffix of x and x is a suffix of uz, u is also a suffix of uz $\rightarrow$ This means u is a border of uz, so z is a period of uz. \\
-    This gives us the a suffix of u that matches a prefix of x. Since we're looking for $min|z|$, this gives us the longest suffix.
+    This gives us a suffix of u that matches a prefix of x. Since we're looking for $min|z|$, this gives us the longest suffix.
 \end{enumerate}
 Z effectively shifts U to the left, to align it with a new occurrence or find the longest prefix. Since this new occurrence is to the left in X, we shift X to the right to line it up with Y. Since U shifts by $|z|$, and we have to shift all of X to align U in the same way, we shift $|x|-|z|$: in rare cases this might be less than 0, so we set the shift to min(0, $|x|$-$|z|$). \\
 
@@ -35,19 +35,19 @@ After that, we compute d(u) for each u: first we try to find the periods (Case 1
     \item \(|X| = m, j=0, D[i] = m\; \forall\; i \)
     \item for i in range(m-1, 0):
 \begin{enumerate}[label=\arabic*]
-    \item if $ \text{suff}[i] = i+1 $:  \emph{This is a border: see the bottom of \ref{sec:Suffix_Table}}
+    \item if $ \text{suff}[i] = i+1 $:  \emph{(This is a border: see the bottom of \ref{sec:Suffix_Table})}
     \begin{enumerate}
-        \item [] while \( j < m-i-1\) \emph{i+1 is a border, $|x|-i-1$ is a period. This loop runs through the length of this period.}
+        \item [] while \( j < m-i-1\) \emph{(i+1 is a border, $|x|-i-1$ is a period. This loop runs through the length of this period.)}
         \begin{enumerate}
-            \item D[j] = m-i-1 \emph{Sets each member of the period string to the period (Case 1) (i.e the shift to get the same character)}
+            \item D[j] = m-i-1 \emph{(Sets each member of the period string to the period (Case 1) (i.e the shift to get the same character))}
             \item j ++
         \end{enumerate}    
     \end{enumerate}    
+\end{enumerate}    
     \item for i in range(0, m-2)
     \begin{enumerate}
-        \item D[m-suff[i]-1] = m-i-1 \emph{m-suff[i]-1 is the appearance of that character at x[m-i-1] in the suffix of the prefix x[0:1] (Case 2) (m-i-1 is the shift to match them)}
+        \item [] D[m-suff[i]-1] = m-i-1 \\ \emph{(m-suff[i]-1 is the appearance of that character at x[m-i-1] in the suffix of the prefix x[0:1] (Case 2) (m-i-1 is the shift to match them))}
     \end{enumerate}  
-\end{enumerate}    
 \end{enumerate}
 
 \newpage

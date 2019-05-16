@@ -37,9 +37,8 @@ Any regular expression can be converted to an NFA, and vice-versa.
 \subsection{McNaughton and Yamada's Construction}
 \begin{enumerate}
     \item Add a subscript to each character
-    \item Make a table of potential successors for each character
-    \item Identify Start/End Characters for a pattern
-    \item Using 2 for transitions and 3 for start/initial state transitions, construct the NFA
+    \item Make a table of potential successors for each character, and the possible Start/End Characters
+    \item Construct the NFA
     \item Remove the subscripts
 \end{enumerate}
 \textbf{e.g.}
@@ -64,16 +63,8 @@ $a_7$ & END \\ \hline
 \end{tabular}
 \label{tab:Regex2.23}
 \end{table}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Regex/Regex24.png}
-    \label{fig:Regex2.4}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Regex/Regex25.png}
-    \label{fig:Regex2.5}
-\end{figure}
+\includegraphics[width=\textwidth]{Regex/Regex24.png}
+\includegraphics[width=\textwidth]{Regex/Regex25.png}
 \begin{description}
     \item[Good] $|s|+1$ states , no $\varepsilon$-transitions
     \item[Bad] Making the table can be $O(|s| + |s|^2)$

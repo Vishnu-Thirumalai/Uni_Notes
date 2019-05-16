@@ -70,9 +70,9 @@ If we take slink(u) = $S_u$[1:] for all u, depth(slink(u)) = depth(u)-1. Below i
     \item d = depth(u), v = slink(parent(u))
     \item while $depth(v) < d-1$:
         \begin{enumerate}
-            \item [] v = child(v, X[start(u)+depth(v)+1]) \emph{The next node in the substring u[1:]}
+            \item [] v = child(v, X[start(u)+depth(v)+1]) \emph{(The next node in the substring u[1:])}
         \end{enumerate}     
-    \item if $depth(v) > d-1$: \emph{If the algorithm overshot and s[1:] doesn't exist yet}
+    \item if $depth(v) > d-1$: \emph{(If the algorithm overshot and s[1:] doesn't exist yet)}
         \begin{enumerate}
             \item [] Create the node s[1:], v = new node
         \end{enumerate}     

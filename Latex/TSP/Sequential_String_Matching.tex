@@ -22,7 +22,7 @@ In the algorithm, we 'shift' x to the border[$|s|$], were s was the length of th
     \item while j $<$ $|y|$:
 \begin{enumerate}[label=\arabic*]
     \item while $i=|x|$ or $x[i]\neq x[j]$ : \emph{($i=|x|$ to move per(x) after finding a full match, $x[i]\neq x[j]$ for a mismatch)}
-    \item[ ] $\;$ j = border[j]    
+    \item[ ] $\;$ i = border[i]    
     \item i++, j++
     \item if $i==|x|$
     \begin{enumerate}
@@ -79,4 +79,4 @@ The KMP Algorithm uses strict borders and interrupted periods, but is otherwise 
 \subsection{String Matching Automaton}
 To find the string x in y, we make an automaton that accepts the sequence x, then give in the letters of y till a match is found. For space efficiency, we try to find the smallest automaton possible. Forward transitions imply a match, and backward transitions occur on a mismatch: we can make these smarter using periods and borders. \\
 
-Each state of the automaton represents u, a prefix of x, and the transitions each represent a letter t. Forward arcs go from u to ut if ut is a prefix of x, and to the initial state ($\varepsilon$) otherwise. Backward arcs go to vt, where vt is the longest suffix of ut that is a prefix of x (effectively a strict border of u).
+Each state of the automaton represents u, a prefix of x, and the transitions each represent a letter t. Forward arcs go from u to ut if ut is a prefix of x, and to the initial state ($\varepsilon$) otherwise. Backward arcs go to vt, where $u\neq v$vt is the longest suffix of ut that is a prefix of x (effectively a strict border of u).

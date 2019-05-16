@@ -47,7 +47,7 @@ The algorithm uses the following three cases, all of which assume that \(l_d < x
     X is somewhere between i and f, and $l_i$ = $l_{if}$
     \item \(l_d \leq l_f < l_{if} \rightarrow\) x has less in common with f than i does with f $\rightarrow$ move f=i \\     
     X is somewhere between d and i, and $l_i$ = $l_{f}$
-    \item \(l_d \leq l_f < l_{if} \rightarrow\) f has the same prefix for x and i $\rightarrow$ check L[i] and x from index $l_f$         
+    \item \(l_d \leq l_f = l_{if} \rightarrow\) f has the same prefix for x and i $\rightarrow$ check L[i] and x from index $l_f$         
 \end{enumerate}
 These cases can also be flipped, checking against d rather than f. \\ \\
 \textbf{LCP Search(L, X)} 
@@ -58,7 +58,7 @@ These cases can also be flipped, checking against d rather than f. \\ \\
     \item \(i = int((d+f)/2)\), \( l_{if} = lcp(L[i],L[f]), l_{id} = lcp(L[i],L[d])  \)
     \item if \(l_d \leq l_{if} < l_f\): \emph{(Case 1)}
  \begin{enumerate}
-    \item [] d=i, $l_d$=$l_if$ \emph{(Move d up, $l_d=l_i=l_{if}$)}
+    \item [] d=i, $l_d$=$l_{if}$ \emph{(Move d up, $l_d=l_i=l_{if}$)}
 \end{enumerate} 
     \item [] else if \(l_d \leq l_f < l_{if}\): \emph{(Case 2)}
  \begin{enumerate}
