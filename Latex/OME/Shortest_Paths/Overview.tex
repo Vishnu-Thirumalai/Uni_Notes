@@ -1,0 +1,61 @@
+\section{Shortest Path Algorithms}
+
+\subsection{Graphs}
+A graph is normally represented as (V,E) for \textbf{Vertices} and \textbf{Edges} respectively . \textbf{Weighted graphs} have a cost/weight associated with each edge, and in \textbf{Directed graphs} each edge has a direction, a start node and an end node. In directed graphs, a \textbf{Cycle} is a set of edges that return to the same node (e.g. (a,b),(b,c),(c,a)). \\
+A \textbf{Fully Connected graph} has a direct connection between every node. In these graphs, there are $\frac{v*(v-1)}{2}$ edges, where v is the number of vertices. In \textbf{Connected graphs}, where all the nodes are connected directly or indirectly, there are at least $v-1$ edges, where v is the number of vertices. 
+
+\subsection{Paths}
+In a directed graph, a path is an ordered list of edges: the \textbf{source} of a path is the start node of the first edge, and the \textbf{sink/destination} is the end node of the last edge. In a weighted directed graph, where the weight of an edge e is given by w(e), the weight of a path P is:
+\begin{equation}
+    \sum_{e\in P} w(e)
+\end{equation}
+For two points a and b, we define the \textbf{Shortest Path Weight} as:
+\begin{equation}
+    \delta(a,b) = 
+    \begin{cases}
+    \text{Weight of Path with Lowest Weight} &, \text{if there is a path(s) between a and b} \\
+    \infty &,otherwise 
+    \end{cases}
+\end{equation}
+The shortest path is the path with this weight. Note that by this definition there can be \textbf{multiple shortest paths}, as long as each path has the lowest weight. \\
+By definition, the weight of a path with a negative cycle is $-\infty$, since any path can just repeat the cycle infinitely. Most shortest path algorithms stop or break when they encounter a negative cycle, since the path is 'longer' in that it takes more edges, and the concept of $-\infty$.
+
+
+\subsection{Shortest Path Properties}
+\begin{itemize}
+    \item Any subpath (subset) of a shortest path is also a shortest path
+    \item The concatenation of two shortest paths is not necessarily a shortest path
+    \item A shortest path can have at most v-1 edges, where v is the number of vertices
+    \begin{itemize}
+        \item If there are more than v-1 edges, this means there's a vertex has been visited more than once, so there's a cycle
+        \item negative-cost cycles aren't allowed by most algorithms, positive-cost cycles won't exist in a shortest path since they add weight, zero-cost cycles can be removed for no change
+        \item Therefore there are no cycles in a shortest path, so there can't be more than v-1 edges.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Multiplicative Path Weights}
+For certain applications, rather than a sum of edge costs the product is used (e.g converting between various currencies). This can be converted to a summation by converting each edge weight to a logarithm. i.e if w(a,b) is x, set it to $\ln{x}$ . This converts the product to a sum, since \(\sum_{i=0}^n ln(x_i) = ln(\prod_{i=0}^n x_i) \), so standard techniques can be used.
+
+\subsection{Single Source}
+Any path has a source and end (sink). A single-source is a graph where one node s is designated as the source, and the shortest path to each node is calculated from it. Each node v in such a graph has the following two attributes:
+\begin{description}
+    \item [v.d] is the shortest path estimate, the current upper bound on the shortest path from s to v.
+    This is initialised to $\infty$ for all nodes, then s.d is set to 0.
+     \item [v.$\pi$] is the node before v on the current shortest path from s to v. This is initialised to Nil for all nodes, since a path hasn't been defined yet.
+\end{description}
+At the end of an algorithm, v.d = $\delta(s,v)$ for all v, and $v.\pi$ is the predecessor on the shortest path for each vertex. 
+
+\subsubsection{Relaxation}
+The process of reducing the upper bound of a node, this is used by the following algorithms to generate the shortest paths. Where u and v are nodes, (u,v) is the edge from u to v and w is the cost function for an edge:
+\begin{align}
+    \text{If v.d $>$} &\text{ u.d+w(u,v):} \nonumber \\
+    v.d &= u.d+w(u,v)  \\
+    v.\pi &= u \nonumber 
+\end{align}
+For this, u.d$\neq\infty$. So in the first step of an algorithm, only the nodes connected from s can be initialised. Also, if the bound on source node of an edge (u.d in the example) is reduced, that means the edges from it can be further reduced: so care has to be taken to re-relax edges if required.
+
+\subsection{Shortest Paths Tree}
+A tree based on a graph G and rooted at s such that, for every other node v, the path from s to v in the tree is the shortest path from s to v in G. Unlike the traditional definition, the tree only contains one path from s to v. \\
+If a node doesn't appear in the tree then there's no path from s to v in G. Using this approach to store shortest paths is $O(v)$ space, while using a list would be $O(v^2).$
+
+

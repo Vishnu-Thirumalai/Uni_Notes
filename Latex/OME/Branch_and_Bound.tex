@@ -1,0 +1,45 @@
+\section{Branch and Bound}
+
+\subsection{Partial Configurations}
+A configuration is a possible solution to a problem: so a partial configuration is a partial solution. For example, a partial configuration of a TSP is a path that doesn't contain every vertex. A partial configuration can be extended (e.g. adding another vertex) to make another configuration, either complete or partial.\\
+Every complete configuration can only be obtained from \textbf{one} partial configuration in NP problems. In EXP problems like chess, this doesn't hold. The initial partial configuration (for TSP a path with no vertices) can be extended to every other configuration. 
+
+\subsection{Branching}
+The same as extending, this procedure generates new configurations from a partial configuration. This depends on the problem, but it always takes one step: that is, it only generates the neighbourhood of the configuration. Again using TSP as an example, extending is only adding one vertex: if two were added at a time, some configurations might be missed. \\
+By making every possible branch starting from the initial configuration (state), the entire search space of the problem can be traversed. However, blindly branching will take a very long time.
+
+\subsection{Bounding}
+Rather than branching every possibility, this uses the cost function to decide whether or not to follow a branch. The bounding procedure keeps a track of the best cost found so far, and when branching checks the best cost obtainable from the generated state or its descendents. If this cost is worse (higher) than the current best cost, the algorithm doesn't follow the branch, since it can't provide a better configuration. \\
+When calculating the cost, the algorithm normally ignores validity to get a faster result. For example in TSP, the cost of a partial configuration is:
+\begin{equation}
+    bound(PC) = cost(PC) + \text{min. cost edge from all nodes not in the PC}
+\end{equation}
+Obviously, this might not be the cost a valid path: but it represents a lower bound. For a complete configuration, this is just the cost of the path. Creating a minimum valid path would take as long as generating all the descendents from the state, so defeats the purpose.
+
+\newpage
+\subsection{Algorithm}
+\begin{enumerate}[label=\Alph*]
+\item to\_visit = [initial\_state], best\_bound = $\infty$
+\item curr = Null, best = Null
+\item while to\_visit is not empty:
+\begin{enumerate}[label=\arabic*]
+    \item curr = state from to\_visit with lowest bound
+    \item remove curr from to\_visit
+    \item if $bound(curr)\geq best\_bound:$ \emph{(If the best unvisited state is worse than the current best, the search is over)}
+    \item [] \quad \quad break
+    \item else:
+    \begin{enumerate}
+        \item children = branch(curr)
+        \item for child in children:
+            \item []\quad I. if $bound(child) < best\_bound:$
+            \begin{enumerate}
+                \item [] $\alpha$. if child is a complete configuration: \emph{(We've found a new best solution)}
+                \item [] \quad \quad best = child, best\_bound = bound(child)
+                \item [] $\beta$. else: \emph{(We've found a branch that might lead to a best solution)}
+                \item [] \quad \quad to\_visit.add(child)
+            \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+\end{enumerate}
+This algorithm is greedy, in that it always chooses the node with the lowest cost at each iteration. However, since it keeps a track of all possible nodes it won't miss an optimal solution. Until it finds a complete configuration it will add all branches to \emph{to\_visit}, as the initial bound is infinite.
+

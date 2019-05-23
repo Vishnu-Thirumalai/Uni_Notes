@@ -1,0 +1,62 @@
+\subsection{Dijkstra's Algorithm}
+An alternate single-source shortest-paths algorithm that is faster than the Bellman-Ford, \textbf{but can't handle negative edge weights}. If there are negative edge weights/cycles, the algorithm doesn't raise a flag: it finishes executing, but the answers produced will be incorrect. 
+
+\subsection{Lemmas Used}
+\begin{description}
+    \item [Triangle Inequality:] \(\delta(u,v) \leq \delta(u,x) + w(x,v)\).i.e. the shortest path between two points can't be further relaxed
+    \item [Upper Bound:] \(v.d \geq \delta (s,v) \) at every point of the algorithm
+    \item [No Path:] If there is no path between S and V, $v.d=\delta(s,v)=\infty$
+    \item [Convergence:] Once \(v.d = \delta (s,v)\), there is no change in v.d
+\end{description}
+
+\subsection{Algorithm}
+In the below, N.adj is the list of nodes that are connected to N by an outgoing edge (i.e. N$\rightarrow$n), and extract$\_$min(Q) returns the node with the lowest upper bound in Q.\\
+\textbf{Dijkstra(V,E)}:
+\begin{enumerate}[label=\Alph*]
+    \item v.d = $\infty$, v.$\pi$ = Nil $\forall$ v $\in V$, s.d = 0
+    \item S = $\emptyset$, Q = V 
+    \item while Q $\neq\emptyset $: 
+\begin{enumerate}[label=\arabic*]
+    \item N = extract$\_$min(Q)
+    \item S.add(N)
+    \item for n in N.adj:
+    \item [] \quad relax(N,n)
+\end{enumerate}  
+\end{enumerate}
+Each edge is only relaxed once, since each node is only considered once. As the nodes are reached in a greedy order and there are no negative edge weights, this means that the nodes are reached as fast as possible and thus there shouldn't be a shorter path.
+
+\newpage
+\subsection{Proof of Correctness}
+If we can prove that for any u $\in$ S, u.d = $\delta(s,u)$, then at the end all nodes are in s so all have the shortest path.
+\begin{itemize}
+    \item We can prove this by induction:
+    \item At S=$\emptyset$, trivially true.
+    \item At S=$\{s\}$, s.d = $\delta(s,s)$ = 0
+    \item [\textbf{Hypothesis}]We assume that for S=X, all nodes in S and the edges from them have been relaxed (this is what the algorithm does at each step)
+    \item At S = X+$\{u\}$, a proof by contradiction:
+    \begin{itemize}
+        \item Assume the contradiction, that u.d $\neq \delta(s,u)$
+        \begin{itemize}
+            \item u can't be s, since s.d = $\delta(s,s)$ = 0
+            \item There must be a path s$\rightarrow$u, otherwise s.d = $\delta(s,s)$ = $\infty$
+        \end{itemize}
+        \item Let y be the first node on s$\rightarrow$u that's NOT in S (this might be u), and x be y's predecessor (so x $\in$ S)
+        \begin{itemize}
+            \item Since y is before or equal to u, $\delta(s,y) \leq \delta(s,u)$
+            \item We know that x.d and (x,y) have been relaxed, by the inductive hypothesis
+            \item By convergence, since x.d and (x,y) have been relaxed, y.d is relaxed as well, so y.d = $\delta(s,y)$            
+            \item \textbf{Since the algorithm chooses the lowest bound each time}, u.d $\leq$ y.d
+        \end{itemize}
+        \item Combining the abve, this gives us \(u.d \leq y.d = \delta(s,y) \leq \delta(s,u) \)
+        \item $u.d$, by definition, can't be $< \delta(s,u)$. Therefore, $u.d = \delta(s,u)$
+        \item This contradicts our assumption, so it can't hold. Therefore we've proved that $u.d = \delta(s,u)$ if u is the node with the lowest bound
+    \end{itemize}
+\end{itemize}
+
+\subsection{Implementation and Performance}
+The algorithm's performance depends on the implementation of Q:
+\begin{itemize}
+    \item If Q is a regular list, extract\_min is O(V) every time (V times across the algorithm), and updating the bound on a vertex is O(1) (E times across the algorithm) so the algorithm is $\boldsymbol{O(V^2 + E)}$ $\approx$ $O(V^2)$
+    \item If Q is a binary min-heap, extract\_min is O($\log$ V) every time (V times across the algorithm), and updating the bound on a vertex is O($\log$ V) (E times across the algorithm) so the algorithm is $\boldsymbol{O((V+E)\log V)}$ $\approx$ $O(E \log V)$
+\end{itemize}
+Therefore, this depends on if the graph has more edges or vertices. A dense graph has more edges so a regular list works best, a sparse one has more vertices so the min-heap is better. Dense/Sparse can be determined by $\frac{v^2}{\log v}$ : E. E is usually lower, so the min-heap is more commonly used.

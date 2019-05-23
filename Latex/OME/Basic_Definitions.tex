@@ -1,0 +1,47 @@
+\section{What is Optimisation?}
+
+\subsection{Combinatorial Optimisation}
+Most problems can be represented as (R,C) where:
+\begin{description}
+    \item[R] is a \textbf{finite} set of configurations, each of which is a possible solution to the problem. They effectively represent the search space of the problem, and in most cases won't be explicit.e.g.\\
+    S={1,2,3,\dots ,100} and S = ${x|x\in N, x\leq 100}$ are the same space, but the second is much more compact
+    \item[C] is the cost function, which tells us the value of each configuration. It takes in a configuration and outputs a real number. 
+\end{description}
+\textbf{An optimisation problem is to find the configuration with the lowest cost}\\(i.e.$\underset{R}{\operatorname{arg\; min}}(r)$).If we wanted to find the configuration with the highest cost, we could just multiply the costs by -1.
+
+\subsubsection{SAT Problem}
+Given a boolean CNF (a boolean consisting of 'AND' with 'OR' as sub-problems\\(e.g. (a OR b) AND (c or d))), find a configuration of truth values for each variable that satisfies the CNF (i.e. the whole CNF results in true). \\
+The cost function is simply 1 if the CNF is true, and 0 otherwise. X-SAT refers to a problem where the longest sub-problem's length is X. Any X $>2$ can be converted to a 3-SAT by adding extra variables.  2-SAT is P complexity, 3-SAT is NP-Complete (Explained in \ref{subsec:Time_Complexity_Problems}).
+
+
+
+\subsection{Time Complexity}
+
+\subsubsection{Algorithms}
+Measuring the running time of algorithms is futile: it depends on the hardware used, the background processes running on the computer, etc. Instead it's assumed that each step takes a constant amount of time, and the growth in the number of steps based on the size of the input determines the time complexity of an algorithm. \\ 
+Again, rather than comparing the exact number of steps, an algorithm is abstracted to the largest influence on the number of steps. e.g. If the algorithm takes \(4n^2+2n+3\) steps (n is the input size), we represent only consider the $n^2$. This is because, for large enough input values, the lower powers have little impact on the final value. e.g. The difference between $n^2$ and $n^2+n$ at n = 1000 is 0.1\%. 
+\newpage
+To represent the time complexity of an algorithm (f(x), the growth in the number of steps with the growth in the input size), we use the following three notations:
+\begin{description}
+    \item[Big-O(O)] An algorithm is O(g(x)) if there are some constants c and d such that \(c*g(x) \geq f(x)\) when $x > d$. This gives an upper bound on the performance of an algorithm, so the \textbf{Worst Case}, and is the notation mostly used.
+    \item[Big-Omega($\Omega$)] An algorithm is $\Omega$(g(x)) if there are some constants c and d such that \(c*g(x) \leq f(x)\) when $x > d$. This gives an lower bound on the performance, so the \textbf{Best Case}.
+    \item[Big-Theta($\Theta$)] An algorithm is $\Theta$(g(x)) if there are some constants $c_1$, $c_2$ and d such that \(c_1*g(x) \leq f(x) \leq c_2*g(x)\) when $x > d$. This gives a tight bound on the performance, so the \textbf{Average Case}.    
+\end{description}
+O and $\Omega$ could be very loose but still technically correct. e.g f(x) = n  is O($n^{10}$), but that doesn't tell us anything useful. Since we mostly expect large input values, we use d to remove problems at smaller values: e.g. \(5n > n^2\) for \(n < 5\), but $n^2$ grows quicker,
+
+\begin{center}
+   \( O(log n) < O(n) (Linear) < O(n * log n) < O(n^x) (Polynomial) < O(X^n) (Exponential) \) \\
+    \(O(n!) \approx O(n^5). \)
+\end{center}
+
+\subsubsection{Problems}\label{subsec:Time_Complexity_Problems}
+\begin{description}
+    \item[P] denotes the class of problems for which there exists a \textbf{Polynomial-Time} algorithm to solve them. These are computationally 'easy'. e.g. Shortest Path with Positive Weights, Linear Programming
+    \item[NP] problems can't be solved, but a solution can be verified, in polynomial time. Alternatively, they can be solved in polynomial time by a \textbf{Non-deterministic Turing Machine} (a type of automaton with memory). Finding a polynomial solution to one of these is an ongoing problem. e.g. Travelling Salesman Problem, Boolean SAT
+\end{description}
+Chess is NP-Hard (as hard/harder than every other NP problem), but is EXP-Complete (an exponential-time algorithm), since verification is exponential. A problem is NP-Complete if it is harder than/as hard as every other NP problem, and is also an NP problem itself.
+
+\subsection{Travelling Salesman Problem}
+The input is a graph (V,E) with the cost of each edge $\in E$ known. The objective is to find the path that visits every vertex $\in V$ exactly once with a minimal cost. Some problems may require the path to start and end at the same node.\\ \\
+This can be converted to a decision problem: given a length X, is there a path with cost $< X$? Alternatively, each vertex can be given as an (x,y) point in space, and the euclidean distance (\(\sqrt[2]{(x_1-x_2)^2+(y_1-y_2)^2}\)) between points is used as the cost. The classic problem is NP-Hard, the decision problem is NP-Complete.
+
