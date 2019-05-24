@@ -22,8 +22,9 @@ In the below, N.adj is the list of nodes that are connected to N by an outgoing 
     \item for n in N.adj:
     \item [] \quad relax(N,n)
 \end{enumerate}  
+\item return (V,E)
 \end{enumerate}
-Each edge is only relaxed once, since each node is only considered once. As the nodes are reached in a greedy order and there are no negative edge weights, this means that the nodes are reached as fast as possible and thus there shouldn't be a shorter path.
+Each edge is only relaxed once, since each node is only considered once. As the nodes are reached in a greedy order and there are no negative edge weights, this means that the nodes are reached as fast as possible and thus there shouldn't be a shorter path. The algorithm returns the graph, with with d and $\pi$ set for each vertex.
 
 \newpage
 \subsection{Proof of Correctness}

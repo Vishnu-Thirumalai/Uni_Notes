@@ -1,0 +1,58 @@
+\subsection{Johnson's Algorithm}
+Both of the above algorithms give the shortest path to each node from a single source node. To get this for each node, we could run Dijkstra/Bellman\_Ford once for each node as the source. But the former can't handle negative weights, and the latter would be $O(V^2E)$.
+
+\subsubsection{Re-Weighting}
+An easy fix to the problem is removing all the negative edge weights. Adding a constant M to each edge to make all the weights positive would fix that problem, but then it would add M to the cost of a path for each edge in it: since negative weights give a shorter path weight with more edges, this will change the results.
+
+The new weight function ($\hat{w}$) needs to preserve the shortest paths, and be positive for every edge. This can be achieved by giving each vertex v a value h(v), and defining $\hat{w}$ as:
+\begin{equation}
+    \hat{w}(a,b) = w(a,b) + h(a) - h(b)
+\end{equation}
+Using this equation, the weight of a path P would be:
+\begin{equation}
+    \hat{w}(s,v) = \sum_{(a,b) \in P} w(a,b) + h(s) - h(v)
+\end{equation}
+This is because, other than the source/sink, every node n on the path will have an incoming edge (so -h(n)) and an outgoing edge (+h(n)). Therefore, for any path between the nodes, the added values will be the same: this preserves the shortest paths. Calculating h(v) to remove negativity is shown in the next section.
+
+\subsubsection{Calculating h(v)}
+Since the aim is to remove negative weights, we need to show that for an edge (a,b) that \(h(a)-h(b) \geq 0\). h(v) is computed by creating a new node, say s, connecting it to every other node with a zero-cost edge, then setting h(v) = $\delta(s,v)$. \\
+Briefly, since s has access to every other node (and thus every possible path in the graph), $\delta(s,v)$ is the shortest path into v from any other node. Since shortest is by path weight, we can say this is the most negative path weight leading into v. If this is subtracted from any incoming path weight, it'll end up as positive. A more mathematical proof:
+\begin{align}
+    \text{By the triangle inequality, }& \delta(s,v) \leq \delta(s,u) + w(u,v) \nonumber \\
+    \text{Therefore, }& \delta(s,v) - \delta(s,u) \leq w(u,v) \nonumber \\
+    \hat{w}(u,v) &= w(u,v) + h(u) - h(v) \nonumber \\
+                 &= w(u,v) + \delta(s,v) - \delta(s,u) \nonumber \\
+                 &\geq 0 \quad \forall \; u,v \nonumber 
+\end{align}
+Since we compute h(v) using Bellman-Ford, s has access to every path so it can also check if there's a negative cycle and terminate. Using Dijkstra wouldn't work, since there would be negative edges.
+
+\subsection{Algorithm}
+Since the algorithm has to store the shortest path for each algorithm, it uses a VxV matrix. Normally the algorithm stores either d or $\pi$ for each vertex for each source, this pseudocode stores both. In the below pseudocode, G.V and G.E are the vertices/edges for a graph G.\\ \\
+\textbf{Johnson(G,W)}:
+\begin{enumerate}[label=\Alph*]
+    \item G' = (G.V,G.E) \emph{(G's is a copy of G, which we use to generate node weights)}
+    \item G'.V.add(s) \emph{(Add the extra node)}
+    \item  for v in V: \emph{(The original list of vertices)}
+\begin{enumerate}[label=\arabic*]
+        \item G'.E.add((s,v))
+        \item w(s,v) = 0  \emph{(Adding zero-cost edges)}
+\end{enumerate}        
+    \item G'' = Bellman\_Ford(G'.V, G'.E) \emph{(G'' is the graph with the shortest paths from s)}
+    \item If Bellman\_Ford returned false:
+    \begin{enumerate}
+        \item [] return False
+    \end{enumerate}    
+    \item  for (a,b) in E: \emph{(Setting the new weights)}
+    \begin{enumerate}
+        \item [] w(a,b) = w(a,b) + G''.V[a].d -  G''.V[b].d  \quad \emph{(G''.V[v].d = h(v))}
+    \end{enumerate}
+    \item Results = []
+    \item for v in V: \emph{(Run Dijkstra for)}
+\begin{enumerate}[label=\arabic*]
+    \item Set v as source
+    \item $G_v$ = Dijkstra(G.V,G.E) 
+    \item Results.append($G_v.V$) \emph{(Add the vertices from the solved graph to the list of results)}
+\end{enumerate}    
+    \item return Results
+\end{enumerate}
+All the weights will be off by the node values: they can be fixed before step H.2. The weight of the shortest path to node v from node u can be fixed by adding h(u)-h(v): essentially reversing the effects of the re-weighting. 
