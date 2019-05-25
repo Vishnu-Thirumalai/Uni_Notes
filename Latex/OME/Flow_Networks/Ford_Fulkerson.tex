@@ -1,0 +1,56 @@
+\subsection{Ford\_Fulkerson Method}
+
+\subsubsection{Augmenting Path}
+Building on the definition of a residual network, a \textbf{Residual Path} is a path (collection of consecutive edges) in the residual network. An \textbf{Augmenting Path} is a residual path from the source to the sink: essentially, it's a part of a flow in the residual network. The residual capacity of this augmenting path is the lowest residual capacity of its edges. i.e for an augmenting path p:
+\begin{equation}
+    c_r(p) = \min_{(a,b)\in p} c_r(a,b)
+\end{equation}
+
+\subsubsection{Path Flow}
+Given a residual network R and an augmenting path P, the path flow for any edge (u,v) is:
+\begin{equation}
+    f_P(u,v) = 
+    \begin{cases}
+        c_r(p) &, \text{(u,v) is on P} \\
+        0 &, otherwise
+    \end{cases}
+\end{equation}
+For the path flow, the only flow in the network is on the residual path.
+
+\subsubsection{Augmentation}
+When adding the path flow $F_p$from an augmenting path P, the flow value is constant for every edge: its the capacity of the augmenting path, say q. This can be used to speed up addition. If an edge (a,b) $\in$ P (a$\rightarrow$b is from the source to the sink), f is the current flow and F is the resulting flow then:
+\begin{itemize}
+    \item F(a,b) = f(a,b) + max{q-f(b,a),0}
+        \begin{itemize}
+            \item If f(a,b) > 0, then the flows were in the same direction and f(b,a) = 0: so they're just added
+            \item if f(a,b) = 0, then the flows were in the opposite direction, and f(b,a) $\geq$ 0: f(a,b) is set to the result of removing the original flow from the augment 
+        \end{itemize}
+    \item F(b,a) = max{f(b,a)-q,0}
+        \begin{itemize}
+            \item The flow in the augmenting path is in the opposite direction: if they collided f(b,a) is set to the difference, if f(b,a) was 0 it stays at 0
+        \end{itemize}    
+\end{itemize}
+
+\newpage
+\subsubsection{Algorithm}
+\begin{enumerate}[label=\Alph*]
+    \item F = Zero Flow \emph{(f(a,b) = 0 for all (a,b))}
+    \item while True: 
+\begin{enumerate}[label=\arabic*]
+    \item N = Residual Network of F
+    \item $F_p$ = Augmenting path in P
+    \item If F' does not exist:
+    \item [] \quad break
+    \item F = F.augment($F_p$)
+\end{enumerate}  
+\item return F
+\end{enumerate}
+The advantage over the basic method is its easier to find augmenting paths than full flows.
+
+\subsubsection{Performance}
+For a graph (V,E): constructing the residual network is $\boldsymbol{\Theta(E)}$ (checking edge by edge), finding an augmenting path is \textbf{O(E)} (For example, a breadth-first search), and augmenting is \textbf{O(V)} (each vertex appears max. once). \\
+This means each iteration is normally O(E) (most graphs are sparse, $\frac{v^2}{\log v}$:E). The number of iterations depends on which augmenting path is selected.\\ \\
+The bound on the number of iterations is the size of the maximum flow ($|f*|$). This is obtained when the flow is comprised entirely of distinct paths (i.e size of flow = number of paths in flow). The Ford\_Fulkerson method discovers one path at a time, so the overall runtime will be $O(|f*|*E)$.
+
+\subsubsection{Edmonds\_Karp Method}
+A variation of the Ford\_Fulkerson method: select the shortest (lowest number of edges) augmenting path each time. This can be found using a Breadth-First Search or similar. The performance is $\boldsymbol{O(VE^2)}$, with the number of iterations being \textbf{O(VE)}. This is \\obtained by there being at most V-1 paths in any network, and any path length repeating at most E times (the proof isn't required).

@@ -1,0 +1,27 @@
+\subsection{Cuts in a Flow Network}
+A \textbf{Cut} is splitting the nodes in a network into two groups: group S contains the source, group T contains the sink. 
+\begin{itemize}
+    \item The \textbf{Capacity} of a cut is $\sum c(u,v)$ where u $\in$ S, v $\in$ T, (u,v) $\in$ E : the capacity of the edges going from S to T
+    \item The \textbf{Net Flow} of a cut is $\sum f(a,b) - \sum f(c,d)$ where a,c $\in$ S, b,d $\in$ T, (a,b),c,d $\in$ E : the flow from S to T minus the flow from T to s
+\end{itemize}
+For any cut, flow(cut) = flow(sink) $\leq$ capacity(cut) (equal when there is no flow from S to T). Therefore, \textbf{max. flow in a network $\boldsymbol{\leq}$ min. capacity of all cuts}.
+
+\subsubsection{Max-Flow Min-Cut Theorem}
+\begin{enumerate}
+    \item Max. flow in a network $\leq$ min. capacity of any cut in the network
+    \item The following three statements are equivalent:
+    \begin{enumerate}
+        \item F is a max. flow in G 
+        \item There's no augmenting path in the residual network $G_F$
+        \item For some cut (S,T) in G, c(S,T) = f(S,T) = F 
+    \end{enumerate}
+\end{enumerate}
+
+Proof:
+\begin{description}
+    \item [a$\rightarrow$b] If there was an augmenting path, it could be used to increase the flow. The flow can't be increased, so there's no augmenting path
+    \item [b$\rightarrow$c] No augmenting path means all the paths from source to sink are saturated, which means there are no reverse edges. All edges from S to T in a cut will be at capacity, all edges from T to S will be empty.
+    \item [c$\rightarrow$a] When c(S,T) = F(S,T), we've shown that this is a max flow. Since f(S,T) = F, F is a max flow
+\end{description}
+
+\noindent This is also a proof for the Ford\_Fulkerson algorithm: \textbf{when there are no augmenting paths left, a max. flow has been found}. 

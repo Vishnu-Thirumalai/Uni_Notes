@@ -1,0 +1,43 @@
+\subsection{Max Flow}
+More of a general approach than an algorithm, this uses the concept of residual capacity to iteratively build the optimal flow. The following algorithms use the ideas here. 
+
+\subsection{Residual Capacity}
+The residual capacity for an edge (a,b) is defined as:
+\begin{equation}
+    c_r(a,b) = 
+    \begin{cases}
+        c(a,b) - f(a,b) &, if f(a,b) > 0 \\
+        c(a,b) + f(b,a) &, if f(b,a) > 0
+    \end{cases}
+\end{equation}
+By the definition of a flow, if $f(u,v)>0$, then f(v,u)=0. The residual capacity of an edge with a flow is how much more flow it can take (capacity-flow), and the backward edge has how much flow can be reversed (capacity + reverse edge flow). \\
+A \textbf{Residual Edge} is an edge with residual capacity $>0$. The \textbf{Residual Network} of a flow f is the flow network made of residual edges after applying f. This network can be used to find flows not included in f, and these can be 'added' to f.
+
+\subsection{'Adding' Flows}
+By using the residual network, there might be a flow which improves the current one: this flow is 'added' to the current flow, altering it and increasing the overall flow. Assuming there are two flows $F_1$ and $F_2$, adding them together is done edge-by-edge to produce the flow $F'$. Assuming that $F_1(u,v) > 0$ (and therefore $f(u,v)=0$):
+\begin{itemize}
+    \item If $F_2(u,v) > 0$, then $F'(u,v) = F_1(u,v) + F_2(u,v)$
+        \begin{itemize}
+            \item Both flows are in the same direction for this edge, just add them together
+        \end{itemize}
+    \item If $F_2(v,u) > 0$, then $F'(u,v) = max(0, F_1(u,v) - F_2(v,u))$ and $F'(v,u) = max(0, F_2(v,u) - F_1(u,v))$
+        \begin{itemize}
+            \item The flows run in opposite direction, so think of them as colliding
+            \item The larger flow direction is set to the difference of the flows
+            \item The smaller flow direction is set to 0
+        \end{itemize}    
+\end{itemize}
+
+\subsection{Algorithm}
+\begin{enumerate}[label=\Alph*]
+    \item F = Zero Flow \emph{(f(a,b) = 0 for all (a,b))}
+    \item while True: 
+\begin{enumerate}[label=\arabic*]
+    \item N = Residual Network of F
+    \item F' = Flow in N
+    \item If F' does not exist:
+    \item [] \quad break
+    \item F = F.add(F')
+\end{enumerate}  
+\item return F
+\end{enumerate}
