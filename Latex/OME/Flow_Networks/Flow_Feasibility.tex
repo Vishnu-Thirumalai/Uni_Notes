@@ -1,0 +1,15 @@
+\subsection{Flow-Feasibility Problems}
+A variation on flow networks, rather than a single source/sink each vertex has a value d(v). Usually \(\sum_{v \in V}d(v) = 0\).
+\begin{itemize}
+    \item If $d(v) > 0$, it's a \textbf{Supply Node}. Supply nodes have an outgoing flow (negative).
+    \item If $d(v) < 0$, it's a \textbf{Demand Node}, with a demand of abs(d(v)). Demand nodes have an incoming flow (positive).
+    \item If $d(v) = 0$, it's a \textbf{Transitional Node}.
+\end{itemize}
+These problems try to find a flow such that d(v) = 0 for all nodes, and can be reduced to max. flow problems.
+
+\subsubsection{Reduction to Max. Flow Problems}
+\begin{enumerate}
+    \item Make a source node and connect it to each supply node s with an edge of capacity d(s).
+    \item Make a sink node and connect it to each demand node x with an edge of capacity d(x).
+    \item If the max. flow saturates the edges from the source/into the sink, that's a feasible flow.
+\end{enumerate}

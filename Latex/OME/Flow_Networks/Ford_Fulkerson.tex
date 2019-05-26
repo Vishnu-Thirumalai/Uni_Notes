@@ -20,12 +20,12 @@ For the path flow, the only flow in the network is on the residual path.
 \subsubsection{Augmentation}
 When adding the path flow $F_p$from an augmenting path P, the flow value is constant for every edge: its the capacity of the augmenting path, say q. This can be used to speed up addition. If an edge (a,b) $\in$ P (a$\rightarrow$b is from the source to the sink), f is the current flow and F is the resulting flow then:
 \begin{itemize}
-    \item F(a,b) = f(a,b) + max{q-f(b,a),0}
+    \item F(a,b) = f(a,b) + max\{q-f(b,a),0\}
         \begin{itemize}
             \item If f(a,b) > 0, then the flows were in the same direction and f(b,a) = 0: so they're just added
             \item if f(a,b) = 0, then the flows were in the opposite direction, and f(b,a) $\geq$ 0: f(a,b) is set to the result of removing the original flow from the augment 
         \end{itemize}
-    \item F(b,a) = max{f(b,a)-q,0}
+    \item F(b,a) = max\{f(b,a)-q,0\}
         \begin{itemize}
             \item The flow in the augmenting path is in the opposite direction: if they collided f(b,a) is set to the difference, if f(b,a) was 0 it stays at 0
         \end{itemize}    
@@ -39,7 +39,7 @@ When adding the path flow $F_p$from an augmenting path P, the flow value is cons
 \begin{enumerate}[label=\arabic*]
     \item N = Residual Network of F
     \item $F_p$ = Augmenting path in P
-    \item If F' does not exist:
+    \item If $F_p$ does not exist:
     \item [] \quad break
     \item F = F.augment($F_p$)
 \end{enumerate}  

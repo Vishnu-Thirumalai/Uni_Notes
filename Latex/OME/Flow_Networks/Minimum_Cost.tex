@@ -1,0 +1,46 @@
+\subsection{Minimum Cost Flows}
+A common type of problem that builds off Flow-Feasibility: each edge is given a cost per flow, and the objective is to find the flow that satisfies the demands (or as close as possible) while minimising the total cost. Edges are usually labelled as (c,a), where c is the capacity and a is the cost. 
+
+\subsubsection{Flow Network Tweaks}
+\begin{itemize}
+    \item If the edge (a,b) exists and c(a,b) > 0, then c(b,a) is 0. Therefore in the residual network, $c_r$(a,b) = c(a,b)-f(a,b) and $c_r$(b,a) = f(a,b)
+    \item The cost of a reverse edge is the negative of the existing edge. i.e if edge (u,v) exists, then a(v,u) = -1*a(u,v). 
+    \item d(v) in the residual network is d(v) + incoming flow - outgoing flow from the original network
+\end{itemize}
+
+\subsubsection{Successive Shortest Paths Algorithm}
+This algorithm is very similar to the Edmonds\_Karp algorithm, with some key differences:
+\begin{itemize}
+    \item Since there are multiple start/end points for shortest augmenting paths, a supply node is a chosen (arbitrarily) and a shortest path tree to every demand node is created
+    \begin{itemize}
+        \item The tree could also be created to every node then checked for demand
+        \item A list of supply nodes is kept: when a d(node) = 0, it can be removed from the list
+        \item The tree can be made with Dijkstra's if the costs are re-weighted , so O(E $\log$V)
+    \end{itemize}
+    \item The capacity of the chosen path is min\{d(supply), abs(d(demand)), $c_r$(p)\}
+    \begin{itemize}
+        \item This is because previously the source/sink could release/accept infinite flow, but now the supply/demand also constrain how much flow can go through the path
+    \end{itemize}
+    \item Unfortunately, the total number of iterations could be \textbf{exponential} with regards to V
+\end{itemize}
+
+\newpage
+\textbf{Algorithm:}
+\begin{enumerate}[label=\Alph*]
+    \item F = Zero Flow \emph{(f(a,b) = 0 for all (a,b))}
+    \item S = list of supply nodes \emph{(Nodes where d(v) > 0)}
+    \item while True: 
+\begin{enumerate}[label=\arabic*]
+    \item N = Residual Network of F
+    \item v = Arbitrarily chosen Supply node/vertex
+    \item T = Shortest augmenting path tree to demand nodes in N reachable from v
+    \item $F_p$ = Shortest augmenting path in T from v to x
+    \item $c_r(F_p)$ = min \{d(v), d(x), $c_r(F_p)$ \}
+    \item If $F_p$ does not exist:
+    \item [] \quad break
+    \item F = F.augment($F_p$)
+\end{enumerate}  
+\item return F
+\end{enumerate}
+As mentioned previously, each iteration is \textbf{O(E $\boldsymbol{log}$V)} to generate the tree, and the total number of iterations is exponentially-bounded. \\
+The best known running time of a minimum cost flow algorithm is $\boldsymbol{O(E^2 \log V)}$, and there are multiple polynomial-time algorithms.
