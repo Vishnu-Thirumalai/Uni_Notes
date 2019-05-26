@@ -1,0 +1,108 @@
+\section{Linear Programming}
+A method of minimising a given function according to various constraints. Effectively, if the constraints are plotted on a graph (by bounding the areas of the graph that don't break them), the minimum value of the function lies on one of the corners of the bounded area (intersections between constraints). Even if the area is unbounded, the corners still provide the minimum values. \textbf{If the function is linear and the variables accept real values, then this method is polynomial in the number of variables}.
+
+\begin{description}
+\item [Objective Function:] The function to minimise. 
+\begin{itemize}
+    \item If this isn't present, then the program acts as a feasibility problem
+    \item To Maximize a function f(x), minimize -f(x)
+\end{itemize}
+\item [Constraint Functions:] These are functions that the solution must satisfy. 
+\begin{itemize}
+    \item If a constraint is non-linear, they must be split into linear constraints. 
+    \item The 'standard form' for constraints is \(ax_1+b_x+\dots \leq c\). The exception is the non-negativity constraints, which are of the form \(x_i \geq 0\).
+\end{itemize}
+\end{description}
+
+\subsection{Shortest Path}
+When converting problems to linear programs, care has to be taken to make sure the conversion doesn't remove necessary features from the problem. An example of this is the single-pair shortest path problem, to find the shortest path weight from a source node to a destination node.
+
+\subsubsection{Program}
+\textbf{Notation:} v.d is written as $v_d$, s is the source, t is the destination, E is the list of edges
+\begin{description}
+\item [Objective Function:] Maximise $d_t$
+\item [Constraints]\textbf{:}  
+\begin{itemize}
+    \item \(d_v \leq d_u + w(u,v)\quad \forall \;(u,v) \in E\)
+    \item $d_s$ = 0
+\end{itemize}
+\end{description}
+
+\subsubsection{Explanation}
+Considering we're trying to find the shortest path, maximizing is counter-intuitive. However if the problem was min $d_t$, then it could be satisfied by setting $d_v$ to 0 $\forall\; V$. The first constraint forces the program to set $d_v=\delta(s,v)$ or less, so only the shortest valid path and shorter paths will meet this constraint. Therefore the maximum path that meets this constraint is the required shortest path. 
+
+\subsection{Max. Flow in a Flow Network}
+\textbf{Notation:} f(u,v)$\rightarrow f_{uv}$, s is the source, t is the destination, E is the list of edges
+\begin{description}
+\item [Objective Function:] Maximise net. flow from source 
+\begin{equation}
+   Maximise \sum_{(s,v)\in E} f_{sv} - \sum_{(v,s)\in E} f_{vs} \nonumber
+\end{equation} 
+\item [Constraints]\textbf{:}  
+\begin{itemize}
+    \item \(f_{uv} \leq c(u,v) \quad \forall \;(u,v) \in E\) \\ Flow $<$ capacity for each edge
+    \item \(f_{uv} \geq 0 \quad \forall \;(u,v) \in E\) \\ Flow $>=0$ for each edge
+    \item \(\sum_{(x,v)\in E} f_{xv} - \sum_{(v,x)\in E} f_{vx} =0 \quad \forall x \in V-\{s,t\}\) \\ Net flow = 0 for all nodes except the source/sink
+    \end{itemize}
+\end{description}
+The constraints on the sink's flow aren't explicitly mentioned to minimise the number of constraints, but are still implied by the other constraints.
+
+\subsection{Min. Flows}
+Since LPs are polynomial, this general approach is better than the specialised approach shown earlier. However, this approach is for a single source/sink, rather than the supply/demand approach from earlier.\\ \\
+One constraint is that there are no 1-cycles (edges (a,b) and (b,a)) allowed, but these can be easily fixed: add a node x, remove (b,a) and add the edges (b,x) and (x,a), both with the capacity of (b,a) and one with 0 cost, the other with the cost of (b,a). 
+
+\subsubsection{Program}
+\textbf{Notation:} f(u,v)$\rightarrow f_{uv}$, s is the source, t is the destination, E is the list of edges, d is the demand we place on the system
+\begin{description}
+\item [Objective Function:] Minimise total cost
+\begin{equation}
+    Minimise \sum_{(u,v)\in E} a(u,v) * f_{uv}  \nonumber
+\end{equation} 
+\item [Constraints]\textbf{:}  
+\begin{itemize}
+    \item \(f_{uv} \leq c(u,v) \quad \forall \;(u,v) \in E\) \\ Flow $<$ capacity for each edge
+    \item \(f_{uv} \geq 0 \quad \forall \;(u,v) \in E\) \\ Flow $>=0$ for each edge
+    \item \(\sum_{(x,v)\in E} f_{xv} - \sum_{(v,x)\in E} f_{vx} = 0 \quad \forall x \in V-\{s,t\}\) \\ Net flow = 0 for all nodes except the source/sink
+    \item \(\sum_{(s,v)\in E} f_{sv} - \sum_{(v,s)\in E} f_{vs} = d\) \\ The flow from the source is d 
+    \end{itemize}
+\end{description}
+
+\subsection{Multi-Commodity Feasibility}
+LPs are currently the only known polynomial solver for multi-commodity flows. Looking at the problem (see \ref{subsubsec:Multi_Commodity_Problem_Types}), its to see if the source/demand can be met for every flow while meeting capacity constraints. This means there's nothing to optimise.
+
+\subsubsection{Program}
+\textbf{Notation:} $s_q/t_q/d_q$ is the source/destination/demand for commodity q, E is the list of edges, $f_{quv}$ is the flow for commodity q through edge (u,v) and $f_{uv}$ is the net flow through an edge ($f_{uv} = \sum_qf_{quv}$)
+\begin{description}
+\item [Objective Function:] None
+\item [Constraints]\textbf{:}  
+\begin{itemize}
+    \item \(f_{uv} \leq c(u,v) \quad \forall \;(u,v) \in E\) \\ Flow $<$ capacity for each edge
+    \item \(f_{uv} \geq 0 \quad \forall \;(u,v) \in E\) \\ Flow $>=0$ for each edge
+    \item \(\sum_{(x,v)\in E} f_{qxv} - \sum_{(v,x)\in E} f_{qvx} = 0 \quad \forall x \in V-\{s_q,t_q\}\; \forall q \) \\ Net commodity flow = 0 for all nodes except the commodity source/sink for all commodities/edges
+    \item \(\sum_{(s,v)\in E} f_{qsv} - \sum_{(v,s)\in E} f_{qvs} = d_q\) \\ The flow from the source is $d_q$ for each commodity
+    \end{itemize}
+\end{description}
+Once again, rather than adding separate constraints that flow(sink) = -$d_q$, since they're implied by the others these constraints can be omitted to shrink the problem. 
+
+\subsection{Min. Congestion Multi-Commodity}
+Again recalling the problem (section \ref{subsubsec:Multi_Commodity_Problem_Types}), this is to minimise the maximum congestion $\lambda$: alternatively, that the congestion for every edge $\leq\lambda$. Another note is that a solution might break feasibility, so the upper capacity constraints need to be removed.
+
+\newpage
+\subsubsection{Program}
+\textbf{Notation:} $\lambda$ is the target minimum maximum flow, $s_q/t_q/d_q$ is the source/destination/demand for commodity q, E is the list of edges, $f_{quv}$ is the flow for commodity q through edge (u,v) and $f_{uv}$ is the net flow through an edge ($f_{uv} = \sum_qf_{quv}$)
+\begin{description}
+\item [Objective Function:] Minimize $\lambda$
+\item [Constraints]\textbf{:}  
+\begin{itemize}
+    \item \(f_{uv} - \lambda * c(u,v)  \leq 0 \quad \forall \;(u,v) \in E\) \\ Congestion $\leq$ max. congestion for each edge
+    \item \(f_{uv} \geq 0 \quad \forall \;(u,v) \in E\) \\ Flow $>=0$ for each edge
+    \item \(\sum_{(x,v)\in E} f_{qxv} - \sum_{(v,x)\in E} f_{qvx} = 0 \quad \forall x \in V-\{s_q,t_q\}\; \forall q \) \\ Net commodity flow = 0 for all nodes except the commodity source/sink for all commodities/edges
+    \item \(\sum_{(s,v)\in E} f_{qsv} - \sum_{(v,s)\in E} f_{qvs} = d_q\) \\ The flow from the source is $d_q$ for each commodity
+    \end{itemize}
+\end{description}
+Once again, rather than adding separate constraints that flow(sink) = -$d_q$, since they're implied by the others these constraints can be omitted to shrink the problem. The first constraints are converted into the standard form by:
+\begin{align}
+    \frac{f_{uv}}{c(u,v)} \leq \lambda \nonumber \\
+    f_{uv} \leq \lambda * c(u,v) \nonumber \\
+    f_{uv} - \lambda * c(u,v) \leq 0 \nonumber
+\end{align}

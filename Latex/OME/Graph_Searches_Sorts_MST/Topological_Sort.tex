@@ -1,0 +1,26 @@
+\section{Topological Sort}
+A \textbf{Directed Acyclic Graph} is a directed graph that doesn't have cycles. By this definition, it's technically a tree, and there's a strict ordering on the nodes in it. Given a set of nodes from a DAG, a topological sort places them in an array such that if there's an edge from a to b, then idx(a)$<$idx(b). Effectively, all edges go from left to right. 
+
+\subsection{Algorithm}
+The algorithm is identical to DFS, with the exception that \textbf{each node is added to the front of the result list as it finishes}. This is the same as sorting the list of vertices by v.f. \\
+The idea behind this is that if a node is finished, either there are no outgoing edges or all of its descendants are already on the list: therefore any edges will go to nodes with later indices. \\
+Inserting to the front of a list is O(1), so this algorithm is also $\boldsymbol{\Theta(V+E)}$.
+
+\subsection{Shortest Paths in a DAG}
+Using this sorted array, a single-source shortest path graph can easily be calculated. Any node can be designated as the source and this method can handle negative edges: there are no cycles in a DAG, so there's no issue with negative cycles.
+
+\subsubsection{Algorithm}
+\textbf{DAG\_Shortest(V,E,s)}:
+\begin{enumerate}[label=\Alph*]
+    \item D = Topological\_sort(V,E)
+    \item v.d = $\infty$, v.$\pi$ = Nil $\forall$ v $\in V$
+    \item s.d = 0
+    \item for v in D: \emph{(traverses vertices in the sorted order)}
+\begin{enumerate}[label=\arabic*]
+    \item [] for (a,b) in V.adj[v]:
+    \begin{enumerate}
+        \item [] relax(a,b)
+    \end{enumerate}
+\end{enumerate}    
+\end{enumerate}
+Since any path between two nodes is from left to right in the sorted array, the edges can be relaxed in this order without worrying about the effects on previous nodes. 

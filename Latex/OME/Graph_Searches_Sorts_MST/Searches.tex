@@ -1,0 +1,82 @@
+\section{Searching a Graph}
+There are multiple ways to search graphs (especially weighted graphs), but the two simplest are \textbf{Breadth-First Search} and \textbf{Depth-First Search}. Both are very similar: DFS can be faster, but BFS is less reliant on the graph structure. 
+
+\subsection{Breadth-First Search}
+In short: select a node, add all its children to the back of a list, then select the front node of the list and repeat. This particular variant also marks $v.d $ and $v.\pi$ for each vertex. Vertices that haven't been added to the list are undiscovered (white), vertices on the list are discovered (grey), vertices that were on the list are visited (black). Discovered is used to prevent the same vertex being added to the list multiple times, which is just needless computation.
+
+\subsubsection{Algorithm}
+\textbf{BFS(V,E,s):}
+\begin{enumerate}[label=\Alph*]
+\item v.V = False, v.d = -1, v.$\pi$=Nil $\forall \; v\in V$
+\item s.V = True, s.d = 0 \emph{(s is the node to start the search from)}
+\item to\_visit = {s}
+\item while to\_visit is not empty:
+\begin{enumerate}[label=\arabic*]
+    \item curr = s[0]
+    \item for child in V.Adj[curr] \emph{(V.Adj(v) is the list of nodes next to v (children of v if directed graph))}
+    \begin{enumerate}
+        \item if child.V = False: \emph{(To prevent nodes being added multiple times)}
+        \begin{enumerate}
+            \item child.V = True
+            \item child.d = curr.d+1
+            \item child.$\pi$ = curr
+            \item to\_visit.append(child)
+        \end{enumerate}
+    \end{enumerate}
+    \item remove curr from to\_visit
+\end{enumerate}
+\end{enumerate}
+Any vertices that still have v.d = -1 aren't reachable from s: in non-directed graphs this means they're not connected to any other node. v.V stands for v.Visited: rather than tracking 3 states, its sufficient to just track 2: a visual display would need all 3. 
+
+\subsubsection{Predecessor Graph}
+A graph built from the BFS results, that shows the edges and order taken by the search. For a graph G, the predecessor graph $G_\pi$ consists of:
+\begin{itemize}
+    \item $V_\pi$ = (v for v $\in$ G.V where v.$\pi$ is not Nil) + {s}
+    \item $E_\pi$ = (v.$\pi$, v) for v in $V_\pi$ - {S}
+\end{itemize}
+
+\subsection{Performance}
+O(v) nodes are visited, O(E) edges are traversed across the program to check if the adjacent nodes have been visited, so in total its \textbf{O(V+E)}. It's not $\Theta$(V+E) because not every node/edge is visited, some might not be reachable.
+
+\subsection{Depth-First Search}
+Normally almost identical to BFS, the difference is that new nodes are added to the front of the list: this causes the algorithm to follow the currently chosen path as far as it can before backtracking and trying another one. Since BFS has the current node 'teleporting' around the graph, DFS is more-commonly used for things like maze traversals.\\ \\
+This version of the DFS uses a recursive method, and keeps track of when each vertex is first discovered (v.d) and when it's finished (v.f). These values allow us to track some further statistics and classify edges.
+
+\subsubsection{Algorithm}
+
+\textbf{Traversal(V,E):}
+\begin{enumerate}
+    \item v.V = False, v.d = -1, v.f = -1, v.$\pi$=Nil $\forall \; v\in V$
+    \item time = 0 \emph{(time is a global variable)}
+    \item for v in V:
+    \item [] \quad if v.V = False:
+    \item [] \quad \quad DFS(V,E,v)
+\end{enumerate}
+
+\noindent \textbf{DFS(V,E,v)}
+\begin{enumerate}
+    \item time+=1, v.d = time
+    \item for u in V.adj[v]:
+    \begin{enumerate}
+        \item [] if u.V = False:
+        \begin{enumerate}
+            \item u.$\pi$ = v
+            \item DFS(V,E,u)
+        \end{enumerate}
+    \end{enumerate}
+    \item time+=1, v.f = time
+\end{enumerate}
+
+Since every node is visited thanks to the loop in traversal, v.d and v.f will be $>0$ for every node. Since not all nodes are connected, this may create multiple trees within the same graph. Nodes with v$\pi$ = Nil are the roots of these trees.
+
+\subsubsection{Predecessor Graph}
+In addition to the definitions for BFS, the edges of the trees are also classified as one of the following:
+\begin{description}
+    \item [Tree Edge] An edge that is part of the search
+    \item [Forward Edge] An edge from a node n to a descendant d in the same tree (n.d < d.d, the node has already been finished)
+    \item [Backward Edge] An edge from a node n to an ancestor a in the same tree (n.d > a.d, the ancestor is currently on the stack) or a self-looping edge
+    \item [Cross Edge] An edge between two different trees/vertices of the same tree that aren't ancestor/descendant: any edge that isn't one of the above three
+\end{description}
+
+\subsubsection{Performance}
+DFS is called on every vertex (O(V)), and the loop in DFS runs $\Theta$(E) times in total across the whole program, once for each edge, so in total its $\boldsymbol{\Theta(V+E)}$.

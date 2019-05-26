@@ -1,0 +1,38 @@
+\section{Minimum Spanning Tree}
+For an undirected weighted graph, the \textbf{Minimum Spanning Tree} is the tree (set of edges with no cycles) with the lowest weight that reach every vertex. By necessity, this has $|V|-1$ edges: any less won't reach every vertex, more would have a cycle.
+
+\subsection{Kruskal's Algorithm}
+\textbf{Kruskal(V,E)}
+\begin{enumerate}
+    \item Create $|V|$ sets, each with one vertex
+    \item T = []
+    \item Sort E by ascending cost
+    \item for (a,b) in E:
+    \begin{enumerate}
+        \item [] If a and b aren't in the same set
+        \begin{enumerate}
+            \item T.add(a,b)
+            \item Merge the sets containing a and b
+        \end{enumerate}
+    \end{enumerate}
+    \item return T
+\end{enumerate} 
+Since each edge is added in order of ascending cost, this is a fairly greedy approach. The condition that the nodes aren't in the same set prevents a cycle: nodes in the same set are connected, so adding a new connection would make a cycle. \\
+This algorithm can stop as soon as a spanning tree is created: this happens when there's a single vertex, since the algorithm makes sure no cycles are introduced. This is why the algorithm can't automatically take the first $|V|-1$ edges, since they may contain a cycle. The algorithm maintains a single tree throughout. 
+
+\newpage
+\subsection{Prim's Algorithm}
+\textbf{Prim(V,E,r)}
+\begin{enumerate}
+    \item v.d = 0, v.$\pi$ = Nil \(\forall\; v \in V\)
+    \item r.d = 0 \emph{(r is an arbitrary root node)}
+    \item Q = V
+    \item while \(Q \neq \emptyset\)
+    \begin{enumerate}
+        \item u = vertex with min. d in Q \emph{(d represents the distance from the tree)}
+        \item Relax all edges from u
+        \item Remove u from Q
+    \end{enumerate}
+    \item return (V,E)
+\end{enumerate} 
+Starting from r, a tree can be constructed using v.$\pi$ for each vertex. Like Dijkstra, the running time depends on Q: it could be a priority queue, a binary min-heap or something else. Since this method uses the shortest distance from the tree rather than the shortest edges, there's no chance of a cycle: this means $\Theta$(V) iterations in total. 

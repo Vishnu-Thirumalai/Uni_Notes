@@ -2,7 +2,7 @@
 These problems have a single flow network with \textbf{multiple types of flows} running simultaneously. Each type of flow (commodity) has its own source and sink (some networks might have multiple sources/sinks in a single node), and a demand to be fulfilled. Each commodity is represented as \textbf{(source (node), sink (node), demand (real value))}.\\ \\
 Problems are to find a simultaneous flow of multiple commodities to solve a global objective. The overall flow is composed of multiple sub-flows, each of which represents one commodity. All other flow rules are followed, though some problems don't account for capacity/have separate capacities for each commodity.
 
-\subsubsection{Types of Problems}
+\subsubsection{Types of Problems}\label{subsubsec:Multi_Commodity_Problem_Types}
 \begin{enumerate}
     \item Feasibility: find a flow that satisfies edge capacities and commodity demands.
     \item Minimum-cost: find a flow that satisfies edge capacities, gets as close to commodity demands as possible, while having a minimum cost
