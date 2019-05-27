@@ -23,7 +23,7 @@ We've seen in previous sections that for a graph (v,e), the shortest path betwee
 Since every shortest path is less than v-1, if an edge can still be relaxed after step C that means there's a negative cycle: this would give us a weight of $-\infty$, so the algorithm just rejects it by returning false.\\
 This algorithm is \textbf{O(VE)} - it loops through all the edges V times in total (v-1 times in step C, 1 time in step D). It returns the graph, with with d and $\pi$ set for each vertex.
 
-\subsection{Improvements}
+\subsubsection{Improvements}
 \begin{itemize}
     \item Edges only need to be updated when their source nodes are updated: the current algorithm updates every edge every time, this can be reduced by keeping a track of which nodes get updated. 
     \item Most shortest paths aren't going to be v-1 edges long: the loop can terminate early if there are no edges to relax at a generation. A shortest path of length k will finish relaxing every node in it in generation k.

@@ -1,7 +1,7 @@
 \subsection{Dijkstra's Algorithm}
 An alternate single-source shortest-paths algorithm that is faster than the Bellman-Ford, \textbf{but can't handle negative edge weights}. If there are negative edge weights/cycles, the algorithm doesn't raise a flag: it finishes executing, but the answers produced will be incorrect. 
 
-\subsection{Lemmas Used}
+\subsubsection{Lemmas Used}
 \begin{description}
     \item [Triangle Inequality:] \(\delta(u,v) \leq \delta(u,x) + w(x,v)\).i.e. the shortest path between two points can't be further relaxed
     \item [Upper Bound:] \(v.d \geq \delta (s,v) \) at every point of the algorithm
@@ -9,7 +9,7 @@ An alternate single-source shortest-paths algorithm that is faster than the Bell
     \item [Convergence:] Once \(v.d = \delta (s,v)\), there is no change in v.d
 \end{description}
 
-\subsection{Algorithm}
+\subsubsection{Algorithm}
 In the below, N.adj is the list of nodes that are connected to N by an outgoing edge (i.e. N$\rightarrow$n), and extract$\_$min(Q) returns the node with the lowest upper bound in Q.\\
 \textbf{Dijkstra(V,E)}:
 \begin{enumerate}[label=\Alph*]
@@ -27,7 +27,7 @@ In the below, N.adj is the list of nodes that are connected to N by an outgoing 
 Each edge is only relaxed once, since each node is only considered once. As the nodes are reached in a greedy order and there are no negative edge weights, this means that the nodes are reached as fast as possible and thus there shouldn't be a shorter path. The algorithm returns the graph, with with d and $\pi$ set for each vertex.
 
 \newpage
-\subsection{Proof of Correctness}
+\subsubsection{Proof of Correctness}
 If we can prove that for any u $\in$ S, u.d = $\delta(s,u)$, then at the end all nodes are in s so all have the shortest path.
 \begin{itemize}
     \item We can prove this by induction:
@@ -54,7 +54,7 @@ If we can prove that for any u $\in$ S, u.d = $\delta(s,u)$, then at the end all
     \end{itemize}
 \end{itemize}
 
-\subsection{Implementation and Performance}
+\subsubsection{Implementation and Performance}
 The algorithm's performance depends on the implementation of Q:
 \begin{itemize}
     \item If Q is a regular list, extract\_min is O(V) every time (V times across the algorithm), and updating the bound on a vertex is O(1) (E times across the algorithm) so the algorithm is $\boldsymbol{O(V^2 + E)}$ $\approx$ $O(V^2)$
