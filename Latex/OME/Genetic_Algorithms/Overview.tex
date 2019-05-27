@@ -1,0 +1,34 @@
+\section{Genetic Algorithms}
+Genetic Algorithms work by evolving a pool of candidate solutions (a population-based method), optimising them in the process till it eventually converges to an optimal enough solution. This is a \textbf{meta-heuristic}: its a way to find a way to find an optimal solution. \\
+Each configuration is represented as an \textbf{individual}, which contains values for the variables of the given problem. \textbf{Binary Genetic Algorithms} represent individuals as a string of binary characters of length n. BGAs assume that \textbf{all} binary strings of length n represent a valid configuration: if this isn't true then there's an overhead in checking validity.\\
+One change for this version of the Genetic Algorithm is to define the \textbf{fitness function} of a configuration: how good a solution is. This version tries to find the individual with the highest fitness function: this can be obtained by multiplying the cost function by -1.
+\\ \\
+This form of the genetic algorithm has 4 main parts:
+\begin{enumerate}
+    \item Natural Selection
+    \item Pair Selection
+    \item Crossover
+    \item Mutation\\ 
+\end{enumerate}
+Combining all of these together, the overall flow of the algorithm is: 
+\begin{enumerate}[label=\Alph*]
+\item Create a random initial population
+\item While stopping criteria are unmet:
+\begin{enumerate}[label=\arabic*]
+    \item Create pairs via Pair Selection
+    \item Make new individuals via Crossover
+    \item Filter population with Natural Selection
+    \item Apply mutation to the population
+\end{enumerate}
+\item Select the best performing individual as the solution\\
+\end{enumerate}
+For problems that have constraints or multiple objectives to be optimised, having the cost function be a weighted sum of each individual requirement is sufficient. 
+
+\subsection{Stopping Criteria}
+Any/all of the below can be used: it depends on the situation:
+\begin{enumerate}
+    \item An acceptable (high enough fitness) solution has been found
+    \item The mean/standard deviation/range of the individuals is within a target value
+    \item No change in individuals best/cost/worst cost after X iterations
+    \item N iterations have elapsed
+\end{enumerate}

@@ -1,0 +1,62 @@
+\subsection{Pair Selection}
+This part of the algorithm determines how individuals are paired up for crossovers (creating new individuals). This pairing up is important as it can influence how genes spread throughout the population, and can prevent good genes being overshadowed by poor ones. All of the below are independent of the cost function. i.e they don't require it to be of a certain form, such as differentiable. \\
+
+\noindent The first two are \textbf{Roulette Selections}. These give each individual a probability, and to generate a pair they randomly sample from the entire population twice using the probabilities. One way to do this is to give each individual a cumulative probability, then generate a random number and see which probability that corresponds to. e.g.
+\begin{align}
+    P &= (010,110,011,101) \nonumber \\
+    cProb(P) &= (0.3,0.4,0.6,1.0) \nonumber \\
+    Pair &= (0.37,0.81) \nonumber \\
+         &= (110,101) \nonumber
+\end{align}
+
+
+\subsubsection{Cost-Weighted Roulette}
+The probability for each individual is dependent on its \textbf{fitness function}, so the probability of $i_n$ in the population $P$ is calculated as:
+ 
+\begin{equation}
+    prob(i_n) = \frac{Fitness(i_n)}{\sum_{x\in P} Fitness(x)}
+\end{equation} 
+
+\subsubsection{Rank-Weighted Roulette}
+The probability for each individual is dependent on its rank in the population. Higher fitness functions are given a higher rank, so for a population P of size k the individual with the highest fitness function is given the rank k. The probability of $i_n$ is:
+
+\begin{equation}
+    prob(i_n) = \frac{Rank(i_n)}{\sum_{x=0}^k x}
+\end{equation} 
+
+This gives probability \(\frac{1}{\sum_{x=0}^k x}\) to the worst individual and \(\frac{k}{\sum_{x=0}^k x}\) to the first. For small populations, this gives a very skewed probability, and sorting/ranking is an overhead.
+
+\subsubsection{Tournament Selection}
+A small subset of individuals is randomly chosen, and the best performing individual from this subset is selected. This is done twice to get a pair, and the size of each subset is normally 2-3. Since in each instance only a trivial subset has to be sorted, it reduces computation on sorting and thus works well for problems with large populations. 
+
+
+\subsection{Crossover}
+New individuals are primarily created using the crossover operation. To generate offspring we take parts from the selected two individuals and combine them to make new individuals. The new individuals are added to the population, and then natural selection is applied. Repeatedly doing just crossovers only covers a limited section of the search space, so isn't sufficient to find an optimal solution. 
+
+As previously mentioned, individuals are represented by a binary string (0s and 1s) of length n: this length n is constant for all configurations of a program. 
+
+\subsubsection{Single Point}
+This breaks each parent into two parts, and creates offspring by swapping the second part for each. A random number \(0\leq i < n\) is generated, and used to split the chromosomes (n is the length of the binary string). Using slice notation, this can be shown as: 
+
+\begin{align}
+    Child_1 &= Parent_1[0:i] + Parent_2[i:end] \nonumber\\
+    Child_2 &= Parent_2[0:i] + Parent_1[i:end] \nonumber
+\end{align}
+
+\subsubsection{Double Point}
+This breaks each parent into 3 parts, and swaps the middle parts for each. This middle section is denoted by two crossover points, which are the start and end of the section respectively. These follow \(0\leq i_1 < i_2 \leq n\). Using slice notation, this can be shown as: 
+
+\begin{align}
+    Child_1 &= Parent_1[0:i_1] + Parent_2[i_1:i_2] +  Parent_1[i_2:end] \nonumber\\
+    Child_2 &= Parent_2[0:i_1] + Parent_1[i_1:i_2] + Parent_2[i_2:end] \nonumber
+\end{align}
+
+\subsection{Natural Selection}
+In this version, natural selection is used to bring the population back to its normal size after adding the crossover offspring. If there were originally P individuals, the algorithm generates probabilities with rank/cost-roulette then uses them to select P individuals from the new population.
+
+\subsection{Mutation}
+Mutation is the process that actually drives evolution, by making small changes to the individuals. Crossovers move the genes into potentially better solutions, mutations discover new solutions. \\
+
+\noindent Mutation is determined using a mutation rate, q. To prevent good solutions from being mutated, we can designate the top e chromosomes as \emph{elite}, and not consider them for mutation. In this version, for a population of size P, qP individuals are randomly selected then mutated: this could be flipping some of their bits (0$\rightarrow$1, 1$\rightarrow$0), re-arranging them or other small changes.
+
+

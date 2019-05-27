@@ -1,0 +1,52 @@
+\subsection{Simulated Annealing}
+A general heuristic (technique for solving problems that provides an acceptable, but not necessarily optimal) for solving optimisation problems. \\
+As mentioned in \ref{sec:Combinatorial_Optimisation}, a optimisation problem can be represented as (R,C), which is (set of configurations, cost function). For simulated annealing the \textbf{neighbourhood} is also defined: for a config c, neighbourhood(c) is a set of configurations that can be obtained by a simple modification to c. The algorithm uses this in its \textbf{Generation Mechanism}: given a configuration, it returns a random neighbour.
+
+\subsection{Generation Mechanism}
+
+\subsubsection{TSP}
+A configuration in the travelling-salesman problem consists of a list of vertices, which gives us an order of cities to visit. A generation mechanism could be to swap two non-consecutive edges: this is still a valid tour since all the cities are present. This is called the \textbf{2-opt heuristic}, and is often used in practice. The 3-opt and 4-opt versions are also used.
+
+\subsubsection{Weighted Graph Bisection Problem}
+Given a weighted graph (V,E), split V into two parts with an equal number of vertices such that the sum edge weights between the two halves is minimum: effectively, make a cut on the graph into equal halves with minimum edge weights between the halves. \\
+Since the sizes of the halves (A and B) stay the same, a generation mechanism is to transfer a node from A to B and vice versa. A variation is swapping two nodes from each, rather than one.
+
+\subsection{Why Not Local Search?}
+Local search is a simple optimisation method: given a configuration, search its neighbourhood for a new configuration with a better (lower) cost, move to this, then repeat. If there aren't any better neighbours, then stop. This works fine on some functions, but it may get stuck in \textbf{Local Minima}: a configuration that has a better cost that all of its neighbours, but not the most optimal configuration.
+
+\subsection{Temperature}
+Simulated annealing has a chance to select a neighbour with a worse cost than the current configuration, and uses a parameter known as the \textbf{Temperature} to control this: the higher the temperature, the more likely a worse configuration is allowed. \\
+By allowing worse configurations the algorithm is less likely to be stuck in local minima, as it can break out of them if the temperature allows it. The temperature starts high then is slowly decreased as the algorithm progresses, so in later stages the algorithm reverts to a local search. The temperature changes every L iterations, and L usually increases as the algorithm progresses.
+
+\subsection{Probability}
+The exact probability equation to accept a worse configuration is:
+\begin{equation}
+    p(worse) = \exp{\left(\frac{C(config)-C(new)}{T}\right)}
+\end{equation}
+Where config is the current configuration (c(config) = a), new is the worse configuration (c(new) = x), and T is the temperature. By definition, p(worse) is $\leq 1$: $e^{\frac{a-x}{T}}$=1 when a = x, and is less otherwise as $x>a$. An increase in T increases the probability, an increase in x (a worse neighbour) decreases the probability.
+
+\subsection{Algorithm}
+\textbf{Simulated Annealing(R, C, initial\_config, T, L)}:
+\begin{enumerate}[label=\Alph*]
+    \item config = initial\_config
+    \item Do: 
+\begin{enumerate}[label=\arabic*]
+    \item [] for j in range(L):
+    \begin{enumerate}
+        \item new = generate(config)
+        \item if $C(new) < C(config)$
+        \item [] \quad config = new
+        \item elif $\exp{\left(\frac{C(config)-C(new)}{T}\right)} > rand(0,1)$
+        \item [] \quad config = new
+    \end{enumerate}
+    \item Update T and L
+\end{enumerate}  
+\item [] While (Stopping Criteria Unmet)
+\item Return config
+\end{enumerate}
+
+\subsection{Stopping Criteria}
+\begin{itemize}
+    \item T hits a defined minimum value
+    \item There weren't any/enough transitions in the last temperature phase
+\end{itemize}

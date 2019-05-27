@@ -1,0 +1,22 @@
+\subsection{Travelling Salesman Problem}
+Representing configurations/tours as a binary string is difficult, so instead we can use a sequence of vertices: each individual will have the same vertices, but in a different order.
+
+\subsubsection{Fitness Function}
+Say for each tour t the cost is cost(t), and the individual representing that tour is $t_i$ . If for a population P the worst cost is $cost_{max}(P)$, then the fitness for $t_i$ is:
+\begin{equation}
+    fitness(t_i) = cost_{max}(P) - cost(t) + r
+\end{equation}
+r is a constant is used to make sure the fitness for all individuals is positive: having a fitness of zero or less breaks the cost-weighting roulette. Having r too high weakens the cost-weighting roulette, as the fractional difference between each individual becomes too small to effectively provide probabilities. 
+
+\subsubsection{Crossover}
+Given two individuals a and b, children are the first half of one individual + the remaining cities in the order they appear in the other individual. e.g.
+\begin{align}
+    a &= [1,3,5,7,4,2,6,8] \nonumber \\
+    b &= [2,3,4,8,6,1,5,7] \nonumber \\
+    child_a &= [1,3,5,7|2,4,8,6] \nonumber \\
+    child_b &= [2,3,4,8|1,5,7,6] \nonumber \\
+\end{align}
+For $child_a$: [1,3,5,7] are copied directly, then 4,2,6 and 8 are added in the order they appear in b. For $child_b$: [2,3,4,8] is copied and 1,5,7 and 6 are added.\\
+
+This crossover can be improved by making sure that new configurations follow the triangle inequality/etc. .  This requires extra computation, but prevents needless iterations with obviously inferior configurations.
+
