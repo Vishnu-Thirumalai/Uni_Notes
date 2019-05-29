@@ -3,7 +3,7 @@ A common type of problem that builds off Flow-Feasibility: each edge is given a 
 
 \subsubsection{Flow Network Tweaks}
 \begin{itemize}
-    \item If the edge (a,b) exists and c(a,b) > 0, then c(b,a) is 0. Therefore in the residual network, $c_r$(a,b) = c(a,b)-f(a,b) and $c_r$(b,a) = f(a,b)
+    \item If the edge (a,b) exists and c(a,b) $>$ 0, then c(b,a) is 0. Therefore in the residual network, $c_r$(a,b) = c(a,b)-f(a,b) and $c_r$(b,a) = f(a,b)
     \item The cost of a reverse edge is the negative of the existing edge. i.e if edge (u,v) exists, then a(v,u) = -1*a(u,v). 
     \item d(v) in the residual network is d(v) + incoming flow - outgoing flow from the original network
 \end{itemize}

@@ -14,7 +14,7 @@ By the definition of a flow, if $f(u,v)>0$, then f(v,u)=0. The residual capacity
 A \textbf{Residual Edge} is an edge with residual capacity $>0$. The \textbf{Residual Network} of a flow f is the flow network made of residual edges after applying f. This network can be used to find flows not included in f, and these can be 'added' to f.
 
 \subsection{'Adding' Flows}
-By using the residual network, there might be a flow which improves the current one: this flow is 'added' to the current flow, altering it and increasing the overall flow. Assuming there are two flows $F_1$ and $F_2$, adding them together is done edge-by-edge to produce the flow $F'$. Assuming that $F_1(u,v) > 0$ (and therefore $f(u,v)=0$):
+By using the residual network, there might be a flow which improves the current one: this flow is 'added' to the current flow, altering it and increasing the overall flow. Assuming there are two flows $F_1$ and $F_2$, adding them together is done edge-by-edge to produce the flow $F'$. Assuming that $F_1(u,v) > 0$ (and therefore $f(v,u)=0$):
 \begin{itemize}
     \item If $F_2(u,v) > 0$, then $F'(u,v) = F_1(u,v) + F_2(u,v)$
         \begin{itemize}

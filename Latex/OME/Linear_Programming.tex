@@ -97,7 +97,7 @@ Again recalling the problem (section \ref{subsubsec:Multi_Commodity_Problem_Type
     \item \(f_{uv} - \lambda * c(u,v)  \leq 0 \quad \forall \;(u,v) \in E\) \\ Congestion $\leq$ max. congestion for each edge
     \item \(f_{uv} \geq 0 \quad \forall \;(u,v) \in E\) \\ Flow $>=0$ for each edge
     \item \(\sum_{(x,v)\in E} f_{qxv} - \sum_{(v,x)\in E} f_{qvx} = 0 \quad \forall x \in V-\{s_q,t_q\}\; \forall q \) \\ Net commodity flow = 0 for all nodes except the commodity source/sink for all commodities/edges
-    \item \(\sum_{(s,v)\in E} f_{qsv} - \sum_{(v,s)\in E} f_{qvs} = d_q\) \\ The flow from the source is $d_q$ for each commodity
+    \item \(\sum_{(s,v)\in E} f_{qsv} - \sum_{(v,s)\in E} f_{qvs} = d_q \quad \forall q\) \\ The flow from the source is $d_q$ for each commodity
     \end{itemize}
 \end{description}
 Once again, rather than adding separate constraints that flow(sink) = -$d_q$, since they're implied by the others these constraints can be omitted to shrink the problem. The first constraints are converted into the standard form by:

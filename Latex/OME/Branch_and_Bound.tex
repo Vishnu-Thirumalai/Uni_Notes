@@ -12,7 +12,7 @@ By making every possible branch starting from the initial configuration (state),
 Rather than branching every possibility, this uses the cost function to decide whether or not to follow a branch. The bounding procedure keeps a track of the best cost found so far, and when branching checks the best cost obtainable from the generated state or its descendents. If this cost is worse (higher) than the current best cost, the algorithm doesn't follow the branch, since it can't provide a better configuration. \\
 When calculating the cost, the algorithm normally ignores validity to get a faster result. For example in TSP, the cost of a partial configuration is:
 \begin{equation}
-    bound(PC) = cost(PC) + \text{min. cost edge from all nodes not in the PC}
+    bound(PC) = cost(PC) + \text{min.cost edge from last node to node not in the PC} + \text{min. cost edge from all nodes not in the PC}
 \end{equation}
 Obviously, this might not be the cost a valid path: but it represents a lower bound. For a complete configuration, this is just the cost of the path. Creating a minimum valid path would take as long as generating all the descendents from the state, so defeats the purpose.
 

@@ -47,7 +47,7 @@ Since the algorithm has to store the shortest path for each algorithm, it uses a
         \item [] w(a,b) = w(a,b) + G''.V[a].d -  G''.V[b].d  \quad \emph{(G''.V[v].d = h(v))}
     \end{enumerate}
     \item Results = []
-    \item for v in V: \emph{(Run Dijkstra for)}
+    \item for v in V: \emph{(Run Dijkstra for each vertex in the original list)}
 \begin{enumerate}[label=\arabic*]
     \item Set v as source
     \item $G_v$ = Dijkstra(G.V,G.E) 

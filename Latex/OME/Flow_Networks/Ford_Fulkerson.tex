@@ -22,7 +22,7 @@ When adding the path flow $F_p$from an augmenting path P, the flow value is cons
 \begin{itemize}
     \item F(a,b) = f(a,b) + max\{q-f(b,a),0\}
         \begin{itemize}
-            \item If f(a,b) > 0, then the flows were in the same direction and f(b,a) = 0: so they're just added
+            \item If f(a,b) $>$ 0, then the flows were in the same direction and f(b,a) = 0: so they're just added
             \item if f(a,b) = 0, then the flows were in the opposite direction, and f(b,a) $\geq$ 0: f(a,b) is set to the result of removing the original flow from the augment 
         \end{itemize}
     \item F(b,a) = max\{f(b,a)-q,0\}
@@ -45,7 +45,7 @@ When adding the path flow $F_p$from an augmenting path P, the flow value is cons
 \end{enumerate}  
 \item return F
 \end{enumerate}
-The advantage over the basic method is its easier to find augmenting paths than full flows.
+The advantage over the basic method is its easier to find augmenting paths than full flows. 
 
 \subsubsection{Performance}
 For a graph (V,E): constructing the residual network is $\boldsymbol{\Theta(E)}$ (checking edge by edge), finding an augmenting path is \textbf{O(E)} (For example, a breadth-first search), and augmenting is \textbf{O(V)} (each vertex appears max. once). \\
@@ -53,4 +53,4 @@ This means each iteration is normally O(E) (most graphs are sparse, $\frac{v^2}{
 The bound on the number of iterations is the size of the maximum flow ($|f*|$). This is obtained when the flow is comprised entirely of distinct paths (i.e size of flow = number of paths in flow). The Ford\_Fulkerson method discovers one path at a time, so the overall runtime will be $O(|f*|*E)$.
 
 \subsubsection{Edmonds\_Karp Method}
-A variation of the Ford\_Fulkerson method: select the shortest (lowest number of edges) augmenting path each time. This can be found using a Breadth-First Search or similar. The performance is $\boldsymbol{O(VE^2)}$, with the number of iterations being \textbf{O(VE)}. This is \\obtained by there being at most V-1 paths in any network, and any path length repeating at most E times (the proof isn't required).
+A variation of the Ford\_Fulkerson method: select the shortest (lowest number of edges) augmenting path each time. This can be found using a Breadth-First Search or similar. The performance is $\boldsymbol{O(VE^2)}$, with the number of iterations being \textbf{O(VE)}. This is \\obtained by there being at most V-1 paths in any network (every time a path is augmented, one edge is saturated), and any path length repeating at most E times. The intuition behind these: every time an augmenting V-1
