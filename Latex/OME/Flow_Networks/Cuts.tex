@@ -6,6 +6,28 @@ A \textbf{Cut} is splitting the nodes in a network into two groups: group S cont
 \end{itemize}
 For any cut, flow(cut) = flow(sink) $\leq$ capacity(cut) (equal when there is no flow from S to T). Therefore, \textbf{max. flow in a network $\boldsymbol{\leq}$ min. capacity of all cuts}.
 
+\subsubsection{Minimum Cut}
+A minimum cut of a graph is the cut with the lowest capacity: there may be more than one. One method to find minimum cuts:
+\begin{enumerate}
+    \item Find the maximum flow, and generate its residual network N
+    \item Make a list a = \{S\}, where s is the source 
+    \item Add all nodes reachable from s, then all nodes reachable from the new nodes, etc. until no more nodes are reachable
+    \begin{itemize}
+        \item If t (the sink) is reached, then this isn't a maximum flow because there's a path from s to t
+    \end{itemize}
+    \item The first minimum cut is (\{a\}, \{v-a\}) (v is the list of vertices/nodes)
+    \item Repeat the following steps till t is reached:
+    \begin{enumerate}
+        \item Add a single node that connects to a
+        \item Continue to add all new reachable nodes (as in step 3) until no more nodes are reachable.
+        \begin{itemize}
+            \item If at any point t is added to the list, stop and end the algorithm.
+        \end{itemize}
+        \item The next minimum cut is (\{a\},\{v-a\})
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
 \subsubsection{Max-Flow Min-Cut Theorem}
 \begin{enumerate}
     \item Max. flow in a network $\leq$ min. capacity of any cut in the network

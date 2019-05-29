@@ -18,11 +18,12 @@ This is because, other than the source/sink, every node n on the path will have 
 Since the aim is to remove negative weights, we need to show that for an edge (a,b) that \(h(a)-h(b) \geq 0\). h(v) is computed by creating a new node, say s, connecting it to every other node with a zero-cost edge, then setting h(v) = $\delta(s,v)$. \\
 Briefly, since s has access to every other node (and thus every possible path in the graph), $\delta(s,v)$ is the shortest path into v from any other node. Since shortest is by path weight, we can say this is the most negative path weight leading into v. If this is subtracted from any incoming path weight, it'll end up as positive. A more mathematical proof:
 \begin{align}
-    \text{By the triangle inequality, }& \delta(s,v) \leq \delta(s,u) + w(u,v) \nonumber \\
-    \text{Therefore, }& \delta(s,v) - \delta(s,u) \leq w(u,v) \nonumber \\
-    \hat{w}(u,v) &= w(u,v) + h(u) - h(v) \nonumber \\
-                 &= w(u,v) + \delta(s,v) - \delta(s,u) \nonumber \\
-                 &\geq 0 \quad \forall \; u,v \nonumber 
+    \text{By the triangle inequality, }& \delta(s,a) \leq \delta(s,b) + w(b,a) \nonumber \\
+    \text{Therefore, }&  -w(a,b) \leq  \nonumber \delta(s,b) - \delta(s,a) \\
+    \hat{w}(a,b) &= w(a,b) + h(a) - h(b) \nonumber \\
+                 &= w(a,b) + ( \delta(s,b) - \delta(s,a) ) \nonumber \\
+                 &\geq w(a,b) + (-w(a,b)) \nonumber \\
+                 &\geq 0 \quad \forall \; a,b \nonumber 
 \end{align}
 Since we compute h(v) using Bellman-Ford, s has access to every path so it can also check if there's a negative cycle and terminate. Using Dijkstra wouldn't work, since there would be negative edges.
 
