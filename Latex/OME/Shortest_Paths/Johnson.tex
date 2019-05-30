@@ -56,4 +56,6 @@ Since the algorithm has to store the shortest path for each algorithm, it uses a
 \end{enumerate}    
     \item return Results
 \end{enumerate}
-All the weights will be off by the node values: they can be fixed before step H.2. The weight of the shortest path to node v from node u can be fixed by adding h(u)-h(v): essentially reversing the effects of the re-weighting. 
+All the weights will be off by the node values: they can be fixed before step H.2. The weight of the shortest path to node v from node u can be fixed by adding h(u)-h(v): essentially reversing the effects of the re-weighting. \\ \\
+Bellman\_Ford is \textbf{O(VE)}, but Dijkstra is run V times, so that dominates. The overall complexity is $\boldsymbol{O(V^3)}$ or $\boldsymbol{O(VE\log V)}$, depending on which Dijkstra version is used. 
+

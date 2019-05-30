@@ -13,6 +13,7 @@ This algorithm is very similar to the Edmonds\_Karp algorithm, with some key dif
 \begin{itemize}
     \item Since there are multiple start/end points for shortest augmenting paths, a supply node is a chosen (arbitrarily) and a shortest path tree to every demand node is created
     \begin{itemize}
+        \item The edge weights are the costs of each edge
         \item The tree could also be created to every node then checked for demand
         \item A list of supply nodes is kept: when a d(node) = 0, it can be removed from the list
         \item The tree can be made with Dijkstra's if the costs are re-weighted , so O(E $\log$V)
@@ -28,12 +29,12 @@ This algorithm is very similar to the Edmonds\_Karp algorithm, with some key dif
 \textbf{Algorithm:}
 \begin{enumerate}[label=\Alph*]
     \item F = Zero Flow \emph{(f(a,b) = 0 for all (a,b))}
-    \item S = list of supply nodes \emph{(Nodes where d(v) > 0)}
+    \item S = list of supply nodes \emph{(Nodes where d(v) $>$ 0)}
     \item while True: 
 \begin{enumerate}[label=\arabic*]
     \item N = Residual Network of F
     \item v = Arbitrarily chosen Supply node/vertex
-    \item T = Shortest augmenting path tree to demand nodes in N reachable from v
+    \item T = Shortest augmenting path tree to demand nodes in N reachable from v 
     \item $F_p$ = Shortest augmenting path in T from v to x
     \item $c_r(F_p)$ = min \{d(v), d(x), $c_r(F_p)$ \}
     \item If $F_p$ does not exist:
