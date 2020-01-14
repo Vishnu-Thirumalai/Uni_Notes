@@ -1,0 +1,102 @@
+\section{Practical Reasoning}
+
+\subsection{Definition}
+\textbf{Practical Reasoning} is reasoning on what actions to do. 
+
+In humans, there are two steps:
+\begin{enumerate}
+    \item Deliberation - Deciding the desired goal
+    \item Means-End Reasoning - Deciding how to achieve the goal
+\end{enumerate}
+
+\subsection{Intentions}
+Intentions are the result of deliberation: a state of affairs that the agent aims to achieve. Once obtained, agents will devote resources to trying to achieve it. 
+
+For an intention I chosen by an agent A:
+\begin{itemize}
+    \item A will try to achieve I, trying alternative plans if it fails
+    \item A won't aim for any intention that conflicts with I (This helps constrain the search space)
+    \item A \emph{believes} that I is possible under certain circumstances 
+    \item Agents won't choose intentions that are impossible or that will happen inevitably (without the agent acting)
+    \item Agents don't always intend the side effects of their intentions (i.e if a is intended and a$\rightarrow$b, the agent doesn't necessarily intend b) 
+\end{itemize}
+
+Intentions can be thought of as a want/goal with actions being put towards it, rather than just a desire. 
+
+\subsection{Planning}
+Means-End reasoning gives a plan of action for the agent to achieve its intention, taking into account the environment/state and possible actions.
+
+The largest problem is that deliberation/reasoning aren't instantaneous: the optimal intention may have changed (change in environment/goals) before the deliberation has even finished (Calculative Rationality). 
+
+\subsubsection{Deliberation}
+\begin{enumerate}
+    \item Generate options/desires using state, environment and current goals (to avoid\\ conflict of intentions)
+    \item Filter these options to generate the new intention set
+\end{enumerate}
+
+\subsubsection{Commitment}
+Once an intention has been selected, the agent \emph{commits} to achieving it.
+\begin{description}
+    \item [Blind/Fanatical] Commits until the intention is achieved
+    \item [Single-Minded] Till achieved or no longer possible to achieve
+    \item[Open-Minded] Commits while it believes the intention to be possible
+\end{description}
+
+Agents can commit to ends(goals) or means(the actions taken). If there's a change, the agent needs to check if its plan is valid and potentially re-plan.
+
+\subsubsection{Re-consideration Strategies}
+\begin{itemize}
+    \item Agents can re-check actions/intentions after each action it performs to check they're still possible (open-minded), but this is very costly.
+    \item Checking every iteration might cause the agent to only deliberate and never act 
+    \item Checking too infrequently might lead the agent to try to achieve something that's no longer possible
+\end{itemize} 
+
+Many systems have a higher-level check to determine if the intention/plan should be reconsidered - this check is less costly than reconsidering.
+
+An environment that changes frequently favours constant re-checking, while static environments favour agents that achieve rather than check.
+
+\subsubsection{Belief Desire Intention (BDI) Agent}
+
+\begin{enumerate}
+\item B = [initial\_beliefs], I = initial\_intentions
+\item while true:
+\begin{enumerate}
+    \item Obtain percepts P (info from environment)
+    \item Update beliefs B using P
+    \item D = options(B,I)
+    \item I = filter(B,D,I)
+    \item $\pi$ = plan(B,I)
+    \item while not (empty($\pi$) OR succeded(I) or impossible(I)):
+    \begin{enumerate}
+        \item Execute action $\pi[0]$
+        \item Obtain percepts P
+        \item B = update(B,P)
+        \item if reconsider\_check(B,I):
+            \begin{enumerate}[label=\arabic*]
+                \item D = options(B,I)
+                \item I = filter(B,D,I)
+            \end{enumerate}
+         \item if not(sound($\pi$)):
+            \begin{enumerate}[label=\arabic*]
+                \item $\pi$ = plan(B,I)
+            \end{enumerate}    
+    \end{enumerate}
+\end{enumerate}
+\end{enumerate}
+
+\subsubsection{Plan Libraries}
+The IRMA and PRS (Procedural Reasoning System) architectures use a \emph{plan library}: a pre-made set of plans that an agent can use to achieve its intentions. \\
+
+Each plan has:
+\begin{enumerate}
+    \item Invocation Condition - why it would be selected
+    \item Context - the requirements for the plan
+    \item Maintenance Condition - things that must remain true for the duration of the plan
+    \item Body - contains the actions/goals to be achieved (The goals add sub-plans to a stack)
+\end{enumerate}
+
+The PRS observes, generates goals by checking the plans' invocation conditions, and selects a plan as an intention. It creates a stack for the intention in its event queue: the system can have multiple intentions running at once.  
+
+\subsection{Hybrid Agents}
+It's suggested that agents can't work with only deliberation/reactive capabilities, and that they need both. Such an agent can react to immediate events while maintaining overall goals. 
+

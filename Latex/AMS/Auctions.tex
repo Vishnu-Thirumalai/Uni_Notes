@@ -1,0 +1,135 @@
+\section{Auctions}
+\emph{Auctions} are a mechanism to allocate \textbf{limited} resources that are desired by more than one agent. The resources are allocated based on how much each agent values the resource.
+
+\subsection{Structure of an Auction}
+\subsubsection{Types of Agents}
+\begin{description}
+    \item[Auctioneer] an agent that allocates the resources - wants to maximise the selling price
+    \item[Bidder] an agent that wants to minimise the price they pay for the resources - they do this by using a \emph{strategy} to place bids
+\end{description}
+
+\subsubsection{Valuation of Goods}
+\begin{description}
+    \item[Public/Common] The good has the same value to all agents - but not all agents have perfect information on this value
+    \item[Private] Each agent has their own value on the good. e.g. sentiment
+    \item[Correlated] Private + based on other people's valuations. e.g. buy a good to sell it later, so you need to know how much others want it
+\end{description}
+
+\subsubsection{Visibility of Bids}
+\begin{description}
+    \item[Open Cry] Bids are common knowledge to all bidders
+    \item[Sealed Bid] Bids are private
+\end{description}
+
+\subsubsection{Bidding Mechanism}
+\begin{description}
+    \item[Ascending/Descending] Start at price X, subsequent bids increase/decrease the price
+    \item[One-Shot] All agents submit a single bid
+\end{description}
+
+\subsubsection{Winner Price Determination}
+\begin{description}
+    \item[First Price] Agent with the highest bid pays the highest bid
+    \item[Second Price] Agent with the highest bid pays the second highest bid value
+\end{description}
+
+\subsection{English Auctions}
+First price, open cry, ascending. The bidding stops after a set time deadline or a fixed time period in which no bids have been made. 
+
+\subsubsection{Bidder Strategy}
+Agents will never bid more than their expected value of the good. Instead, they bid $\Delta V$ (the smallest permitted amount) above the current highest bid until they reach their expected value.
+
+\subsubsection{Expected Price}
+The auctioneer will receive the second highest bid + $\Delta V$, as opposed to the winner's true valuation. It therefore loses out that much. The less competition, the higher the loss of revenue for the auctioneer.\\
+Auctioneers (or agents they collude with) can place \emph{shill bids}, which are false bids intended to drive up the value of the second highest bids. Auctioneers will also have a \emph{reserve value}, which is the minimum value they will sell for. 
+
+\subsection{Dutch Auction}
+First price, open cry, descending. The auctioneer controls the speed of the descent, and the first bidder to accept the current price wins. 
+\subsection{Bidder Strategy}
+Agent will never bid more than the expected value. Below this value, the agent needs to balance two risks: decreasing the price vs. losing the item to another agent. This is made harder as the agent doesn't know the valuations of the other agents. 
+
+\subsubsection{Risk Attitudes}
+\begin{description}
+    \item[Risk Averse] An agent that's less likely to take risks
+    \item[Risk Seeking] An agent that's more likely to take risks
+    \item[Risk Neutral] An agent that bases their choice solely on probabilities. e.g. 
+\end{description}
+
+\subsubsection{Expected Price}
+If the bidders are risk averse, they will accept as soon as it hits their true value, so the auctioneer will get the maximum valuation across all agents. If they're risk-seeking, then an English Auction provides better results.
+
+\subsection{First Price Sealed Bid}
+A one-shot auction mechanism, where every agent submits one private bid. It's similar to a dutch auction - agents won't pay more than their true valuation, and below that depends on their risk attitude.\\
+
+All of the mechanisms so far have bidders taking into account the other agent's valuations, rather than giving their true valuations.
+
+\subsection{Vickrey Auction}
+Second price, sealed bid, one shot. As agents only pay the second price, it might be possible to bid more than their true valuation
+
+\subsubsection{Bidder Strategy}
+\begin{itemize}
+    \item If they bid higher than their true value, the second bid could also be higher - this would end in a loss
+    \item If they bid lower than their true value, they have less chance of winning and they still get the second highest valuation
+\end{itemize}
+Therefore, it makes sense for the bidders to bid their true values
+
+\subsubsection{Expected Price}
+Auctioneers will get the second highest true valuation - this is slightly less than an english auction.\\
+
+An \emph{anti-social bid} is a bid placed to intentionally raise the second highest bid, so the winner pays more. This is risky for a bidder this value will be higher than its true valuation, so it might accidentally win and get a loss. However, an auctioneer can place a shill anti-social bid at no risk once it knows the highest bid.
+
+\subsection{Winner's Curse}
+For any auction, the winner always faces the concern that they paid too much/over-valued the good, as no other agent was willing to pay that much. This is especially the case if the good has a public value. For a Vickrey auction this is reduced, as the second highest agent would have also needed to imperfectly value the good.
+
+\subsection{Bidder Collusion}
+Multiple/all of the bidders could collude to buy the good at a low price, then sell it elsewhere for a higher price and split the profits between them.\\
+This is dangerous if the agents cant trust each other, as one could betray and buy it for a slightly higher price then keep it. Hiding agent bids and keeping who wins a secret further dicourages collusion.
+
+\subsection{Combinatorial Auctions}
+Auctions in which multiple goods are auctioned at the same time. For the set of goods Z, each agent i$\in$Ag has a preference/valuation function over subsets of goods ($v_i: 2^Z\rightarrow{R}$(real numbers)). The outcome of the auction is the set of allocations of each item (${<z^*_1,z^*_2,\dots>}$) - an item can't be allocated to more than one agent. 
+
+\subsubsection{Properties of Valuation functions}
+\begin{description}
+    \item[Free disposal] the agent isn't worse off getting more items ($z_1\subseteq z_2\rightarrow v_i(z_1) \leq v_i(z_2)$ )
+    \item[Normalised] $v_i(\emptyset )=0$
+    \item[Substitutable] Some goods can replace others, so we don't want to repeat items. e.g. buying a console+game and buying just the game \\ \qquad \qquad $z_1 \cap z_2 \neq \emptyset ,\quad v_i(z_1) + v_i(z_2) > v_i(z_1 \cup z_2)$
+    \item[Complementarity] Some goods increase in value when together. e.g. 2 halves of a set of collectable items
+    \\ \qquad \qquad $z_1 \cap z_2 \neq \emptyset ,\quad v_i(z_1) + v_i(z_2) < v_i(z_1 \cup z_2)$
+\end{description}
+The \emph{exposure problem} is when an agent bids high for all of the items in a complementary set, but fails to obtain one or more - they've now overpaid for the other items. 
+
+\subsubsection{Maximising Social Welfare}
+The auctioneer wants to maximise social welfare (give each bidder its highest valuation), but doesn't have access to the valuation functions of each agent. Even if each agent declares its entire value function, this isn't sufficient as:
+\begin{enumerate}
+    \item Agents can lie on their value functions
+    \item The table would be of size numOfAgents x numOfBundles. For 1000 items, there are more possible combinations than atoms in the universe
+    \item Np-hard problem, even assuming a small number of items/agents
+\end{enumerate}
+
+\subsubsection{Bidding Language}
+Agents can submit \emph{atomic bids} - a pair (z, p) of a bundle and the price the agent is willing to pay for it. This defines a valuation function $v_i$ where $v_i(z') = p$ if $z'\supseteq z$, and $v_i(z') = 0$ otherwise.\\
+These can be connected with an XOR to form \emph{composite bids} - agents will pay for one of the atomic bids to be satisfied. If multiple bids are, then the agent pays the highest price. These composite bids can be used to represent the entire set of possible bundles, and only require an exponential amount of atomic bids if the agent has a different valuation for every combination of goods. e.g. if the agent only wants a good g, then it can represent every bundle containing that good with a single atomic bid
+
+\subsubsection{Winner Determination Problem}
+This is a combinatorial optimisation problem, which is NP-Hard. To make the problem easier we can
+\begin{enumerate}
+    \item Restrict the number/types of bids - constraints
+    \item Use different techniques for specific cases - heuristics
+    \item Accept approximate solutions
+\end{enumerate}
+One set of constraints is to limit the size of bids, and say that the bids must be on a continuous set of good. e.g. continuous frequency spectrum. If there is no natural ordering, we can impose an artificial one.\\
+An example of a heuristic is a greedy algorithm on bid prices - at each iteration, allocate the bundle with the highest bid price among all agents
+
+\subsubsection{Vickery-Clarke-Groves Mechanism}
+\begin{enumerate}
+    \item Each agent declares their valuation function
+    \item The auctioneer allocates to maximise social welfare $\rightarrow{<z^*_1,z^*_2,\dots>}$
+    \item For each agent i, the price is $p_i$ where:
+    \begin{enumerate}
+        \item Determine the max. social welfare allocation if i wasn't present  $\rightarrow{<z'_1,z'_2,\dots>}$
+        \item \begin{align*}
+                p_i &= \sum_{k\in (Ag\neq i)}v_k(z'_k) - \sum_{k\in (Ag\neq i)}v_k(z^*_k) \\
+                    &= \text{social welfare lost since the agent is present}
+            \end{align*} 
+    \end{enumerate}
+\end{enumerate}

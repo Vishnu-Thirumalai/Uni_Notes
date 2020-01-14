@@ -1,0 +1,107 @@
+\section{Algorithms and Responsibility}
+
+\subsection{Accountability and Transparency}
+Algorithms are being used for life-altering decisions - so if something goes wrong, where does the blame lie? In humans we can identify who had the \emph{intent} of the decision, but we can't currently for AI. If they make an incorrect/unjustified decision, what consequences can be applied to it?
+
+\subsubsection{Transparency}
+The ability to examine a decisions making process (the algorithm) to understand how it makes its decisions. This inherently forces designers of the algorithm to make fairer and more ethical decisions, as opposed to the decisions going unseen. e.g. modern corporations not making all their decisions with regards to consumers public, The Ring of Gyges (an argument that someone invisible would commit wrongdoings, as they're not accountable)\\
+Machine Learning is currently a black box - there's no way to explain the choices made in the decisions it takes.\\
+
+Sometimes full transparency isn't desired - sensitive information could be leaked (personal or for a company). Alternatively, knowing the workings of a system could make it ripe for abuse (e.g. who is selected for 'random' screenings at an airport). Transparency isn't a fundamental value, and should be applied on a case by base basis.
+
+\subsection{Procedural Regularity}
+A basic requirement is that the same procedure is applied to everyone, and wasn't designed in a way to specifically disadvantage one/more groups. This can be achieved by ensuring:
+\begin{itemize}
+    \item Same policy/rule used in all cases, and decisions are reproducible
+    \item The policy was fully specified \emph{before} the individuals were known, to prevent tailored changes
+    \item If the policy requires random inputs, these aren't in the control of any interested party
+\end{itemize}
+
+\subsubsection{Ensuring Regularity}
+\emph{Software Verification} can be used to check that a program satisfies certain properties/invariants, and consistently does this with any input. One example is \emph{model checking}, that tests all possible inputs to make sure no invariants are violated.\\
+\emph{Cryptographic Commitments} can be used to check hidden parts of the algorithm that the general public shouldn't have access to - but only those with specific access can check
+
+\subsection{ACM Principles for Accountability and Transparency}
+\begin{enumerate}
+    \item Awareness: everyone involved should be aware of potential biases in an algorithm and the effects they can cause
+    \item Access/Redress: if there are people adversely affected, they should be able to ask for information/contest decisions
+    \item Accountability: institutions that use algorithms are responsible for their decisions, \emph{even if they can't explain them}
+    \item Explanation: companies that use algorithms are encouraged to produce explanations for the procedures/results from using them (not all procedures are explainable)
+    \item Data Provenance: anything related to/that influences the data needs to have its full history stored - who influenced it, where it came from, etc. This data should also have a list of potential biases, for the public to check - sensitive data can have restricted access
+    \item Auditing: algorithms, data and results should be recorded to they can be inspected
+    \item Validation/Testing: rigorous routine tests of the models should be made to check for fair outcomes, and the results are encouraged to be made public
+\end{enumerate}
+
+\subsection{Legal Responsibility}
+The ACM says that institutions that use algorithms are to blame for the results, but what about cases where the algorithm is more independent in a larger world space? e.g. self-driving cars \\
+Currently the manufacturer/developer is assumed to be legally liable, but this isn't always the case - the pedestrian/driver could also be presonsible. It's hard to draw the line where the human control stops and the AI takes over.
+
+\subsubsection{Criminal Liability of an AI}
+\emph{Criminal Liability} implies action and intent - there are three main possible scenarios to consider:
+\begin{enumerate}
+    \item Via Another - an offence is committed via an agent that can't reason for itself (e.g. a dog used to attack a human by another) - the initiator (owner of the dog in this case) is guilty.\\
+    \qquad - It could be assumed that the AI is innocent as it doesn't \emph{consciously understand} what it's doing, and the developer/manufacturer/user is to blame
+    \item Natural Probable Consequence: ordinary actions unintentionally perform a criminal act. This depends on whether the developer knew such an outcome was possible
+    \item Direct liability: action can be attributed to the AI, but how does one prove intent?  
+\end{enumerate}
+Criminal liability might not apply in the direct case: if the AI is treated as a product or service it comes under civil law. A product would come under the warranty and appropriate legislation, whereas a service would come under the rules of negligence - the AI had a duty and breached it, causing harm to the plaintiff. 
+
+\subsection{Moral Responsibility}
+Determining if an agent has \emph{moral responsibility} is important to decide if the results of the action should be attributed to the agent for reward/punishment:
+\begin{enumerate}
+    \item The agent was conscious of/understood the effects of the action
+    \item The agent was free to do otherwise, and chose this path - this implies a self/free will, as in Moor's Full Ethical agent (see \ref{subsec:Moral_Agent_Categories})
+\end{enumerate}
+
+If a person/agent is found guilty, the law applies penalties to:
+\begin{enumerate}
+    \item Protect society/criminal from each other
+    \item Deter others from commiting the crime
+    \item Rehabilitate the criminal so they don't repeat
+    \item Punish the agent for Retribution/Vengeance - punishing the self for making a free choice
+ \end{enumerate}
+ 1-3 are utilitarian, increasing happiness for the criminal or society: 4 doesn't add anything that 1-3 don't cover. 
+ 
+ \subsubsection{For AI}
+ AI doesn't currently have 'free will' - it makes choices based on rules/utilities/virtues, so doesn't have the ability to choose otherwise. If there's no self, then retribution doesn't make sense.\\
+ Instead, we can use a utilitarian framework to change the AI (rehabilitate), punish developers (deterrence) or simply turn it off (protection).\\
+ 
+ \subsubsection{For Humans}
+ Humans have a similar conundrum - what is the 'self' that makes decisions and has experiences (i.e. what is consciousness)? Neuroscience/Philosophy/Buddhism all come to the conclusion that a distinct 'self', separate from our body, is an illusion - the mental processes/thoughts/sensations are what make up brain activity and the self is just the easiest way to represent this, and so we evolved it to self-reflect (as opposed to Decartes, the self doesn't think but is the integration of thoughts/experiences). Having this self and self-awareness causes us to gain self-preservation, to keep our physical body safe.\\
+ 
+ Physics/Buddhism say that there is no free will and everything is a complex cause/effect chain, including all choices - the concept of a self making decisions is a shortcut to represent this. Free will is just what it feels like to make a choice.\\
+ 
+ According to this, there's no reason to include retribution - the processes should be stopped and the people rehabilitated. However, for more serious crimes the public might lose faith in the system if there is no retribution - it can be argued that this provides utility. \\
+
+ This also implies there's no difference between Explicit and Full ethical agents, as there's no self to make the decisions.
+ 
+ \subsection{Algorithmic Bias}
+ Systemic/repeatable errors that create unfair outcomes in a system. This can be reduced by only using relevant data to affect choices - drawing the 'relevance' border is difficult. e.g. insurance premiums are usually lower for women, because they're less likely to cause accidents, not because they're women. However, a court has said this outcome is biased.\\
+ 
+Separating bias from outputs is difficult: not only has algorithm complexity grown (And thus individual decisions and their collective impact masked), but new algorithms are a black box with regards to explanation (e.g. Machine Learning) 
+
+ 
+ \subsubsection{Types of Bias}
+ \begin{description}
+    \item[Data Bias] If the training data set is biased, the algorithm will be as well. The bias could be on statistical (disproportionate representation of groups in the data) or moral (makes decisions based on factors humans have deemed that it can't for this application (\emph{protected characteristics}), like gender in car insurance or economic state in healthcare)
+    \item[Algorithm Bias] bias in the design of the algorithm
+    \item[Use Bias] used in unintended situations 
+    \item [Interpretation Bias] the output not being interpreted correctly, not using common sense to moderate the output
+    \item[Feedback Bias] the algorithm uses the results/reviews to update itself, making small biases much larger
+ \end{description} 
+ e.g. racial bias in criminal detection, errors in automatic translation that weren't checked
+ 
+ \subsubsection{Solving Bias}
+ \begin{enumerate}
+     \item Groups are starting to monitor algorithms and moderate/restrict those with heavy biases
+     \item Statistical approaches:
+     \begin{enumerate}
+         \item Pre-processing - modify/fix/filter the training data
+         \item In-processing - modify the algorithm itself to ignore parts that depend on protected characteristics
+         \item Post-processing - modifying the model after it's been trained
+     \end{enumerate}
+     \item Spreading awareness, testing frameworks, self-assessment tools and learning materials, technical standards and certification programs
+     \item Standardising documentation to explain datasets and their potential biases 
+ \end{enumerate}
+ 
+ 

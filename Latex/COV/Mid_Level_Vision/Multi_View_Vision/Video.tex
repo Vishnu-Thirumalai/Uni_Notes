@@ -1,0 +1,101 @@
+\section{Video}
+\emph{Video} is a series of N images acquired at time intervals $\Delta{T}$. The intensity of a pixel is represented as I(x,y,t), where t is the time. Video comes from a single camera at different times, stereo images come from multiple cameras at the same time. 
+
+\subsection{Motion analysis}
+The projection of a scene onto the image changes with movement in the scene (\emph{object motion}) and movement of the camera(\emph{ego motion}). The \emph{optic flow} is the \textbf{apparent} movement of a scene point in the image (i.e. position at time t - position at time $t-\Delta T$) - similar to the disparity in stereo images. The optic flow field can be for specific objects (sparse) or for every point in the image (dense). \\
+
+In contrast, the \emph{motion field} is the \textbf{actual} movement of scene points - this is not always equal to the optic flow. e.g. a for a barber's pole, the optic field is vertical but the motion field is horizontal. The motion field must be estimated from the optic flow.
+
+\subsection{Video Correspondence}
+To find the optic flow, we find corresponding points between two frames and track the motion of objects. Similar to stereo correspondence, there are some constraints we can use:
+\begin{enumerate}
+    \item As $\Delta T$ is normally small, optic flow vectors will be small
+    \item Spatial Coherence - assuming smooth surfaces, neighbouring flow vectors will be similar
+    \item As the viewpoint doesn't change much, most points will be common between the images and will look similar 
+\end{enumerate}
+
+\subsubsection{Aperture Problem}
+With no change in intensity, it's hard to determine the optic flow (across an intensity gradient is easy, parallel to it is nearly impossible as every point looks the same across an edge). Local motion along the brightness pattern is hard to discern, so the brain usually takes the average/slowest movement (which is movement perpendicular to the pattern). \\
+
+To solve this, we can combine motion from multiple locations into a global motion, or use locations where the direction isn't ambiguous (e.g. corners - SIFT/Harris)
+
+\subsection{Calculating Depth from Optic Flow and Ego Motion}
+In the following, it is assumed that the object is still and the camera is moving in a roughly straight line. As we calculated earlier, $imageSize = \frac{focalLength}{objectDistance}\cdot objectSize$
+
+\subsubsection{Ego Motion $\perp$ Optic Axis}
+The velocity of the camera is $V_x$, and z is constant. X is the object size, x is the image size.
+\begin{align*}
+    z = f\cdot \frac{X_1}{x_1} &= f\cdot \frac{X_2}{x_2} = f\cdot \frac{(X_1 - V_x\cdot t)}{x_2} \\
+                 X_1x_2 &= x_1(X_1 - V_x\cdot t) \\
+                 X_1(x_2-x_1) &= -V_x\cdot t\cdot x_1\\
+                 X_1 &= \frac{-V_x\cdot x_1}{\frac{(x_2-x_1)}{t}} = \frac{-V_x\cdot x_1}{\dot{x}}
+\end{align*}
+Note that the object size doesn't change -  $X_2 = X_1 - V_x$ w.r.t the initial co-ordinate frame.Plugging this value of $X_1$ into our original formula, we obtain:
+\begin{equation}
+    Z = f\cdot\frac{X_1}{x_1} = f\cdot \frac{-V_x\cdot x_1}{x_1\cdot\dot{x}} = -f \cdot \frac{V_x}{\dot{x}}
+\end{equation}
+Therefore if $\dot{x}$(change in x in image) can be measured, z(depth) can be recovered.
+
+\subsubsection{Ego Motion $\|$ Optic Axis}
+The velocity of the camera is $V_z$, towards the object (i.e distance to object reduces). Unlike the previous scenario, X has the same value in both camera co-ordinate frames ($x$ still changes).
+\begin{align}
+    fX = x_1\cdot Z_1 &= x_2\cdot Z_2 \nonumber\\
+                 x_1\cdot (Z_2 + v_Z\cdot t) &= x_2\cdot Z_2 \nonumber\\
+                 X_1\cdot v_Z\cdot t &= Z_2 (x_2-x_1)\nonumber\\
+                 Z_2 &=  x_1\cdot \frac{V_z}{\dot{x}}
+\end{align}
+
+\subsection{Calculations from Optic Flow}
+
+\subsubsection{Time to Collision}
+In cases where the camera velocity is unknown, we can use the above formula as:
+\begin{equation}
+    \text{Time to collision} = \frac{\text{distance}}{\text{time}}\frac{Z_2}{V_z} =  \frac{x_1}{\dot{x}}
+\end{equation}
+This assumes $V_z$ is constant, and can be derived solely from the image. Alternatively:
+\begin{equation}
+    \text{Time to collision} =  \frac{x_1}{\dot{x}} = \frac{\alpha_1}{\dot{\alpha}} = \frac{2A_1}{\dot{A}}
+\end{equation}
+Where $\alpha$ is the angle subtended by the object on the image, and A is the area of the object in the image - these can be obtained without any camera/object information, just the image. 
+
+\subsubsection{Ego Motion}
+\begin{description}
+    \item[Optic Flow Vectors are Parallel]
+    \begin{enumerate}
+        \item $V_z = 0$
+        \item Ego motion direction is the opposite of the optic flow field motion direction
+        \item Speed of ego motion $\propto$ length of flow vectors
+    \end{enumerate}
+    \item[Optic Flow Vectors are Radial]
+    \begin{enumerate}
+        \item $V_z \neq 0$
+        \item The radial point (where all the vectors point to/away from) is the vanishing point
+        \item If the vectors point towards the vanishing point, then ego motion is away from the vanishing point (And vice versa)
+    \end{enumerate}    
+\end{description}
+
+\subsubsection{Relative Depth}
+\begin{description}
+    \item[Optic Flow Vectors are Parallel] Depth of a point $\propto$ (magnitude of flow vector)$^{-1}$ (i.e. motion parallax)
+    \item[Optic Flow Vectors are Radial] Depth of a point $\propto$ (magnitude of flow vector)$^{-1}$ $\propto$ Distance from point to vanishing point
+\end{description}
+
+\subsubsection{Segmentation}
+Discontinuities in the optic flow field indicate a difference in movement: this could be the foreground vs. background, or two different objects.
+
+\subsection{Tracking}
+If optic flow methods are applied to high-level objects rather than pixels, it's called \emph{tracking}. Most algorithms use previous frames to predict the location of the object in the next frame: this constricts the search space. Some common methods are particle/kalman filtering. Humans tend to predict as well, using previous data + prior knowledge of how objects usually move. 
+
+\subsubsection{Segmentation}
+Motion leads to segmentation. i.e. Gestalt law of common fate\\
+
+A simple way to track motion is \emph{image differencing}: for a static camera, threshhold the difference between subsequent images to find locations where motion has occurred (i.e. $Image_\delta = (I(x,y,t+1) - I(x,y,t)) > threshold$. This works well to find the boundaries of a  moving object, but not internal motion (e.g. if a white square moves from left to right on a black background, the image intensities only change at the left/right edges of the square - differencing will show two rectangles moving, rather than one square).
+
+\subsubsection{Background Subtraction}
+To counter this, we instead take the difference between the frame and the static parts of the scene (the background). This is still messy and requires morphological operations to clean up the image, but shows the entire object + objects that are stationary for a few frames. There are a few methods to select the background:
+\begin{enumerate}
+    \item The previous frame. i.e. image differencing
+    \item A pre-computed background (e.g. take a video of the empty scene and average the frames to get a background - \emph{Off-line Average})
+    \item Moving Average - the background B is a decaying weighted sum of previous frames ($ B(x,y) = \beta I(x,y,t) + (1-\beta )B(x,y)$) . This method is most commonly used, as it overcomes slow changes in illumination.
+\end{enumerate}
+Ideally the background will contain illumination changes/ changes to static background objects, and allow us to easily identify interesting moving objects (even if they temporarily stop).

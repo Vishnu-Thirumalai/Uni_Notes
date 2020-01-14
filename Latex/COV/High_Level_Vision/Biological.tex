@@ -1,0 +1,119 @@
+\section{High Level Vision - Artificial}
+
+\subsection{Prior Representations}
+There are two main hypotheses on how humans store visual information in the brain:
+\begin{enumerate}
+    \item Object-Based - The brain stores 3D models of images
+    \item Image-Based - the brain stores 2D views of the object from multiple viewpoints
+\end{enumerate}
+
+\subsubsection{Object Based}
+The representations are stored as \emph{Structural Descriptions} - the model is segmented into standard parts and stored with the relationships between the parts. \\
+
+The theory says that any object can be represented using a standard set of geometrical shapes called \emph{Geons}(geometrical icons). e.g. cube, sphere, cylinder, cone. Geons are sufficiently different from each other, robust to noise/occlusion and look similar from all viewpoints - this gives a robust method of identification from any viewpoint.\\
+
+To match an image, simply deconstruct it in the same way and compare the description with existing structure representations.\\
+
+The problems with this are:
+\begin{enumerate}
+    \item Decomposing an image is very difficult (we've not yet mastered segmentation)
+    \item Hard to accurately represent some models. e.g. a tree
+    \item Doesn't keep fine details, so some representations would be every similar. e.g. cats vs dogs 
+\end{enumerate}
+
+\subsubsection{Image Based}
+This method is quite similar to template matching. i.e. nowhere near robust enough to explain the human visual system. More recent theories suggest that multiple templates are stored, and interpolations between these are used to match against new viewpoints/slight differencces in the object.
+
+\subsection{Processing Images}
+The two main theories on how humans process images are:
+\begin{enumerate}
+    \item Configural - process the image as a whole
+    \item Featural - process individual features, ignoring the relationships between them
+\end{enumerate}
+It's been shown that humans use both, depending on the situation.
+
+\subsection{Classifying New Objects}
+There are three main theories on how humans set classification boundaries and classify new images: Rule-based, Protoype-based and Exemplar-based. In all, the new image is converted into a feature space that can be used to describe it then categorised. Distance measures in feature space are the usual, as described in \ref{similarity_methods} (maximise normalised cross-correlation, minimise distance).
+
+\subsubsection{Rules}
+Each category is described with a set of rules. e.g. triangles have three sides, birds have a beak/feathers/can fly. New objects are sorted into categories based on these rules.
+
+\begin{description}
+    \item[For] Humans are good at extracting rules from nature. e.g. children pick up on the rules of grammar and apply them before they've learnt the exceptions
+    \item[Against] Graded Membership - some things are 'better' members of a class than others (e.g. a bear is a better mammal than a blue whale). If we only use rules, this shouldn't exist - everything it just a member.
+\end{description}
+
+\subsubsection{Prototype}
+The centroid/average/prototype of each category is calculated, and new images are given the label of the 'closest' prototype.
+
+\begin{description}
+    \item[For] Humans are quick at identifying new images if they resemble old ones. 
+    \item[Against] If categories are only represented by the prototypes in the brain, we shouldn't be able to remember/see variations
+\end{description}
+
+\subsubsection{Exemplar}
+Specific individual instances (exemplars) are stored in each category - new  images are given the label of the closest exemplar. 
+\begin{description}
+    \item[For] Humans are quick at identifying new images if they resemble old ones. 
+    \item[Against] Graded Membership 
+\end{description}
+
+\subsubsection{Supervised Learning}
+Prototype/Exemplar classification are the same as standard ML classification methods in supervised learning (where we have a set of known data points). They correspond to Nearest Mean Classifier and Nearest Neighbour Classification respectively - NMC only works with linear boundaries between classes, and NNC is susceptible to outliers/incorrect data. \\
+
+K-nearest neighbours is similar to exemplar, but takes the majority label from the nearest K neighbours. K is normally small and odd to prevent ties, but large enough to prevent a single outlier from affecting the outcome.
+
+\subsection{Cortical Visual System}
+
+\subsubsection{Receptive Field Hierarchy}
+The further along the visual system (from gangilons$\rightarrow$LGN cells$\rightarrow$V1 cells), the larger the receptive field and the more tolerant to location the neurons are. The stimuli the cells respond to also get progressively more complex (e.g. gangilons are centre-surround, simple V1 cells respond to lines, V2 cells perform border ownership...)
+
+\subsubsection{Feedforward Model}
+The \emph{feedforward model} states that neurons receive inputs from lower neurons to build more complex representations they respond to. As they receive inputs from multiple cells in different locations, they become progressively more tolerant to location. There are two main feedforward models: HMAX and CNN
+
+\subsubsection{HMAX}
+Neurons alternate in layers of \emph{simple} and \emph{complex} cells (similar to V1 cells). 
+\begin{description}
+    \item[Simple (S) Cells] these perform SUM/AND operations, combining inputs from multiple cells to create a more complex shape. e.g. combining two lines to respond to a cross. They take information from the layer below.
+    \item[Complex (C) Cells] these perform MAX/OR operations, combining inputs to receive information from a large area. e.g. accepting any line at a particular orientation, irrespective of position in the image. They take information from multiple simple cells.
+\end{description}
+Neurons closer to the eye (lower) create a feature vector built from standard image components - this output is generic, reusable and hard-wired. Higher neurons do specific classifications on objects. i.e. supervised learning classifiers 
+
+\subsubsection{Convolutional Neural Network}
+These are similar to HMAX, but use standard image processing techniques
+\begin{description}
+    \item[Convolution (C) Layer] Apply different convolutions to the image to extract features - like simple cells in HMAX
+    \item[Subsampling (S) Layer] Shrink the feature maps by taking the max. from each group of indices - increases tolerance to location as it takes the highest from each. Similar to complex cells in HMAX 
+\end{description}
+
+\subsubsection{Recurrent Connections}
+In the brain, it's been found that neuron layers/regions also send information to those at the same layer (lateral connections) and the layer below (feedback connections). These allow top-down and bottom-up information to be combined. 
+
+\begin{description}
+    \item[Bottom-up] Using information from just the stimulus
+    \item[Top-down] Uses context + prior information/knowledge
+\end{description}
+
+To combine top-down/bottom-up information in a mathematical way, we can use Bayes' Theorem.
+
+\subsection{Bayes' Theorem}
+\begin{align}
+    P(A|B) &= P(B|A)\cdot\frac{P(B)}{P(A)} \\
+    \text{Posterior} &= \text{Likelihood} \cdot \frac{\text{Prior}}{\text{Evidence}} \nonumber
+\end{align}
+
+For vision, we want to know the probability of a given image representing an object - $P(object|image)$. This is an inverse/ill-posed problem, so it's hard to solve. $P(image|object)$ is a forward problem - still very hard to solve, but possible. We can use Bayes' theorem to convert from one to the other:
+\begin{equation}
+    P(O|I) = P(I|O)\cdot\frac{P(O)}{P(I)} 
+\end{equation}
+We can set $P(I)$ to 1, as we already have the image/evidence and we're trying to determine the object - $P(I/O)$ is geometric (what's the likelihood that the object produces that image, so based on the current information) and $P(O)$ is the probability of seeing that object (e.g. in a city, we're not likely to see a zebra - based on prior knowledge).\\
+We can loop through this for all possible objects - and use various constraints to limit this to a reasonable set of objects.
+
+\subsubsection{Single Object Inference}
+If we only want to know if the image contains a particular object or not, we instead can determine the ratio of seeing/not seeing the object:
+\begin{equation}
+    \frac{P(O|I)}{P(\overline{O}|I)} = \frac{P(I|O)}{P(\overline{I}|O)}\cdot\frac{P(O)}{P(\overline{O})} 
+\end{equation}
+If this ratio is $>1$, then the object is present.\\ \\ \\
+
+Lots of systems use priors to constrain the search space or make assumptions about the image - Bayesian Inference gives us a mathematical way to use these.

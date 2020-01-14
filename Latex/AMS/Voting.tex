@@ -1,0 +1,89 @@
+\section{Voting}
+\emph{Social Choice Theory} is the study of how group decisions are made. Agents are self-interested and want to influence the outcome in their favour, so they use voting protocols to account for a range of preferences.
+
+\subsection{Domain}
+There are a set of N \emph{voters}, each of which have preferences to a set of \emph{outcomes/candidates}. We assume that each voter has a complete set of preferences($A>B or B>A \forall (A,B)$, and that these preferences are transitive ($A>B,B>C\rightarrow A>C$) - so we can represent them as a ranked list.
+
+\subsection{Preference Aggregation}
+Given a collection of preference orders, combine them into an ordering that reflects the orders as closely as possible. There are two main types of algorithm:
+\begin{description}
+    \item[Social Welfare Function] combine the data into a new complete ordering
+    \item[Social Choice Function] combine the data to select a single most preferred outcome
+\end{description}
+
+\subsection{Plurality Voting}
+A simple social choice function: each outcome gets one point if it's \textbf{first} in a voter's preference ranking, and the outcome with the most points is selected.\\
+This ignores the rest of the preference/lower ranks. e.g. voters are split between A and B for first, but everyone has C in second. It also allows for strategic voting: if an agent knows the rankings of other agents, it can submit a false ranking to change the outcome.
+
+\subsection{Condorcet Winner}
+A social choice function: every pair of outcomes has a contest, and the outcome that beats \emph{every} other outcome is chosen. The contest is simply the number of voters that prefer one outcome to the other. i.e. for (a,b), a gets +1 point for each voter with $a>b$ and -1 for each voter otherwise
+
+\subsubsection{Condorcet Principle and Paradox}
+Any system that follows the \emph{Condorcet Principle} will always choose the condorcet winner. However, there might not be a candidate that wins in every case - this is the \emph{Condorcet Paradox}.
+
+\subsection{Linear Sequential Majority}
+A social choice function: outcomes take place in pairwise rounds, and the winner moves onto the next round. e.g. (4,3) $\rightarrow$ winner faces 1 $\rightarrow$ winner faces 2 \\
+The order of the contests is called the \emph{agenda} - it determines which outcomes face each other, and is open to manipulation as some outcomes might not be the strongest, but if they're at the end of the agenda can still win. The contests can be represented as a \emph{majority graph}, with an edge $a\rightarrow b$ implying a beats b in a simple majority. 
+
+\subsection{Instant Run-Off}
+A social choice function: in each round, the candidate with the least number of first choice votes is removed from all voters' lists, and this continues until only one outcome remains. If a voter's first choice is removed, then its second choice becomes its first and so on. \\
+This method doesn't account for deeper preferences in candidates that are removed early. e.g. nobody had B first, but everyone had them second.
+
+\subsection{Copeland Rule}
+A social choice function: similar to condorcet, except the outcome with \emph{the most wins} is chosen. i.e. there doesn't need to be an outcome that beats every other outcome. A win gives 1 point, a loss -1 points, and a draw 0.
+
+\subsection{Borda Count}
+A social choice function: similar to plurality but the full ranking is used, with each position being weighted. The outcome with the most points wins. The weighting for m candidates is: (m-1) points for each first place vote, (m-2) for each second place \dots 0 for last place votes.
+
+\subsubsection{Spoiler Effect}
+Candidates who don't win the election under the borda count can still shift the results of the election.e.g.
+\begin{center}
+    3 votes for $a>b$, 2 votes for $b>a$ - a wins \\
+    3 votes for $a>b>c$, 2 votes for $b>c>a$ - b wins 
+\end{center}
+This happens because B now receives more votes as it's not in last place, while A still is. 
+
+\subsubsection{Positional Scoring}
+Rather than strictly (m-1), (m-2), the scores ($S_1,S_2,S_3,\dots,S_m$) can be any values as long as the following two rules are maintained:
+\begin{enumerate}
+    \item $S_1 \geq S_2 \geq S_3 \geq \dots \geq 0$. (Non-negative decreasing scores)
+    \item $S_1 \ge S_m$. (The scores must decrease at some point) 
+\end{enumerate}
+e.g. $S_m = 0, S_{m-1} = 1, S_{m-2} = 3, S_{m-3} = 6, S_1 = m (m+1)/2$
+Positional scoring as a whole violates the condorcet principle (i.e. it's not always guaranteed to provide the condorcet winner)
+
+\subsection{Voting Rule Properties}
+\begin{description}
+    \item[Anonymous] All votes are counted equally  - no voter is more influential than any other
+    \item[Resolute] A unique winner (no ties)
+    \item[Surjective] Every candidate has a chance to win
+    \item[Dictatorship] there is a voter whose first choice is always the winner
+    \item[Strategy-Proof] there isn't an ordering for a voter that gives it a better outcome than its true preferences (no reason for a voter to lie)
+    \item[Weakly Pareto] It won't select an outcome A it there is an outcome B such that $B>A$ for all voters
+\end{description}
+
+\subsubsection{Gibbard-Satterthwaite Theorem}
+Any resolute, surjective and strategy-proof rule for 3 or more candidates will be a dictatorship.\\
+Selecting a strategy can be very difficult, so this doesn't mean that all rules are inherently useless.
+
+\subsubsection{Independence of Irrelevant Alternatives}
+The outcome of a preference between A and B should only depend on the preferences between A and B. e.g. if $A>B$, then adding C shouldn't change that. As seen previously, the Borda Count does not hold IIA
+
+\subsubsection{Arrow's Impossibility Theorem}
+Any rule that is surjective and is independent of irrelevant alternatives will be a dictatorship.
+
+\subsubsection{Universal Domain Assumption}
+Both of the above theorems assume that every voter has a complete preference ordering - if we drop this assumption, then the theorems no longer hold.
+
+\subsection{Median Voter Rule}
+
+\subsubsection{Single-Peaked Preference}
+There is an ordering over the outcomes, and outcomes closer to your first choice are more preferred than those further away. e.g. let the outcomes be 21,17,11 and 4 - if a voter chooses 17, they'll prefer 21 to 11. 
+
+\subsubsection{Voting Rule}
+A social choice function: each voter chooses a single candidate, the votes are ordered, then the median candidate is chosen. e.g. 
+\begin{center}
+    21 gets 10 votes, 17 gets 20 votes, 11 gets 40 votes, 4 gets 30 votes. \\
+    There are 100 votes in total, so the median is 50 - this is 11, so 11 is the winner
+\end{center}
+If there are an odd number of voters, this provides a condorcet winner. The rule is strategy proof (a voter can't shift the median towards their true outcome by voting against it), and is weakly pareto.

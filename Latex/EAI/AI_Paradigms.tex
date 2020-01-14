@@ -1,0 +1,95 @@
+\section{AI Paradigms}
+
+\subsection{Logic and AI}
+Early AI was logic-based - it used predicates and symbols to represent the world, and reasoned about the state of the world (\emph{epistemic reasoning}) and the appropriate actions to take (\emph{practical reasoning}). Inference rules are used to derive these new facts and determine what actions to use. 
+
+\subsubsection{Logic in Maths}
+For a system/model/field, axioms are self-evidently true examples, and inference rules are used to extend these to prove other truths. \\
+
+Logical inference is the syntax, and the model/axioms are the semantics. The proof system (rules + model) is \emph{sound} if anything that can be derived is true, and \emph{complete} if everything true can be derived.  
+
+\subsubsection{Applying Logic to AI}
+Good Old Fashioned AI (GOFAI) used a similar method - the AI had a model about the world (W), containing axioms($\Delta_0$). These were put into a knowledge base(KB) for the agent (the agent's beliefs), and the agent has a proof system that can prove/add more complex tasks to the KB. \\
+When the agent acts (based on its goal and the KB), the world changes to W' - the agent then senses new facts about the world ($\Delta_1$) and updates the KB accordingly. \\
+A complete proof system for first order logic is turing complete - so this system should be able to mimic any function required. Alternatively, if intelligence can be explained through mathematics (e.g utility functions) and mathematics can be formalised into logic, then intelligence should be explainable by logic.
+
+\subsubsection{Monotonic/Non-Monotonic Logic}
+In mathematics, the initial model of the world is constant - later findings won't invalidate/change older rules/axioms, and thus this this logic is \emph{monotonic}.\\
+In the real world, new exceptions to rules are discovered all the time (see \ref{subsec:logic_in_philosophy}, which is often how knowledge of the world grows. In monotonic logic, this would result in adding new rules for each contradiction (e.g. birds can fly, birds can fly if not a penguin, birds can fly if not dead...).\\
+\emph{Non-monotonic} logics were developed, that allow new discoveries to change old ones and allow uncertainty.e.g.
+\begin{center}
+    Monotonic: $a\rightarrow b$ (a implies b)\\
+    Non-Monotonic: $a\rightarrow b$ (a implies b unless something contradicts it)
+\end{center}
+If a new fact is discovered that then says b isn't true, it takes priority over the rule.
+
+\subsubsection{Model/Semantic Theory}
+The model of the world interprets it into:
+\begin{enumerate}
+    \item Individuals, represented by constants in the language. e.g. person X, Y
+    \item tuples of individuals to represent Predicates (if an individual is in a tuple, the predicate holds for it)
+    \item tuples mapping sets of individuals to single individuals to represent functions
+\end{enumerate}
+Non-monotonic logics use \emph{preferential model semantics} - they choose the model that most accurately represents the known world, and can swap between them as required.
+
+\subsubsection{Modal Logic} \label{subsubsec:Modal_logic}
+Logical statements are 'qualified' by \emph{modals}. e.g.
+\begin{center}
+    p = It will rain today\\
+    $\square$p = It WILL rain today (in every possible model of the world)\\
+    $\diamond$p = It will POSSIBLY rain today (it does in some models of the world, not in others) ($\diamond$p = $\neg(\square\neg p)$)
+\end{center}
+Deontic modals refer to actions:
+\begin{center}
+    Op = p is obligatory\\
+    Fp = p is forbidden\\
+    Pp = p is permitted
+\end{center}
+
+\subsection{Problems with Logic AI}
+\begin{enumerate}
+    \item Large/realistic domains need too many rules - hard to scale, brittle to changes in KB
+    \item No mention in design of how to do low level sensory tasks - conversions to logic
+    \item Symbol Grounding problem - the logic/symbols were based on the designer, not directly from the real world. Again, this was merely symbol manipulation without understanding  
+\end{enumerate}
+
+
+\subsection{BDI Agents (Belief, Desire, Intention}
+BDI logic describes the mental attitudes of the agents.
+\begin{description}
+    \item[Beliefs] what the agent thinks about the world (not \emph{knowledge}, what is necessarily true
+    \item[Desires] what the agent would like to do
+    \item[Goal] once selected, a desire that the agent persues - and is consistent will all the other goals
+    \item[Intention] a high level plan to achieve a goal (if an agent intends I, then I isn't currently true)
+\end{description}
+
+\subsubsection{Knowledge vs. Belief}
+In epistemology, a key concern is that the beliefs that we hold about the world might not be actually true - we have no way of knowing anything's independent truth value, only what we perceive. Knowledge is true and justified belief, but the 'true' objective model of the world isn't available to us.\\
+
+This distinction is shown in logic-based systems: proof theory/deriving inferences is what the agent believes about the world from axioms, while model/semantic theories model the true nature of the world. 
+
+\subsection{Machine Learning}
+A computer program that learns from experience E about a task(s) T, and measures if its performance P of T increases with E at T. This is similar to how humans learn (but much faster) - we don't have all the logic/answers at the beginning, and we learn as we do things. The AI extracts information about the world from learning/training data, rather than pre-programmed axioms and notions.
+\begin{description}
+    \item[Supervised] the training data has labels of what it should be
+    \item[Semi-supervised] some of the training data doesn't have labels
+    \item[Unsupervised] none of the training data has labels - the model draws its own conclusions and finds structure in the data
+    \item[Reinforcement learning] the AI is given positive/negative feedback to improve its performance
+    \item[Deep learning] rather than directly matching input to output, the AI has multiple layers of I/O that can abstract to different representations of the data at each level - the AI learns these abstractions by itself
+\end{description}
+
+\subsubsection{Limitations of ML}
+\begin{enumerate}
+    \item Needs large amounts of data
+    \item Difficult to force the AI to learn the 'correct' abstract representations - this leads to:
+    \begin{enumerate}
+        \item Difficult to generalise between situations, even if they're very similar
+        \item Can't do high level cognition: planning, causal reasoning, analogical reasoning (realising that two situations are similar)
+    \end{enumerate}
+    \item Black box - the process of reasoning is opaque to humans
+    \item ML can't explain its reasoning as it's all statistical - there's no symbolic representations
+\end{enumerate}
+
+\subsection{Common Sense Reasoning}
+The main problem is common-sense reasoning - knowing what to look for or check in a scenario. e.g. most humans don't check that every possible contradiction to a sensory input/scenario is false\\
+Non-monotonic logics can theoretically solve these, but are hard for humans to understand, computationally infeasible, and developed for single-agent reasoning rather than collaboration

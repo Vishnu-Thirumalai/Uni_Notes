@@ -1,0 +1,121 @@
+\section{High Level Vision - Artificial}
+Object Recognition consists of:
+\begin{enumerate}
+    \item Classification - Determine what category an object is (e.g. phone vs calculator)
+    \item Identification - Determine the specific identity of an object (e.g. Pikachu vs Mickey Mouse)
+    \item Localisation - Determine where/if the object is in the image
+\end{enumerate}
+If localisation is accurate enough, it can act as \emph{semantic segmentation} - split the image on categories.
+
+\subsection{Category Hierarchy}
+Classification places a scene into a category - an object can be part of multiple categories simultaneously. Identification is classification at the lowest category level. Some categories are subsets of others:
+\begin{align*}
+    \text{Superordinate Categories} & \begin{cases}
+                                        object \\
+                                        animal/building\\
+                                        mammal/reptile
+                                      \end{cases} \\
+    \text{Basic level} &\{ Dog/Cat/Cow \\
+    \text{Subordinate categories} & \begin{cases}
+                                        Labrador/Poodle/ \\
+                                        Golden/Black/Brown/ \\
+                                        (Specific names)
+                                      \end{cases} \\
+\end{align*}
+The basic level is the fastest for humans, the first one that children learn to do, and usually the step humans perform before identification. It's the highest level at which members look similar, and the lowest where there are easy methods of discrimination. 
+
+\subsection{Requirements}
+Object recognition needs to deal with background noise, viewpoint/lighting changes, non-rigid deformations and intra-category variation (e.g. two chairs can look very different while still being chairs). To achieve this it uses image data, representations of objects and matching techniques.  \\
+
+The standard method creates object representations from standard/training images, then matches these representations to the target image. 
+
+\subsection{Template Matching}
+Given a template of the object, match it against every image region to calculate the similarity, then threshold the peaks to find the object locations. Similarity methods are as in \ref{similarity_methods}: maximise cross-correlation (this can be found using convolution), minimise the distance (euclidean/manhattan/sum of squares).
+
+\subsubsection{Problems}
+The method is inherently not robust to change: the target needs to be very similar to the template to be able to match. We could use multiple templates to account for change in rotation/illumination/etc., but this increases the number of false matches. Raising the threshold to reduce false matches will also miss many true matches, as the method isn't very robust.\\
+
+By adding multiple templates, and checking on every region at multiple scales, the method soon becomes very intractable. It's also highly sensitive to occlusion.
+
+\subsection{Sliding Window}
+Rather than a template, this method runs patches of the image through a classifier (such as a CNN) - it takes patches of different size/shape and resizes them as appropriate (which covers multiple scales and increases tolerance). \\
+
+Classifying every region of every size/shape/location is impossible, so it instead segments the image to find regions that might contain an object, and processes only those. 
+
+\subsection{Edge Matching}
+Similar to template matching, but pre-processes the template/image to extract edges first. It then finds the location with the minimum distance between the location and the template.
+\begin{center}
+    Distance between image/template = avg. of minimum distance between each point of the template and a point in the image
+\end{center}
+
+\subsection{Model-Based Recognition}
+Make a model/template, convert to edges, then rotate/scale/etc. to find occurances at each patch of the image. This method can work for 2D and 3D models, but just using edges is unreliable on textured images. To combat this, it also looks for the relative orientations of connected edges - this still isn't very good. 
+
+\subsection{Intensity Histograms}
+Create a histogram of the intensities/colours in the template and each image region, then compare the two. This method is very fast, and insensitive to small changes - so is often used as part of face recognition, as the skin has a standard number of colours so can be used to heavily contract the search space.\\
+On the downside, it's sensitive to illumination and doesn't preserve spatial ordering. e.g. a chessboard and a zebra could have the same intensity histogram. 
+
+\subsection{Implicit Shape Model}
+Represents the template with two components: the actual parts/image features, and the structure the parts should follow. This allows flexibility in the exact arrangement of the parts, as long as the overall structure is followed - it searches the image for the parts and checks if they're in an acceptable configuration.
+
+\subsubsection{Preprocessing/Representation}
+\begin{enumerate}
+    \item Find interest points for the object in the training images (e.g. Harris,SIFT)
+    \item Extract image patches around the points from the whole training image dataset
+    \item Cluster the patches, the centroid of each patch is added to a \emph{Appearance Codebook}
+    \item Template match the codebook to each training image, and determine where the centre of the object should be relative to each of the codebook features (determination through a process like the generalised Hough transform (Each feature votes for where the centre could be))
+\end{enumerate}
+
+\subsubsection{Matching}
+\begin{enumerate}
+    \item Find the interest points in the image
+    \item Match these points to the code book features
+    \item Determine the object centre (again via the generalised hough transform)
+    \item Back-project the codebook features from the centres to highlight where the image matches
+\end{enumerate}
+
+\subsection{Feature-Based Recognition}
+Extract robust local features (such as SIFT) from the template objects and convert these to descriptors. Perform the same extraction on the image, and compare against the template descriptors. For this method to work, the descriptors need to be invariant to change in size/translation/rotation/lighting, as well as consistent to find and sufficiently dense. \\
+
+While matching, the system takes the top two descriptors that match the image and checks the distance ratio between them (distance between the image and the template). If the distance ratio is below a certain threshold, that means both descriptors are almost equally likely - this isn't very discriminating, and may have been a random match so is discarded.
+
+\subsubsection{Model Fitting}
+If three matching non-collinear points can be found, then a translation model can be created to match the rest of the template to the image. This model can be obtained using RANSAC/Hough Transform/etc. 
+
+\subsection{Bag of Words}
+
+\subsubsection{For Words}
+\begin{enumerate}
+    \item Documents are parsed into words
+    \item Common words (e.g. the, and) are removed, and the remaining words are converted to base forms (e.g. ran,running$\rightarrow$ run)
+    \item Each word is given a unique numerical identifier
+    \item A histogram (ordered by identifier) is created, then converted into a string and finally a vector
+\end{enumerate}
+To match with another document, it's also converted into a vector then the angle between them is computed (i.e $cos^{-1}$\{Normalised cross-correlation\} (as in \ref{similarity_methods}))
+
+\subsubsection{For Images}
+\begin{enumerate}
+    \item Select image features/regions (all, interest points, randomly)
+    \item Encode the features using a descriptor (e.g. SIFT descriptor)
+    \item Take the features from across the dataset and cluster them - each cluster is part of a \emph{visual codeword dictionary}
+    \item The most common codewords (appear in most/all images) are removed, as they're too generic to be useful
+\end{enumerate}
+Images can then be compared to training images by computing visual codeword histograms for both and finding the angle between them.
+
+\subsection{Geometric Invariants}
+A property of the scene that don't change with a change in viewpoint. What invariants are available depend on the type of viewpoint change:
+\begin{description}
+    \item[Similarity Space (translation/rotation/scale)] ratio of lengths and angles are invariant
+    \item[Affine Space (similarity + sheer)] parallel lines, ratio of areas and ratio of lengths along lines are invariant
+    \item[Projective Space (affine + foreshortening)] cross-ratio (ratio of ratios of lengths along lines)
+\end{description}
+
+\subsection{Local vs. Global Representation}
+
+\subsubsection{Local}
+Objects are broken down into simple features. e.g. A = / + \textbackslash + -, T = - + $|$ \\
+This is tolerant to changes in viewpoint/occlusion/variation within category, but doesn't preserve spatial ordering and can potentially match multiple objects. e.g. T = - + $|$,\\  L = - + $|$
+
+\subsubsection{Global}
+The overall shape of the image is used. This distinguishes well between similar images, but is sensitive to viewpoint changes/occlusion/variation
+

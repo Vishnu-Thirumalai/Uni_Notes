@@ -1,0 +1,123 @@
+\section{Correspondence Problem}
+Given two images, find matching image elements. These images could come from multiple views of the same scene (stereo), the same object at different times (video) or be different and we want to find matching objects. By solving correspondence, we can obtain depth/3D information (from stereo images), perform motion tracking (finding the same object in a video) and object recognition in unrelated images. \\
+
+This is a search-based problem - for stereo/video the two image as a whole are very similar, which makes solving easier. Some difficulties are:
+\begin{enumerate}
+    \item Occlusion - Due to movement, elements in one image might be blocked/have moved out of the other
+    \item False Matches/Repeating patterns 
+    \item Change in lighting / viewpoint(shear/size/shape)
+    \item Very large search space - the matching element \emph{could} be anywhere in the other image, but we use priors/knowledge to constrain this
+\end{enumerate}
+
+There are two main classes of solution:
+\begin{description}
+    \item [Correlation-based] Match based on similar image intensities - usually match a 'window' of the image
+    \item [Feature-based] Match based on similar image features. e.g. corners
+\end{description}
+
+\subsection{Correlation-based methods}
+Select a region in $Image_1$ and a search space in $Image_2$, then search (using a similarity function) for a match of the region in the search space. 
+\begin{itemize}
+    \item Window Size - too small and there's not enough detail to match/lots of false matches. Too large, and lower precision/low tolerance to small changes between images
+    \item Search Area Size - too large is computationally expensive, too small could miss the region. Usually centred on the region's location in $Image_1$, but other knowledge can change this (e.g. knowing the exact shift between the two images)
+\end{itemize}
+
+\subsubsection{Similarity Methods} \label{similarity_methods}
+A simple approach is minimising the distance between the original and potential regions. i.e Sum of square differences, Euclidean, Manhattan. Manhattan is usually chosen, as the extra computation from the other methods isn't usually worth it.
+
+The other is to maximise the normalised cross correlation. If we consider the regions as vectors $I_1$ and $I_2$ in feature space, then the cross-correlation is equivalent to the dot product. The normalised cross-correlation is then equal to $cos\theta$ (with $\theta$ as the angle between the vectors), as shown below:
+\begin{align}
+    \text{Cross-Correlation} &= \sum_{x,y}I_1(x,y)I_2(x,y) &&= \|I_1\|\|I_2\|cos\theta \\
+    \text{Normalised Cross-Correlation} &= \frac{\sum_{x,y}I_1(x,y)I_2(x,y)}{\sqrt{\sum_{x,y}I_1(x,y)^2}\sqrt{\sum_{x,y}I_2(x,y)^2}} &&= \frac{\|I_1\|\|I_2\|cos\theta}{\|I_1\|\|I_2\|} = cos\theta 
+\end{align}
+\begin{equation}
+    \text{Correlation coefficient} = \frac{\sum_{x,y}(I_1(x,y) - \Bar{I_1})(I_2(x,y) - \Bar{I_2})}{\sqrt{\sum_{x,y}(I_1(x,y)- \Bar{I_1})^2}\sqrt{\sum_{x,y}(I_2(x,y)- \Bar{I_2})^2}}  
+\end{equation}
+
+\subsection{Advantages/Disadvantages}
+\begin{enumerate}
+    \item [+] Easy to implement, checks correspondence for any/all points
+    \item [-] Computationally expensive, false positives on repetitive patterns, doesn't work well with change in viewpoint/illumination/size/shape
+\end{enumerate}
+
+\subsection{Feature-Based Methods}
+Identify interest points in both images, then match these points by looping through both sets. This only searches interesting points and is less sensitive to change, but doesn't work without 'interesting' points. e.g textured or random regions.
+
+\subsubsection{Detecting Interest Points}
+Any detection method needs to be \emph{repeatable}(finds the same points in both images - invariant to scaling/rotation/translation/illumination changes) and \emph{distinctive}(the feature descriptions are different enough that false matches are low). \\
+
+Corners are good: they have a steep intensity gradient in multiple directions (any point on an edge looks like any other point). 
+
+\subsubsection{Corner Detection}
+\begin{enumerate}
+    \item Generate $I_x$ and $I_y$ - intensity gradients for the image in X/Y directions using a gaussian mask
+    \item Generate the \emph{Hessian Matrix (H)} for each pixel (sum the gradients in a small window (size of the gaussian))
+    \begin{equation}
+    H = \begin{bmatrix}
+            \sum I_x^2 & \sum I_xI_y \\
+            \sum I_xI_y & \sum I_y^2
+            \end{bmatrix}
+    \end{equation}
+    \item Find the eigenvalues ($\lambda_1,\lambda_2$) of H (correspond to the max. slope intensities)
+    \item Locations with \textbf{both} large eigenvalues are corners (1 large is an edge, neither are flat areas)
+\end{enumerate}
+This works well, but generating eigenvalues is slow.
+
+\subsubsection{Harris Corner Detector}
+Rather than calculating eigenvalues, this computes:
+\begin{align}
+    R(Hessian) &= determinant(H) - k \cdot trace(H) \nonumber \\
+               &= (I_x^2\cdot I_y^2 - (I_xI_y)^2) - k \cdot (\sum I_x^2 + \sum I_y^2)
+\end{align}
+The trace of a matrix is the sum of the leading diagonal. k has been found to work best at 0.04-0.06.\\
+
+R(H) is large for corners, negative for edges, and low for flat areas. Large values of R tend to cluster, so the local maxima is taken as the corner. Alternatively, using \emph{non-maximum suppression}, set every pixel with a lower value of R than its neighbour to 0). \\
+
+R is rotation/illumination invariant, but not scale invariant (e.g. zooming on a curved edge gives multiple corners). This can be solved using an image pyramid (Harris-Laplacian, take the max. neighbour across scales) or use SIFT features.
+
+\subsubsection{Scale Invariant Feature Transform (SIFT)}
+\begin{enumerate}
+    \item Use Difference of Gaussians across multiple image scales. i.e. Laplacian pyramid
+    \item Detect local maxima/minima across scales (i.e lower/higher than neighbours and neighbours/self in the scale above and below)
+    \item Filter points, keep those with a high contrast (gradient change)
+    \item Keep points with sufficient structure: similar to calculating R, but instead keep points with:
+    \begin{equation}
+        \frac{(trace(H))^2}{determinant(H)} < \frac{(r+1)^2}{r}
+    \end{equation}
+\end{enumerate}
+r = 10 has been found to work well. 
+
+\subsubsection{Describing Interest Points}
+After Harris/SIFT, the points need to be described. Harris simply takes a small region around the point (like correlation methods) - good for translation, not for rotation/illumination/scale changes.\\
+The SIFT algorithm creates a more robust descriptor as below:
+\begin{enumerate}
+    \item Designate a region around the interest point (usually 16x16 pixels) at the scale it was found, and apply smoothing 
+    \item Find the orientation/magnitude of gradients of pixels in the region
+    \begin{align*}
+        \text{For a pixel P}&\text{ $x_1$ is the pixel to the right, $y_1$ is the pixel above,}\\
+        &\text{$x_2$ the pixel to the left, $y_2$ the pixel below} \\
+        Magnitude &= \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2} \\
+        Orientation &= tan^{-1}\left(\frac{y_1-y_2}{x_1-x_2}\right)
+    \end{align*}
+    \item Create a histogram of all the orientations (placed in 8 orientation bins), weighted by the magnitude/distance to the central pixel
+    \item Rotate the region until the largest orientation points 'up'
+    \item Create histograms for the new orientations in sub quadrants (Each 4 by 4 pixels), weighted by magnitude/distance to central pixel \\ \quad\quad - 4x4 quadrants, 8 orientation bins per quadrant - 128 element vector to store all the histograms
+    \item Normalise the vector and use as a descriptor
+\end{enumerate}
+This is robust, but not perfect - each descriptor can have multiple \emph{putative matches} (potential solutions). \emph{Outliers} are incorrect matches, and \emph{inliers} are correct.
+
+\subsection{Calculating Correspondence}
+To estimate the transformation between images, we can use the matching feature points. However, they're not perfect - to find the most likely transform (max. inliers), we can use the RANSAC algorithm (RANdom SAmpling and Consensus). 
+
+\subsubsection{RANSAC}
+The algorithm takes in a set of putative matches (inliers and outliers), and determines the best transform to fit the data.
+\begin{enumerate}
+    \item Choose a random minimal subset of matches
+    \item Calculate a model, using this subset, to explain the shift (i.e $\Delta X, \Delta Y, rotation$)
+    \item Test the model using the other matches (apply, and use a threshold to see if the model correctly predicts the match's location), and count the number of matches that agree with the model (\emph{consensus set}).
+    \item Repeat 1-4 N times
+    \item Choose the model with the largest consensus set
+\end{enumerate}
+For a simple translation ($\Delta X, \Delta Y$), one match is enough to generate a model. For rotation, 4 matches are required. This can also be used for line fitting (two points to generate a line model), or other model generation tasks.\\
+It's a simple and general method, but can require lots of iterations and determining N/threshold is difficult. 
+

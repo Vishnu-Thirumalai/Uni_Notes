@@ -1,0 +1,86 @@
+\section{Argumentation}
+An \emph{argument} is a reason to believe/do/want something.
+\begin{itemize}
+    \item Can be exchanged between agents to resolve differences and structure interactions
+    \item Agents can use them to structure their internal reasoning
+    \item There can be multiple arguments for/against the same thing
+\end{itemize}
+
+An argument is structured as a set of \emph{premises} to support a \emph{claim}. i.e X because Y,F and M
+
+\subsection{Definition}
+\emph{Argumentation} is the process of constructing/exchanging arguments to interact with other agents.
+\begin{enumerate}
+    \item Abstract Argumentation - given a set of arguments that contradict each other, find a consistent set of knowledge
+    \item Argument-based Dialogue - give a standard structure for interaction in negotiation, persuasion, etc.
+\end{enumerate}
+
+\subsubsection{Terms}
+\begin{description}
+    \item[Database] a set of formulae/knowledge, might not be internally consistent
+    \item[Argument] (premises,claim) - the premises are present in the database, and the claim follows from the premises (using classical logic). The premises are the minimal required set to prove the claim.
+    \item[Attack] when two arguments conflict with each other
+    \begin{description}
+        \item[Rebut] $(p_1,a_1)$ and $(p_2,a_2)$, where $a_1 = \neg a_2$ 
+        \item[Undercut] $(p_1,a_1)$ and $(p_2,a_2)$, where $a_1 = \neg p$ for some $p\in p_2$ 
+    \end{description}
+\end{description}
+
+\subsection{Abstract Argumentation}
+The internal structure of the arguments are ignored, and the focus is on which arguments attack each other - this is represented as an attack graph (A,R) (= (arguments, attacks)).\\
+
+An argument is \emph{In} if all attacking arguments are \emph{Out}, and \emph{Out} if any argument that attacks it is \emph{In}. Arguments can also be unlabelled. e.g. if $A\rightarrow{B}$ and $B\rightarrow{A}$, without making an assumption/external arguments then neither argument can be labelled.\\
+
+An argument that isn't attacked by anything is \emph{In} by default. 
+
+\subsubsection{Semantics}
+    \begin{enumerate}
+        \item Grounded Semantics - strictly follow the rules to minimise node labelling
+        \item Preferred Semantics - Use assumptions to maximise node labelling
+        \begin{enumerate}
+            \item Preferred Credulous - an argument is marked In under any of the preferred labellings
+            \item Preferred Sceptical - an argument is marked In under all of the preferred labellings
+        \end{enumerate}
+    \end{enumerate}
+
+Preferred semantics are preferred as they provide us with more information to use.
+
+\subsubsection{Subjective Defeat Relations}
+For $A\rightarrow{B}$ and $B\rightarrow{A}$, A only \emph{defeats} B if A is subjectively preferred to B - introduces preferences for certain arguments.\\
+These preferences can be explicitly shown in the graph, and can attack attack relations between arguments (e.g. in the above example, a preference for A would attack $B\rightarrow{A}$). Preferences can also attack each other or, or attacks on preferences, or \dots 
+
+\subsubsection{Defeasible Knowledge}
+Knowledge can be revised, attacked, or rendered void. If counter-evidence is provided, something assumed to be true can be changed to false. The above only applies to facts - opinions can't be objectively defeated. 
+
+\subsection{Non-Monotonic Reasoning}
+Agents can change their conclusions as they learn about the world - they can shrink or grow their set of conclusions (can only grow in monotonic). \\
+
+Classical logic doesn't work well to represent this, but argumentation naturally allows for new knowledge to attack previous knowledge. It also provides simple/intuitive ways for humans to add in knowledge, and clearly shows why agents have taken certain decisions.
+
+\subsection{Argument Dialogues}
+Different agents can engage in dialogues with each other, to share their reasons and try to change the other agents' views. Arguments dialogues can be split into: initial situation/cause, , goal of the argument, and personal aims of the agents.
+
+\subsubsection{Dialogue types}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|l|l|l|}
+\hline
+Type & Initial Situation & Main Goal & Personal Aims \\ \hline
+Persuasion & Conflicting points of view & Resolution of views & Change the other agent's views to their own \\ \hline
+Inquiry & Ignorance of multiple agents & Growth of knowledge & Find/destroy a proof/incorrect belief \\ \hline
+Deliberation & Need for action & Reach a decision & Influence the outcome towards the 'best' \\ \hline
+Neogtiation & \begin{tabular}[c]{@{}l@{}}Conflict of interests, \\ but co-operation required\end{tabular} & Make a deal & Get the best deal \\ \hline
+Info-seeking & Ignorance of a single agent & \begin{tabular}[c]{@{}l@{}}Spread knowledge \\ (general/about other agents)\end{tabular} & Gain/Hide/Show personal knowledge \\ \hline
+\end{tabular}
+}
+\end{table}
+
+\subsubsection{Dialogue System}
+The system is defined by:
+\begin{enumerate}
+    \item The moves each agent can make. e.g. assert, accept, challenge, question
+    \item Protocol - rules on what moves can/can't be made. e.g. you can't attack an argument you made previously, you must accept arguments you can't attack
+    \item Strategy for each agent - the 'best' strategy is still a research question
+    \item When the argument terminates and determining the outcome. e.g. last argument wins
+\end{enumerate}

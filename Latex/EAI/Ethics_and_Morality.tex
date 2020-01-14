@@ -1,0 +1,99 @@
+\section{Ethics and AI}
+With the increase in general use of AI, and their introduction into new environments they not be specifically trained for, there's more chance that things will go wrong: AI needs to be able to independently make decisions without human interventions. For this, they need ethical standards to decide what is right/wrong.
+
+\subsection{Ethics for AI}
+\emph{Ethics} (or morality) is the study of what we ought to do and what is good, to ensure that our behaviour leads to good outcomes. the same holds for AI, they need ethics to ensure that they make 'good' decisions and avoid bad ones. \\
+Some additional questions are:
+\begin{enumerate}
+    \item How humans ethically use AI. e.g. should we use it to create a utopia or dystopia?
+    \item Do we design AI to only act in ethical ways (what happens if the developer misses something?), or to choose ethically good courses of action?
+    \item Determine the boundaries of where the AI acts as opposed to the system/world its embedded in
+    \item How do we remain aware of the ethical effects/impact that AI has on humans? e.g. the manipulation of ads we see to steer us towards certain beliefs
+\end{enumerate}
+
+\subsection{Theories of Ethics}
+\begin{enumerate}
+    \item Deontology - a focus on finding a good set of rules and sticking to them
+    \item Consequentialism - focus on the outcome of our actions
+    \item Virtue Ethics - good people with the right virtues will do good things
+\end{enumerate}
+e.g. if a person needs help: deontology would say help them according to the rule 'treat others as you would want to be treated yoursef', consequentalism would say help as it maximises well-being in the world, and virtue ethics would say help as that's what a good/charitable person would do
+
+\subsection{Deontology}
+Choices/actions are prohibited,obliged or permitted (like in deontic logic). They occur solely based on the rules once chooses to adhere to, no matter if the action would be good/bad for the scenario. \\
+
+There are two main approaches: focusing on the \emph{duties} of the agent that acts, or focusing on the \emph{rights} of the agent and those it effects. Either way, following the set of rules means fulfilling the duties and respecting the rights encoded in them. \\
+
+These rules can be: 
+\begin{enumerate}
+    \item Explicit. e.g. Laws, The ten commandments (you must not do X, you must do Y)
+    \item Abstract. e.g. Treat others as you would like them to treat you, Kant's Categorical Imperative
+\end{enumerate}
+
+\subsubsection{Kant's Categorical Imperative}
+This unconditional command states that one should 'act only according to a rule that you would want everyone to universally follow', and Kant believed this was a perfectly rational system on how to act. e.g. If you lied, you would have to accept that everyone would always lie - therefore lying is pointless\\
+
+A note is that this applies to the main intention of the action, not necessarily the side effects.e.g killing someone to achieve a greater good is wrong, killing someone as a side effect of achieving the greater good is permitted
+
+\subsubsection{Criticisms}
+\begin{enumerate}
+    \item Too general/vague and doesn't give specific actions
+    \item Inflexible - if we start to add exceptions, where do we stop?
+    \item Can internally conflict, wit no rules on how to resolve conflicts
+    \item Some rules might be good in the short term, but the overall consequence is harmful. e.g. don't kill people, but killing a person might save 1000
+\end{enumerate}
+
+\subsection{Virtue Ethics}
+The character of the moral agent is important: a good person will make good decisions. This 'goodness' is obtained from experiences and actions, interacting with people will draw connections between actions and their consequences.\\
+Some critiques are that it's too general, doesn't focus on if an action is good/bad but rather what a good person is, and different cultures have very different opinions on what is considered a virtue so there is no one objective list.
+
+\subsection{Consequentialism}
+Actions are judged based on the state of affairs they bring about: it also specifies how to determine if a state is good or bad. There are no set rules or duties, so even breaking the law can be justified. 
+
+\subsubsection{Utilitarianism}
+One popular measure of the 'goodness' of a state is the amount of happiness it brings. This happiness maximisation is impartial: everyone's happiness counts equally (so slavery is wrong because even though it makes some people happy, more people are sad). \\
+\emph{Pragmatic Utilitarianism} says being a perfect utilitarian (giving up everything for other people to be happy) is anti-utilitarian, as our brains are hardwired against this. Practical utilitarianism needs to be compatible with achieving a good life, not through self-sacrifice - a balance needs to be struck.
+
+\subsection{Moor's Categorisation of Moral Agents}\label{subsec:Moral_Agent_Categories}
+\begin{enumerate}
+    \item Ethical Impact: an agent whose actions can be ethically judged. The agent itself doesn't have to think ethically, as long as its actions can be judged
+    \item Implicit Ethical: an agent that has been designed to not cause harm. The agent doesn't think about it, but still acts ethically
+    \item Explicit Ethical: an agent that reasons about the best actions, and acts independently using ethical principles to reason
+    \item Full Ethical: an agent who has \emph{moral agency} -  they make and understand ethical decisions about their actions, and can choose between good or bad actions
+\end{enumerate}
+\emph{Moral Agency} is equated to \emph{moral responsibility} - if an agent understands the ethical impacts of their decisions, and still chooses the ethically wrong one, then they're morally responsible and should be held accountable.
+
+\subsection{Implementing Artificial Moral Agents (AMAs)}\label{subsec:implementing_moral_agents}
+\begin{enumerate}
+    \item Top Down: take an existing  moral theory, encode it in the agent, and it applies it (e.g. GOFAI rules)
+    \item Bottom Up: the agent acts, is rewarded for good actions, and learns (i.e. reinforcement learning). Moral values are implicitly part of the actions, rather than being openly defined
+    \item Hybrid: uses parts of both
+\end{enumerate}
+
+\subsubsection{Deontic Logic (Top Down Deontology)}
+As described in \ref{subsubsec:Modal_logic}, logical statements are designated as obligatory/permitted/forbidden. In case of conflicts (e.g. never drive on the left, but don't hit oncoming cars), a set of priorities are encased in rules - these can get very complicated very quickly to cover all possibilities.\\
+
+This works if the agent only works in restricted contexts, but it's bad for general/unpredictable environments. To be more useful, the agent would need common sense to be able to understand the underlying principles behind the rules, and apply them where applicable. Common sense would also help it resolve deadlocks by prioritising rules, and extending rules to unknown scenarios.\\
+
+A last problem is the unforseen consequences from rules, that the original designers couldn't have forseen. e.g. 'treat others as you want them to treat you' tells a masochist to become a sadist and hurt other people
+
+\subsubsection{Categorical Imperative AMA}
+If a super-powerful agent could reason perfectly, it would be able to determine if every agent acting in the same way would block it from achieving its goal. This would need to simulate the psychology of other agents, their goals, the contexts \dots \\ Again, having common sense would help constrain this space (similar to the frame problem - where does an AI stop looking for relevant effects?)
+
+\subsubsection{Reinforcement Learning (Bottom Up Virtue Ethics)}
+As previously mentioned, machine learning can be equated to virtue ethics: an AI learns what actions are morally good and adjusts its underlying behaviour to prioritise those actions. The virtues aren't explicitly represented, rather shown through the agent's actions. 
+
+
+\subsection{Utilitarian Agents}
+It can be argued that happiness is the ultimate goal behind all ethical systems: they aim to have everything go well. This is universally true: for anything valued, if one removes the positive impact of it then it no longer has value. Happiness can therefore be defined as the universal \emph{subjective experience} of wellbeing.\\
+Research is being done into universal quotients of happiness rather than economic progress for a country. \\
+Utilitarianism can lead to unethical choices.e.g kill an innocent person to save 5 others. It can also go against human instincts (e.g. give up the majority of your life to save multiple others), or be subject to our inherent morals. \\ 
+
+
+\subsubsection{The Trolley Problem}
+A series of thought experiments about choosing to kill people to save others: in the end, it shows that humans are biased against violence and have an inherent distinction between the 'means to ends' and 'side effects' (we respond more strongly to the intended effects of our actions than the side effects). \\
+
+The latter is morally irrelevant, yet we still factor it into decisions - our pre-built intuitions are usually sensible, but not always correct. AI won't have this problem, as they're being built from scratch - they could potentially even make humans more logical by showing them the error of their ways. Utility can be  reduced to empirical values - while enshrining rights work for moral debates that have been settled, for unknown dilemmas utilitarianism is appropriate.
+
+\subsubsection{AMA Implementation}
+Computing the happiness an action creates for all beings that can experience happiness (global impartiality) would require an immense calculation and is intractable - this would be limited based on computational resources,  or forecast based on a combination of average predictions. 

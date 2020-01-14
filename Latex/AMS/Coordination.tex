@@ -1,0 +1,173 @@
+\section{Coordination}
+
+Agents are autonomous: so in a multi-agent environment, one agent can't \emph{force} another agent to taken an action. Instead, they have to communicate to try to influence other agents.
+
+\subsection{Speech Acts}
+The \emph{Speech Act Theory} (John Austin, 1962) states that communication is an action that aims to achieve an intention. The speech act can be split into three parts:
+\begin{enumerate}
+    \item Locutionary - making the communication. e.g. saying 'Open the Door'
+    \item Illocutionary - conveying intentions (highly context dependent)
+    \item Perlocution - the effect of the communication. e.g. the door has been opened
+\end{enumerate}
+Agents make a locutionary act, hope that the illocutionary act has been transmitted (i.e the speaker understood the meaning), and expect the listener to effect the perlocution. 
+
+\subsubsection{Classes of Speech Acts}
+According to John Searle (1969), there are five classes:
+\begin{description}
+    \item [Representative] The speaker says a statement is True/False. e.g. it is raining, it is not 5pm
+    \item [Directive] The agent asks the hearer to do something
+    \item [Commissive] The agent commits to doing something. e.g. I will submit it by 6pm
+    \item [Expressive] The speaker expresses a mental state. e.g. 'Thank you', 'I am sad'
+    \item [Declaration] The speaker says something, which causes an effect. i.e the speech is an action. e.g. 'We are now at war with Mars'
+\end{description}
+
+\subsubsection{Parts of a Speech Act}
+Speech acts have two components:
+\begin{description}
+    \item [Performative Verb] The illocutionary part. e.g. request, inform, commit
+    \item [Propositional Content] The raw content
+\end{description}
+e.g.
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|l|l|l|}
+\hline
+                            & Verb: Request         & Verb: Inform       & Verb: Inquire       \\ \hline
+Content: The door is closed & Please close the door & The door is Closed & Is the door closed? \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Agent Communication Languages}
+Provide a standardised way for heterogeneous agents to communicate. 
+
+e.g. the KQML is an agent communication language that consists of a Knowledge Interchange Format (to denote info/relationships) and a Knowledge Query Manipulation Language (to define performatives). Agents apply the latter to teh former (as in speech acts) to communicate. 
+
+\subsubsection{Communication as Actions}
+Communication is treated as a separate action in a plan. e.g Request(X,Y,Z):
+\begin{description}
+    \item [Preconditions] X believes Y can do Z, X wants Y to do Z
+    \item [Effect] X believes Y wants to do Z
+\end{description}
+
+
+\subsubsection{Communication as Mental States}
+Communications are based around the beliefs of an agent. i.e. if an agent believes a fact to be true
+
+The effect isn't caused as soon as the communication occurs, leading to a potential difference between what the agent believes and what is true.
+
+\subsubsection{Communication as Social Commitments}
+Communications are transmitted as commitments from one agent to another. e.g. If I tells J that $\neg A$, then it can't tell K that $A$ unless it also tells J
+
+These commitments can be publicly verified. 
+
+\subsubsection{Effectiveness}
+\begin{itemize}
+    \item Most of these approaches assume the agents share the same semantics/thought processes as well as the semantics - not always feasible
+    \item Limited to the set of 5 performatives - we can expand this list, but where do we stop?
+    \item As a positive, these performatives act as shortcuts to more complicated concepts
+\end{itemize}
+
+
+\subsection{Co-operation}
+Agents are autonomous. i.e they make decisions at runtime. Therefore, any co-operation between them must be dynamic, rather than hard-wired
+
+\subsubsection{Measuring Co-operation}
+Bond and Gasser [1992] proposed the following criteria to evaluate cooperation:
+\begin{description}
+    \item [Coherence] How well the system achieves the goal. e.g. outcome measure, time taken
+    \item [Co-ordination] How well the agents work together. e.g. not getting in each other's way, sychronizing routines so they're not waiting for each other
+\end{description}
+
+\subsubsection{Co-operative Distributed Problem Solving}
+A type of domain where agents are autonomous and can solve different problems independently, but must work together to complete the problem as a whole.
+\begin{itemize}
+    \item No agent has enough knowledge/skills by itself
+    \item The problem is modular (can be split into reasonable blocks)
+    \item More time spent on computation than communication (if the other way, better to make one 'super' agent)
+\end{itemize}
+
+Solving a CDPS problem has 4 main steps:
+\begin{enumerate}
+    \item Decompose the problem \\ \quad \quad - Which agent decomposes, and how granular is the decomposition?
+    \item Allocate the subproblems \\ \quad \quad - Who decides the allocations? What if an agent refuses its allocation?
+    \item Solve the subproblems \\ \quad \quad - Some subproblems might need scheduling/further co-operation
+    \item Combine the subproblem solutions as required
+\end{enumerate}
+
+\subsubsection{Contract Net Protocol}
+A protocol to allocate subproblems, where the agents bid for the problems they want. The process is:
+\begin{enumerate}
+    \item An agent recognises a problem needs co-operation/delegation of parts
+    \item Agent broadcasts the task: - description, constraints (e.g. deadline) and meta-information (e.g. bid submission deadline)
+    \item Other agents consider, and maybe return a bid
+    \item First agent decides who gets the task, and informs all the bidders
+    \item The winning agent (contractor) performs the given task
+\end{enumerate}
+
+In an ACL, this would be: agent calls for proposal, other agents propose, agent accepts/refuses to all other agents, contract informs of failure/success of task.\\
+
+The collection of agents is the contract net - the only hierarchy is the delegation of tasks, otherwise all agents are equal. e.g A delegates X to B, B splits X into X$_1$ and X$_2$, delegates X$_1$ to A and X$_2$ to C \\
+
+The protocol works well for distributed data, heterogeneous agents (with different skills), and tasks large enough to split and delegate. 
+
+\subsubsection{Co-ordination, Multi-agent Planning and Joint Intentions}
+Co-ordination is managing dependencies between agents activities.
+\begin{description}
+    \item [Positive] Agents ask for help with actions, don't plan the same actions, contribute to others' actions
+    \item[Negative] Agents try to use resources at the same time, plan actions that require other agents even if they're busy
+\end{description}
+
+One way to manage co-ordination is through various types of \emph{Multi-Agent Planning}: 
+\begin{description}
+    \item[Centralised Planning] A central agent makes plans for all agents
+    \item[Merging] Each agent makes a plan, and a central agent merges them to produce a global plan
+    \item[Partial Global Planning] Each agent receives the global plan, makes its own plan accordingly and adjusts the global to include the new information, then passes the global plan along - no centralised system
+\end{description}
+Multi-agent planning requires agents to share private info and reduces autonomy. Combining plans is also non-trivial.\\ 
+
+\emph{Joint Intentions} is a teamwork-based approach. Agents have shared goals, and a responsibility towards other agents. Every agent works towards a goal G with a motivation M - if G is no longer possible or M doesn't hold, the agent tries to inform the other agents. If G is achieved, it instead informs the other agents that the goal is over. 
+
+\subsection{Expectations and Norms}
+To co-ordinate, agents need to have expectations on how other agents will act. These can be obtained via:
+\begin{enumerate}
+    \item Communications and joint intentions
+    \item Knowledge of the system: what is normal/required, past experiences (trust) and reputation of other agents
+\end{enumerate}
+
+\subsubsection{Normative Agent Systems}
+A \emph{norm} is an expected pattern of behaviour - it isn't guaranteed though. They can be \emph{Conventions}(e.g. take a gift when visiting people) or \emph{Prescripted} (e.g. follow the laws). \\
+
+A prescriptive norm can be formally represented with: who it affects, is it an obligation/permission/prohibition, when it applies, what it is, and what the punishment for breaking it. e.g. 
+\begin{center}
+    $<$All Drivers, Obligation, At a red light, Stop, 3 points on licence$>$ 
+\end{center}
+\subsubsection{Reasoning with Norms}
+Norms affect agent behaviour: violating one has a punishment and causes a loss of reputation, so agents will add achievement/maintenance tasks to not break norms. For MAS, agents can expect other agents to generally follow norms - but this isn't guaranteed. \\
+
+Agents might break norms if: they didn't know/understand, the punishment is too low, another norm/goal is more important, or if the norms aren't being enforced. \\
+
+\subsubsection{Conventions as Emergent Behaviour}
+Conventions can occur from agents copying other agents - these might not be globally followed, with different subsets of agents following different norms. e.g driving on the right/left\\
+
+By applying influence maximisation, desired norms can be spread across agents by targeting influencers.
+
+
+\subsection{Trust/Reputation}
+Agents running a bid will pick the agent it believes will do the best job (maximising expected utility). This belief can either come from previous dealings with the agent in question (\textbf{Trust}), or by the trust from other agents (\textbf{Reputation}). \\
+
+Reputation requires trust in the other agents' ratings: the ratings could be on a different scale, or two agents could collude to boost their reputation with other agents.e.g fake amazon reviews. 
+
+If the agent only uses trust, it will continuously pick the same agent as it never generates trust scores for unknown agents. A degree of exploration can be built into the agent, so it tries new agents and generates new trusts.
+
+\subsubsection{FIRE Model}
+One example of trust/reputation is the FIRE model - it uses a weighted sum of:
+\begin{itemize}
+    \item Direct experience
+    \item Other trusted agent references
+    \item Norm expectations
+    \item References provided by the agent
+\end{itemize}
+The weights are based on the source and recency of the information. 
+

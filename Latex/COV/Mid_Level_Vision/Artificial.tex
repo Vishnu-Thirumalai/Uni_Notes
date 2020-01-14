@@ -1,0 +1,159 @@
+\section{Mid Level Vision - Artificial}
+
+\subsection{Feature Space}
+Each location/image section is given a co-ordinate in a \emph{feature space} (e.g. (illumination,colour,size)) and this is used to determine similarity. Objects can then be grouped by:
+\begin{itemize}
+    \item Similarity - Affinity, cross-correlation, correlation co-efficient
+    \item Distance - Euclidean, Sum of Square differences, Manhattan
+\end{itemize}
+In both of the above, we can weight to prioritise features - determining these weights is non-trivial. Features also have to be scaled appropriately so they're all in the same range/ have equal effect (before weighting) on the output.
+
+\subsection{Thresholding}
+A one-dimensional feature space, the image is segmented into above/below the Threshold ($I'(x,y) = I(x,y) > Threshold)$. Brightness is the standard feature, but this can be applied to anything.  
+
+\subsubsection{Choosing the Threshold}
+\begin{enumerate}
+    \item Using the average brightness/intensity as the threshold
+    \item Plot an intensity histogram of the image - these are usually bimodal (two large peaks, that represent the foreground/background respectively), so choose a point between the two peaks
+    \item Hystersis Thresholding - Use two thresholds (e.g. the 2 peaks in the histogram) with the following conditions:
+    \begin{enumerate}
+        \item $I(x,y)> \text{Upper Threshold} \rightarrow I'(x,y) = 1$
+        \item $I(x,y)< \text{Lower Threshold} \rightarrow I'(x,y) = 0$
+        \item $I(x,y)< \text{Upper Threshold } \& I(x,y) > $Lower Threshold \& adjacent to a\\ foreground pixel $\rightarrow I'(x,y) = 1$
+        \item Otherwise $I'(x,y) = 0$
+    \end{enumerate}
+    \item Set the Threshold so a certain \% of the image is foreground
+\end{enumerate}
+
+Usually a single threshold isn't enough - shadows/illumination can vary the average. \emph{Local/Block Thresholding} splits the image into sections (usually quadrants) and uses a separate threshold for each. \\
+
+Thresholding works well with pre-processed images, as they have a clearly defined feature space. It's a simple method though, and can miss important/include unwanted pixels and sections. It also \emph{doesn't use spatial information} to group segments, which is a large limitation.
+
+\subsubsection{Morphological Operations}
+Operations to clean up the results of thresholding 
+\begin{enumerate}
+    \item Dilation - expands the foreground to fill in holes/gaps. Every pixel with a foreground neighbour(i.e. has value 1) is set as foreground.
+    \item Erosion - Reduces the foreground to remove noise. Every pixel that has a background neighbour (i.e. not surrounded by foreground) is set to background (0).
+    \item Closing - Dilation$\rightarrow$Erosion - used to fill in missing pixels
+    \item Opening - Erosion$\rightarrow$Dilation - used to fill in remove noise
+\end{enumerate}
+
+\subsection{Region-Based Segmentation}
+Uses a combination of location and feature space to segment images.
+
+\subsubsection{Region Growing}
+\begin{enumerate}
+    \item Select a seed pixel and give it a region label
+    \item Expand to similar ungrouped neighbouring pixels
+    \item Repeat 2 until there are no similar pixels left
+    \item Assign the group its label, then repeat from 1 till no pixels are ungrouped
+\end{enumerate}
+This method groups similar pixels, but similarity is calculated from the new rather than the seed pixel - slow changes or 'weak' boundaries (intermediate colours) can cause the groups to not segment properly and 'leak' through boundaries. 
+
+\subsubsection{Region Merging}
+\begin{enumerate}
+    \item Split the image into regions (every pixel, every 2x2 pixel square, etc.)
+    \item Select a region, merge with its neighbours if it's similar to create a new region. Repeat this step with the new region
+    \item If no similar neighbours, mark the region as final 
+    \item Repeat from 2 until all regions are final
+\end{enumerate}
+This method uses the region as a whole to determine similarity, so is less likely to leak. However, the final regions depend on the selection order - pixels tend to change slowly so lots of intermediate colours, so a region could be similar to both of its neighbours. e.g. [Blue Turquoise Green] could be [B B G] or [B G G]
+
+\subsubsection{Region Split and Merge}
+\begin{enumerate}
+    \item Set the entire image as one region
+    \item If the region isn't internally consistent (all pixels aren't similar, $\sigma$ is too high), split into quadrants.
+    \item Repeat 2 for every region until they're all consistent
+    \item Apply Region Merging
+\end{enumerate}
+If the image doesn't cleanly divide by 4, add filler columns/rows and remove after step 3.
+
+\subsubsection{Drawbacks}
+Illumination/shadows heavily affect region merging - a single surface can have variations due to curvature/shadows/lighting. 
+
+\subsection{Clustering}
+Groups data points into non-predefined groups/clusters (i.e. unsupervised learning on the feature space). Two main types:
+\begin{enumerate}
+    \item Partitional Clustering - divide the data into non-overlapping groups (each data point is in one group)
+    \item Hierarchical Clustering - the clusters are in a nested hierarchical tree 
+    \begin{itemize}
+        \item Divisive - start with all the points in one cluster, then recursively split
+        \item Agglomerative - each point is a separate cluster, and in each iteration merge the most similar clusters
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{K-Means Clustering}
+A partitional clustering algorithm that takes as input the number of clusters (k). 
+\begin{enumerate}
+    \item [0] Choose k data points (image elements in feature space), assign each to be a cluster centre
+    \item Assign each point to the closest cluster 
+    \item Compute new cluster centres (mean of each cluster's points)
+    \item If any cluster centre has changed this iteration, loop from 1
+\end{enumerate}
+This method is heavily dependent on the initial centres, number of clusters, and the distance method chosen (from the cluster centre, from the closest point in each cluster). It also tends to make the clusters the same size, and clusters around a mean point (circle/sphere/etc.), when these aren't always desired..
+
+\subsubsection{Agglomerative Clustering} 
+\begin{enumerate}
+    \item [0] Treat each data point as its own cluster
+    \item Merge the two most 'similar' clusters
+    \item Repeat 1 until there is a single cluster
+\end{enumerate}
+The similarity is usually stored in a proximity matrix - the definition of the similarity greatly affects the output:
+\begin{enumerate}
+    \item Single Link - the minimum distance between two points in each cluster
+    \item Complete Link - the maximum distance between two points in each cluster
+    \item Group Average - the average distance between each point in each cluster
+    \item Centroid - the distance between the centroid (mean average) of each cluster
+\end{enumerate}
+
+\subsection{Graph Cutting}
+The feature space is a fully connected graph (every pair of nodes is connected) with each vertex/node representing a image element. Each edge contains the similarity measure between the two nodes. It's then segmented into subgraphs to group the elements together, by cutting links/edges. These subgraphs have \emph{strong internal links}(high similarity inside the subgraph) and the cut edges are weak.\\
+
+A cut is a set of vertices removed from the graph to make two distinct subgroups. The 'cost' of a cut for subgraphs (A,V) in a graph (V,E): 
+\begin{equation}
+    cut(A.B) = \sum_{a\in A, b\in B} E(a,b)
+\end{equation}
+This definition favours cuts with a smaller number of edges, leading to smaller (single element) subgroups. To prevent this, we normalise the costs - for a graph (V,E) and subgraphs (A,B)
+\begin{align}
+    Assoc(A)&= \sum_{a\in A, v\in V-A} s(a,v) \\
+            &= \text{total sum of edges coming out of A} \nonumber\\
+    NCut(A,B) &=  \frac{cut(A,B)}{Assoc(A)} + \frac{cut(A,B)}{Assoc(B)}      
+\end{align}
+The normalised version tends to favour cuts into equal segments. Finding subgraphs for the minimum cuts is NP-hard, so we normally approximate. The method (like the others) struggles with textured backgrounds.
+
+\subsection{Fitting}
+Using a known mathematical model (e.g. a straight line), try to fit it to a set of image elements. This can be used to find the boundaries of an object, and thus segment the image.\\
+
+\subsubsection{Hough Transform}
+Rather than trying every possible line/etc. that can fit in an image and seeing how many elements/points it passes through, each point 'votes' for the lines that can pass through it. These votes for each point are stored in an accumulator array and the peaks are chosen. \\
+
+e.g. a line can be represented as $r= ycos\theta -xsin\theta$ (r is the perpendicular distance of the line to the origin, 
+$\theta$ is the forward angle the line makes with the x axis). We can use the points' x and y values to see which $(r,\theta)$ pairs pass through each point.\\
+ If the points aren't well aligned, then this can results in a number of weak matches and no clearly defined peaks in the accumulator. 
+
+\subsubsection{Generalised Hough}
+The above can be easily extended to other shapes. e.g. a circle can be represented as $r = \sqrt{(x-a)^2 + (y-b)^2}$\\
+
+More generally for shapes that can't be represented with a single equation, they can be described as a location of edge pixels relative to a centre pixel (e.g. $e_1 = (c_x+1,c_y+4), e_2=(c_x-4,c_y+1)$) . For each image element, try each edge position to determine a possible centre pixel - this pixel is then incremented in the accumulator array. \\
+
+This method is highly tolerant to gaps/occlusion/noise, but is computationally expensive. 
+
+\subsection{Active Contours/Snakes}
+Some methods can 'overfit' edges, responding to noise and tiny changes in illumination - we normally want edge contours to be smooth and on the edge. 
+
+A 'snake' is a spline curve (a curve defined in pieces by polynomial functions) that tries to fit to an edge by minimising an 'energy' function. This function is a sum of:
+\begin{enumerate}
+    \item Shape of the curve - the more bends/length in/of the snake, the higher the energy
+    \item Proximity - the closer the snake to gradients in the image, the lower the energy
+\end{enumerate}
+This snake is placed near a gradient, then moves along and closer to it till it fits as a boundary and segments the image. This only works on smooth/closed contours and is very sensitive to the initial position/weighting of the energy sum. The snake moves along the gradient, so if it's not placed near a gradient then it won't move/adjust at all.
+
+\subsection{Method Comparisons}
+\begin{description}
+    \item [Edge-Based] partition the image on discontinuities at boundaries \\ \quad\quad e.g. Hough, active contours, threshholding after edge detection
+    \item[Region-Based] group the image on similarities that make a region \\ \quad\quad e.g. clustering, region grow/merge/split, graph cutting
+\end{description}
+\begin{description}
+    \item [Model-based] Fit the image to pre-defined models. e.g hough transform, active contours
+    \item [Model-free] Segmentation/Grouping only on the image properties. e.g region grow/merge/split, clustering
+\end{description}

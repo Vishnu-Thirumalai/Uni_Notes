@@ -1,0 +1,121 @@
+\section{Low Level Vision - Artificial }
+
+\subsection{Convolution}
+At each position (x,y) of the image I, a new value is created using a weighted sum of the neighbouring pixels. The neighbours are determined using a \emph{mask} H of size (k,m) centred on (x,y).
+\begin{equation}
+    I'(x,y) = I\ast H = \sum_{k,m} I(x-k,y-m) \cdot H(k,m)
+\end{equation}
+The -ve sign shows that the mask has been flipped or rotated: if it wasn't, that would be cross-correlation rather than convolution. Convolution is commutative/associative (so we can apply multiple to one image), cross-correlation isn't. \\
+
+At the edges of the image, the mask won't completely fit: 
+\begin{enumerate}
+    \item Only output a cropped image, where the mask has entirely fit (i.e output size will be (x-2k, y-2m)) ('valid' in matlab)
+    \item Pad the eges of the image with zeroes, so the output image is the same size as the input ('same' in matlab)
+\end{enumerate}
+
+\subsubsection{Seperable}
+A convolution is \emph{seperable} if the mask/kernel (H) can be written as the convolution of two row vectors. i.e. H = $h_1 \ast h_2^T$
+
+The convolution of two vectors is the same as their product ($h_1 \ast h_2^T = h_2^T x h_1$). Two 1D convolutions (m+n products per pixel) is much faster than 1 2D convolution (m*n products per pixel). 
+
+\subsection{Masks}
+A mask/kernel can be though of as a point-spread function: it uses each point's value in the calculation of its neighbours. The result of a convolution can be thought of as the superimposition of masks, each weighted by the image's pixels.\\
+
+The mask can also work as a template: when the values in the image section and the \textbf{rotated} mask are \textbf{both} high, then the pixel gets a large value in the convolved image. These pixels show the location of \emph{features} in the image that correspond to the template. \\
+
+
+\subsection{Smoothing Masks}
+Spatial Frequency is how often the pixel values vary. i.e the number of pixels to oscillate between light and dark. A high frequency indicates a sudden change, such as an edge. \\
+
+Smoothing masks blur/smooth an image when applied, bringing the colours closer together and reducing the spatial frequency. The sum of the values in a smoothing mask is 1. 
+
+\subsubsection{Box Mask}
+Every value in the mask is equal (i.e each weight is $\frac{1}{size\_of\_mask}$). This sets each pixel to be the mean average of all of its neighbours, with a larger mask giving a more blurred image. \\
+
+As the box mask/mean filter has the same values throughout, there is a 'hard' edge: every value is the same inside, and outside the weights suddenly drop to 0. This can produce artifacts (small inconsistencies) in the convolved image.
+
+\subsubsection{Gaussian Mask}
+The values gradually fall off from the centre to the edge of the image: the border pixels have low values, so there's no hard edge. In addition to the size, the mask has a \emph{scale} factor ($\sigma$, the standard deviation of the gaussian) used to calculate the values for the mask G:
+\begin{equation}
+    G(X,Y) = \frac{1}{2\pi\sigma} \cdot exp \left( \frac{-(x^2+y^2)}{2\sigma^2} \right)
+\end{equation}
+As the scale increases, the size of the mask has to increase or the mask will have a hard edge - roughly $size >= 6\sigma$. The larger $\sigma$, the blurrier the image and the lower the frequency (less noise).\\
+
+A 2D gaussian is seperable into:
+\begin{equation}
+    G(X,Y) = \left(\frac{1}{2\pi\sigma} \cdot exp \left( \frac{-(x^2)}{2\sigma^2} \right)\right) \left(\frac{1}{2\pi\sigma} \cdot exp \left( \frac{-(y^2)}{2\sigma^2} \right)\right)
+\end{equation}
+
+\subsection{Difference Masks}
+An image can be regarded as a 3D plane, where the height is based on the intensity. The difference between two points gives the gradient ($\propto$ spatial frequency), which can be obtained using a difference mask (i.e. approximating differentiation).\\
+
+These masks usually sum to zero, so in areas of no change (i.e not an edge) we get no response. e.g to get the horizontal gradient ($X'=x_2-x_1$), we use the mask [-1 1], which gives us $-X'$(the mask flips). We can also obtain the change in change in gradient ($X'' = (x_3-x_2)-(x_2-x_1)$) with the mask [1 -2 1]. 
+
+\subsubsection{Intensity Discontinuities}
+These usually occur at edges in the image, which can represent:
+\begin{enumerate}
+    \item Boundary between two items
+    \item Depth Discontinuities. e.g. a cupboard against a wall
+    \item Orientation Discontinuities. e.g. two faces meeting at the edge of a box
+    \item Reflectance Discontinuities. i.e. change in surface material
+    \item Illumination Discontinuities. e.g. shadows (often hinders object recognition)
+\end{enumerate}
+
+\subsection{Edge Detection}
+An edge is a region of the image where the gradients have a common direction and a large magnitude. Simple difference masks can detect edges in one direction .e.g [-1 1] can detect a change from dark to light
+
+\subsubsection{Laplacian Mask}
+The laplacian is an omni-directional difference masks, that can detect a gradient in any direction. e.g. 
+\[
+    \begin{bmatrix}
+    -1 & -1 & -1 \\
+    -1 & 8 & -1 \\
+    -1 & -1 & -1 
+    \end{bmatrix}
+\]
+It is mathematically equivalent to $-(X'' + Y'')$. Due to it's nature, it's very sensitive to noise (a single pixel that is different from its neighbours). 
+
+\subsubsection{Laplacian of Gaussian/ Difference of Gaussian}
+A \emph{Laplacian of Gaussian} mask is a convolution of a Gaussian and a Laplacian: the gaussian removes noise, and the laplacian finds the second derivative in all directions. In practice, it can be simulated with a \emph{Difference of Gaussians} (Gaussian with small $\sigma$ - Gaussian with large $\sigma$).\\
+
+Both give a mask with high centre values, a low value ring, and median border values: these mimic a centre-surround, like a on-centre gangilon cell. 
+\subsubsection{Gaussian Derivative Mask}
+These masks are a convolution of a gaussian with a simple difference mask (e.g. [-1 1]). They're more robust than LoG/DoG, but only work in one direction (the results from two masks can be easily combined to produce a superior image).
+
+\subsubsection{Canny Edge Detector}
+A popular edge detection method with the following steps:
+\begin{enumerate}
+    \item Convolution using Gaussian Derivative masks to obtain x and y gradient values
+    \item Combines the results to obtain Magnitude ($\sqrt{x^2 + y^2}$) and Direction ($arctan(\frac{y}{x})$) of each gradient
+    \item Non-maximum suppression - thins the edges down to single pixels (looks at the pixels on each edge, removes if the neighbour in a perpendicular direction to the edge has a higher magnitude)
+    \item Converts to a binary image using two threshold ($>$high threshold = 1, $<$low threshold = 0, $>$low and adjacent to one over high = 1, other = 0)
+\end{enumerate}
+
+\subsection{Feature Detection}
+Masks can be used as templates: so we construct a mask that matches the feature we're looking for, convolve the image, threshold the convolved image, then search the sections of the image around the remaining pixels. \\
+This has two problems: 
+\begin{enumerate}
+    \item How do we set the threshold other than arbitrarily?
+    \item If the image is rotate/scaled/deformed/not bright then the mask won't react strongly
+\end{enumerate}
+Features are often identified by edges: these are heavily dependent on the scale of the image or scale of the gaussian used. 
+
+\subsubsection{Scale Invariance}
+To find features at different scales, we can use either different image sizes or different filter sizes. The second is computationally easier: we create an \emph{Image Pyramid} that contains images of different sizes. \\
+
+These images can be simply created using down/sub-sampling: $n\downarrow(I)(i,j) = I(n*i,n*j)$. e.g. $2\downarrow$ will take every second pixel. This can be done recursively to get smaller images. 
+
+\subsubsection{Gaussian Pyramid}
+Simply down-sampling might create an inaccurate image (e.g. $2\downarrow$ on an image with alternating b/w will create an all black image) - an \emph{aliased} image. This can be alleviated by smoothing with a gaussian the image before sampling. e.g.
+\begin{equation*}
+    Image_{n+1} = 2\downarrow(Image_n \ast G_\sigma )
+\end{equation*}
+This can also be done recursively, as $2\downarrow(2\downarrow(Image_n \ast G_\sigma ) \ast G_\sigma ) = 4\downarrow(Image_n \ast G_{\sqrt{2}\sigma} )$. 
+
+\subsubsection{Laplacian Pyramid}
+Rather than convolve to obtain the intensity discontinuities at each stage (i.e a LoG), we can subtract the image with the convolved image at each stage (before subsampling) to obtain a difference of gaussians. i.e.
+\begin{align*}
+    G_n &= Image_n * G_\sigma \\
+    L_n &= Image_n - g_n \\
+    Image_{n+1} &= 2\downarrow(G_n) \\
+\end{align*}

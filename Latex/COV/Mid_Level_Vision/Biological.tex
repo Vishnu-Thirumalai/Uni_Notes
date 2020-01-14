@@ -1,0 +1,34 @@
+\section{Mid Level Vision - Basics and Biological}
+\begin{description}
+    \item[Low-Level Vision] Noise Suppression, edge enhancement, efficient coding
+    \item[High-Level Vision] Object Recognition, Classification, Understanding
+    \item[Mid-Level Vision] Grouping of elements, segmentation/separation of elements from each other
+\end{description}
+
+For segmentation, there are two main approaches:
+\begin{description}
+    \item [Top-down] Segment based on \emph{prior knowledge} of what to look for. \\ \quad \quad - This is based on familiarity/expectation of what will be there (e.g Pareidolia)
+    \item [Bottom-up] Group based on similarity of appearance/based on \emph{image properties} .e.g Gestalt Laws 
+\end{description}
+
+\subsection{Gestalt Laws}
+Heuristics (not fixed laws) that guide how elements are grouped in images in humans. 
+\begin{enumerate}
+    \item Proximity - nearby items are grouped
+    \item Similarity - same shape,colour,size,orientation,luminance \\ \quad \quad - V1 inhibiting connections make outliers 'pop' out
+    \item Forming a closed contour. e.g. A venn diagram looks like two circles rather than an oval and two 'C's
+    \item Continuity - elements that form smooth lines or surfaces. e.g a cross is two lines, not two right angles \\ \quad \quad - Sometimes we see illusory contours/surfaces  to make continuity by \emph{connecting} multiple items together if they're scattered or parts are occluded \\ \quad \quad - V1 lateral connections make contours easier to see
+    \item Common Motion - elements that move together
+    \item Symmetry e.g. [$\quad$]($\quad$) vs. $\cdot\quad\cdot\cdot\quad\cdot$ 
+    \item Common Closed Region - elements already grouped. e.g looking at boxes of items 
+    \item Connectivity. e.g. $\ast-\cdot\;\cdot-\diamond$ vs. $\ast\quad\cdot\;\cdot\quad\diamond$
+\end{enumerate}
+The overall abstract principle is \emph{simplicity} - the structure is as simple as possible to describe/remember.
+
+\subsection{Object Segmentation}
+Objects are bounded - boundaries belong to the foreground, so the background doesn't appear to have a border, making it harder to recognise shapes. Only one object can own a border at once, making the other hard to see (Border Ownernship) e.g. the Rubin Face/Vase stimulus
+
+\subsubsection{V2 Cells}
+The V2 cortex (after V1/striate) contains cells that deal with border ownership. They have larger receptive fields, which can check the whole image.\\
+
+Each region has 2 cells sensitive to a particular orientation (to find the border), with each cell sensitive to one direction. The two neurons compete to determine which side owns the border, using the association field with other V2 cells to determine the probable object. The winning side is the object, the loser is the background.

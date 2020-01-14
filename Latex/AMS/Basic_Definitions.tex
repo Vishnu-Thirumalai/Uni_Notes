@@ -1,0 +1,80 @@
+\section{What is an Agent?}
+
+\subsection{Basic Definition}
+An agent is an \emph{autonomous} system situated within an environment, capable of \emph{flexible} behaviour to achieve a set of goals. 
+
+\begin{description}
+    \item[Autonomous] Can control its own state and behaviour
+    \item[Flexible] Is both:
+    \begin{description}
+        \item[Reactive] Responds to changes in and constantly interacts with the environment
+        \item[Proactive] Works towards future goals - keeps track of current and goal states
+    \end{description}
+    Finding a balance between reactive/proactive is an ongoing problem
+\end{description}
+
+\subsubsection{Environment and Multi-Agent Domains}
+Agents are \emph{situated} within environments, and experience/affect them via sensors/actuators. \\
+
+These environments may be \emph{multi-agent}, so an agent has to consider other agents while achieving goals. Some goals require co-operation, so an agent requires \emph{social ability} to interact with other agents.
+
+\subsection{Agents vs. Objects}
+
+Objects (as in OOP) encapsulate a state, communicate with others, and have methods/actions. 
+Agents have the above and:
+\begin{enumerate}
+    \item Independence to choose to listen/ignore requests
+    \item Capable of flexible behaviour
+    \item Actively sense and work towards goals, rather than passively respond to requests
+\end{enumerate}{}
+
+\subsection{Intentional Systems}
+An \textbf{Intentional System} is an entity whose behaviour can be explained/predicted by attributing belief/desire/rationality to it. e.g She \emph{believed} X, He \emph{wanted} Y
+
+This allows us to quickly summarise the behaviour of a system to understand the state, even if it's not actually true. This description is \emph{legitimate} if you can describe a person the same way, and \emph{useful} when it simplifies the understanding. For simple systems (such as a lightbulb), there are easier ways to describe the system. 
+
+\begin{description}
+    \item [First Order Intentional] Has beliefs/desires .e.g A dog wants to walk
+    \item[Second Order Intentional] Has beliefs/desires about beliefs/desires. \\ e.g. Wants to know X, Knows it doesn't know Y
+\end{description}
+
+\subsection{Why Agents?}
+
+\begin{enumerate}
+    \item Need for co-operation between devices
+    \begin{description}
+        \item [Ubiquity] Devices are in everything now. e.g IoT
+        \item [Interconnection] Distributed/Concurrent/Networked systems are the norm 
+    \end{description}
+    \item Devices can act independently
+    \begin{description}
+        \item[Intelligence] Devices can do more complex tasks
+    \end{description}
+    \item Devices need to accurately represent our intentions
+    \begin{description}
+        \item[Delegation] Devices are doing more tasks than before without human intervention
+        \item[Human-Orientation] Devices are being viewed/think like humans. e.g intentional systems
+    \end{description}
+\end{enumerate}
+
+Agent-based programming is capable of modelling independent action, interaction between devices and representing a set of goals. Multi-Agent Systems can co-operate and negotiate to achieve individual goals. 
+
+Agents can also be used in traditional software, to regulate the interactions between different parts of a complex system. 
+
+Finally, agents are excellent for \emph{modelling} complex systems (such as human societies), to predict future behaviours.
+
+\subsection{Related Fields}
+
+Multi-agent systems draws from many other fields, including: economics, social sciences, philosophy, logic and game theory. Lots of ideas, lots of conflicting views.
+
+\subsubsection{Distributed Systems}
+Very similar, but threads aren't autonomous/don't have goals. Co-ordination requires negotiation, as opposed to allocations by some master controller.
+
+\subsubsection{Artificial Intelligence}
+Agents don't need to be strong AI, and instead focuses on the social/co-operative aspects
+
+\subsubsection{Economics/Game Theory}
+Great for modelling perfect theoretical scenarios, but doesn't give us specific solutions and often makes too many/infeasible assumptions
+
+\subsubsection{Social Science}
+No guarantee agents will act like humans societies - plenty of overlap, but still distinct fields

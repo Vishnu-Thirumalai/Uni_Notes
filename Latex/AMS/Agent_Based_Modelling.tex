@@ -1,0 +1,66 @@
+\section{Agent Based Modelling}
+\textbf{Simulations} are an abstracted model of the real world. They can be used to test theories/effects of potential future changes, without actually implementing them. \\
+
+They're widely used where data analytics fail.i.e in very complex systems, where behaviour is emergent, and where data isn't available. Simulations \emph{generate} data, rather than just analyse it.\\
+
+\subsection{Models}
+Any simulation uses a model, which is an abstraction of the real world made to be as simple as possible. Models are based on assumptions and theories, often to test the theories. \\
+
+If a simulation/model explains a real-world phenomenon, then it is a \emph{candidate solution} - further proof is needed to call it a \emph{causal explanation}. The further proof is an ill-posed problem.\\
+
+One test is to vary the initial parameters - fragile models are very sensitive, so will vary dramatically with a tiny change. 
+
+\subsection{Bottom-Up Modelling}
+Agent-based modelling is a \emph{bottom up} approach - the individual parts of the system are defined, and the behaviour of the system as a whole is emergent from the interactions of the parts. \\
+
+These parts/agents can be heterogeneous - a single agent can then be individually changed, and the effects of that change are then transmitted to the system organically.
+
+\subsection{Environment}
+Agents are embedded into an environment, which define their behaviour.
+\begin{description}
+    \item [Spatial Models] Agents have co-ordinates on a grid, and can move about. Interactions are based on proximity.
+    \item [Network Models] Links between agents are via edges, like a graph. Interactions are based on link proximity.
+\end{description}
+Environments can also contain non-autonomous entities, like the weather/ external factors.
+
+\subsection{Scale and Feedback}
+Since agents are non-deterministic, and behaviour emerges from interactions, every run of the system is unique. These can be from lots of simple agents, or a few behaviourally complex agents. e.g. Testing network effects at scale on simple agents vs. testing how a few agents react to a complex environment
+
+The rich data obtained comes from feedback loops: the final state isn't a simple function of the initial state. These loops don't depend on the size/scale of the system, just its structure. 
+
+\subsection{Cellular Automata}
+A simpler system that influenced most ABM models. \begin{itemize}
+    \item The environment is a grid of cells, and each cell has a state
+    \item At each time step, the cell updates based on its neighbours' states
+    \item Each cell is a non-moving, homogeneous agent with no memory in a fixed dynamic environment (i.e the neighbouring cells)
+\end{itemize}
+A famous example is Conway's Game of Life.
+
+\subsection{Shelling's Segregation Model}
+A precursor to ABM's, that focused on individuals in the system - their individual decisions had effects they neither intend nor were aware of. e.g people wanting to live amongst their community splits cities on racial lines
+
+\subsection{Intervention}
+An \emph{Intervention} is a change in the model that affects the agents behaviour. It can be explored by comparing the 'before' and 'after' applying the changes.
+
+\subsubsection{Influence Maximisation}
+By identifying which agents have most influence on the system (e.g the most connections in a network model), interventions can be targeted at them - this maximises the amount of change with minimal intervention. In the real world, these could be applying changes to social media influencers or targeted at certain ethnic/political groups.
+
+\subsubsection{Influence/Spreading Functions}
+Influence can be modelled in different ways, such as in peer pressure (an agent is influenced if a certain percentage of its connections are). The spread of disease can be modelled in such a fashion. 
+
+\subsection{Creation}
+Usually the agents are relatively simple (e.g. BDI, state machines, subsumption-based), and the behaviour emerges from their interactions. The agents only need to capture the relevant behaviour, so they don't need to be complex. \\
+
+Data is required for realistic modelling:
+
+\begin{itemize}
+    \item Calibration - to set the initial agent/environment parameters
+    \item Verification - use the data to set limits on the agent behaviour, etc.
+    \item Validation - check the simulation is correct against real data (Face validation is checking against estimates)
+\end{itemize}
+
+\subsubsection{Pyschological Agents}
+For social setting models, we simulate a particular aspect(s) of the psychology of the individuals. e.g wanting to do X\\
+
+Adding psychological models such as stress and trust can increase the realism of the model - some models even have their agent learn and adapt as the model iterates (i.e. reinforcement learning)
+

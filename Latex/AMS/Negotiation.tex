@@ -1,0 +1,110 @@
+\section{Negotiation}
+Self-interested agents need to agree on how to perform/allocate tasks/resources - they do this by negotiating.
+
+An \emph{Agreement Protocol/Mechanism} defines the structure of the negotiation/argument:
+\begin{enumerate}
+    \item What moves each agent can make
+    \item What are the permitted responses/sequence of moves. e.g. can an agent make an offer in response to an offer?
+    \item How the outcome is determined
+\end{enumerate}
+Each agents has a \emph{Strategy} to decide what move it makes in a given state. 
+
+\subsection{Game Theory}
+A way to analyse negotiations/scenarios where each agent tries to maximise its own utility. 
+\begin{description}
+    \item[Strategy] The action the agent chooses to take
+    \item[Outcome] The result of each agent/player executing their action
+    \item[Dominant Strategy] No matter what the other player(s) do, this is the best strategy for an agent
+    \item[Nash Equilibrium] An outcome where no agent benefits from changing, assuming no other agent changes
+    \item[Pareto Optimal] An outcome where changing to any other outcome to benefit one player would harm another player(s)
+    \item[Max. Social Welfare] The outcome with the max. utility sum across all agents
+\end{description}
+e.g.
+\begin{table}[H]
+\tiny
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|l|l|}
+\hline
+ Agents &  & \multicolumn{2}{c|}{Agent 2} \\ \hline
+ & Actions & \multicolumn{1}{c|}{A} & \multicolumn{1}{c|}{B} \\ \hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Agent \\ \\ 1\end{tabular}} & A & \begin{tabular}[c]{@{}l@{}}\quad \quad2\\ 2\end{tabular} & \begin{tabular}[c]{@{}l@{}}\quad \quad4\\ 0\end{tabular} \\ \cline{2-4} 
+ & B & \begin{tabular}[c]{@{}l@{}}\quad \quad0\\ 4\end{tabular} & \begin{tabular}[c]{@{}l@{}}\quad \quad0\\ 0\end{tabular} \\ \hline
+\end{tabular}%
+}
+\end{table}
+In the above example of a game with two agents and two actions each: BB is the Nash Equilibrium; AA, AB and BA are Pareto Optimal; AA, AB and BA maximise Social Welfare. 
+
+\subsection{Properties of Agreement Mechanisms}
+An agreement mechanism can be any of the following:
+\begin{enumerate}
+    \item Individual Rational - No agent is worse off for participating
+    \item Symmetric - Same rules for everyone
+    \item Fair - Every agent has an equal chance of affecting the outcome
+    \item Pareto Optimal - A PO outcome is guaranteed
+    \item Maximises social utility - An outcome that maximises social utility is guaranteed
+    \item Stable - A Nash Equilibrium Exists
+    \item Simple - easy to find the best strategy
+    \item Guaranteed to terminate - no way the participants interact indefinitely 
+\end{enumerate}
+
+\subsection{Negotiation Definitions}
+Negotiations usually take place over a series of rounds, and each agent makes one proposal per round. The \emph{Negotiation Set} is the set of possible proposals that an agent can make.
+
+Negotiations can be \emph{single-issue} (e.g. the price of X) or \emph{multi-issue} (e.g a contract with multiple clauses). In the single it's obvious where concessions are made, but in the multi it's not obvious how the various issues relate. Multi-issue negotations also can't be simply iterated over, as there are too many possibilities. 
+
+Negotiations can be one-to-one, many-to-one (e.g an auction) or many-to-many.
+
+\subsection{Alternating Offers Protocol}
+A one-to-one protocol to split a given amount - in each round, one agent proposes a deal and the other either accepts (and the negotiation terminates) or rejects and continues to a new round with the roles reversed.
+
+The game is not guaranteed to terminate: if the agents can't reach a deal, this is known as the \emph{Conflict Deal} - which is the worst possible outcome for both agents. 
+
+\subsubsection{Ultimatum Game}
+Like the AoP, but only a single round. Guaranteed to terminate, but unfair to agent 2 as only agent 1 can affect the outcome (both want to avoid a conflict deal)
+
+\subsubsection{Strategies}
+Given that all agents want to avoid a conflict deal, the agent going last (with a fixed number of rounds) can offer any deal, and the other agent must accept. For an indefinite number of rounds, the first agent will get any deal they want - as they always go first, they can propose the same deal every time and reject whatever the second agent proposes. \\
+
+Agents are generally impatient - the sooner they get something, the more value it has. This can be represented as the value of X to agent i at round K being $\delta^k_i \cdot X$ - the higher $\delta_i$, the more patient agent i is.\\
+Knowing the patience of the other agent allows you to make an offer they must accept - the longer the game goes on the less the item is worth to them. For an indefinite number of rounds, the deal agent 1 should make (Assuming the split is (agent 1, agent 2)) is:
+\[
+    \left( \frac{1-\delta_1}{1-\delta_1\delta_2},\frac{\delta_2(1-\delta_1)}{1-\delta_1\delta_2} \right)
+\]
+
+\subsection{Task Oriented Domains}
+Agents have to achieve a set of tasks: they can negotiate to swap tasks to be more efficient. The domain is represented as: \textbf{$<T,Ag,c>$} = $<$set of tasks, set of agents, cost of each subset of tasks$>$. 
+\begin{itemize}
+    \item Encounter - Initial allocation of tasks (a set $<T_1,T_2,...,T_i>$ where $T_i$ is the allocation for agent i)
+    \item Deal - The final allocation of tasks(a set $<D_1,D_2,...,D_i>$ where $D_i$ is the allocation for agent i)
+    \item Cost of deal for agent i - $c(D_i)$
+    \item Utility of deal for agent i - $c(T_i) - c(D_i)$
+    \item Conflict Deal - the initial deal
+    \item Individual Rational Deal - a deal where no agent prefers the conflict deal
+\end{itemize}
+The negotiation set is all deals that are individual rational + pareto optimal (i.e utility $>= 0$ for all agents)
+
+\subsubsection{Deception}
+Agents can lie about the number of tasks they have to get a better deal. 
+\begin{enumerate}
+    \item Hidden Task - An agent can hide a task from its encounter. This lowers the encounter cost, so reduces the individual rational strategies to give it a better deal
+    \item Phantom Task - An agent can pretend to have been allocated a new task. This task can make another task (which the agent wants) look worse, so no other agent will bid for it. 
+\end{enumerate}
+
+\subsection{Monotonic Concession Protocol}
+One-to-one protocol: agents simultaneously propose deals in each round. If neither agent agrees to its opponent's deal, the round continues - in the next round, each agent's proposed deal \emph{cannot be less preferable to it's opponent}. i.e it must propose a deal that is equal/better for the other agent. If neither agent concedes on their deal, the conflict deal is chosen.
+
+\subsubsection{Zeuthen Strategy}
+\begin{enumerate}
+    \item The first deal an agent proposes is its most preferred
+    \item The agent least willing to risk conflict should conceded
+    \item An agent should only concede enough to change the balance of risk
+\end{enumerate}
+This strategy maintains a Nash Equilibrium, so agents can announce this strategy without losing anything. \\
+
+The closer an agent's deal is to the conflict deal, the more willing to risk (less to lose). 
+\begin{align*}
+    \text{A's willingness to risk} &= \frac{utility(Deal_a) - utility(Deal_b)}{utility(deal_a)} \nonumber \\
+    &= \frac{\text{Utility lost by conceding}}{\text{Utility lost by conflict}} \nonumber
+\end{align*}
+If $utility(deal_a)$ = 0 (i.e. the conflict deal), then the risk = 1.

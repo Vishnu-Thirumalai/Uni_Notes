@@ -1,0 +1,135 @@
+\section{Embedded Agents}
+An agent is a system capable of flexible autonomous action to meet objectives in a (multi-agent) environment. They typically work in  a \emph{sense $\rightarrow$ decide $\rightarrow$ act} loop. 
+
+\subsection{Types of Environment}
+
+\subsubsection{Accessibility}
+\begin{description}
+    \item [Accessible] The agent can obtain complete, accurate and up to date information about the relevant parts of the state. e.g Chess
+    \item[Inaccessible] Where it can't get this information. e.g. the real world, the internet
+\end{description}
+
+\subsubsection{Probability}
+\begin{description}
+    \item [Deterministic] All actions have a guaranteed effect, with no uncertainty. e.g. Chess
+    \item[Non-Deterministic] The outcomes of an action have a probability of occurring, there's no guarantee. e.g the real world
+\end{description}
+
+\subsubsection{Episodic}
+\begin{description}
+    \item [Episodic] The performance of the agent in the current scenario doesn't affect future scenarios. e.g robotic vacuum cleaner
+    \item[Non-Episodic] The agent has to reason about its actions effects on the current state and future states. e.g Chess
+\end{description}
+
+\subsubsection{Static/Dynamic}
+\begin{description}
+    \item [Static] Only the agent's actions change the environment. e.g. Solitaire
+    \item[Dynamic] The environment changes beyond the agent's control (external processes, other agents).e.g. Chess, the real world
+\end{description}
+
+\subsubsection{Complexity}
+\begin{description}
+    \item [Discrete] A finite/fixed number of actions and percepts (can be solved with a perfect lookup table). e.g. Tic Tac Toe
+    \item[Continuous] Countably infinite number of actions and percepts
+\end{description}
+
+\subsection{Functions and Sets}
+
+\subsubsection{Sets}
+A set is a collection of objects, and can be written as S = $\{x | x has the property P\}$, where s is the collection of all objects that have the property P.
+
+\begin{itemize}
+    \item x $\in$ S means x is part of the set S
+    \item $\emptyset$ is the empty set (no elements)
+    \item $2^S$ is the \emph{power set} of S, which is the set of all subsets. e.g $2^{(1,2)} = (\emptyset,(1),(2),(1,2))$
+    \item A x B is the cartesian product - the set $\{(a,b) | a \in A, b \in B\}$
+\end{itemize}
+
+\subsubsection{Functions}
+A function maps each element of set A to a single element in set B ($f:A \longrightarrow B$). If x $\in$ A and y $\in$ B, this can be written as $f(x) = y$.
+
+\begin{itemize}
+    \item $\exists$ means 'there exists' e.g. $\exists x$ such that $x<5$
+    \item $\forall$ means 'for all' e.g. $\forall x < 5, x-5 < 0$
+\end{itemize}
+
+\subsection{Agent and Environment Interaction}
+\begin{itemize}
+    \item For a discrete environment, it could be in a state e $\in$ E
+    \item Any agent has a set of possible actions Ac, that affect the environment 
+    \item A run is a sequence of alternating states and actions. e.g $e^0 \rightarrow a^0 \rightarrow e^2 \rightarrow a^4 \rightarrow e^3 \rightarrow \ldots$
+    \begin{itemize}
+        \item $R$ is the set of all possible runs using E and Ac
+        \item $R^{Ac}$ is the set of runs that ends with an action
+        \item $R^{E}$ is the set of runs that ends with a state
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Environment Behaviour}
+A \emph{State Transformer} is a function that takes a run r $\in R^{Ac}$ and returns the set of states that could result from it. i.e $\tau:R^{Ac}\rightarrow2^E$
+
+The environment state obtained is dependent on the run (\textbf{history-dependent}) and non-deterministic. If $\tau$ returns $\emptyset$, then the run has ended - there are no possible successor states (These are shown from the last state, rather than the last action).
+
+An environment \emph{Env} can be represented as $<E, e_{0}, \tau >$ (set of states, initial state, state transformer). 
+
+\subsubsection{Agent Behaviour}
+The agent determines its action based on the current and previous states: assuming it's deterministic, we can represent this as $Ag: R^{E}\rightarrow Ac$. 
+
+A system is a pair (Ag, Env). The set of terminating runs for this system is R(Ag,Env). 
+
+We can say that two agents are behaviourally equivalent for Env iff R($Ag_1$,Env) == R($Ag_2$,Env). If this holds for all Env, then the two agents are generally behaviourally equivalent. 
+
+\subsection{Types of Agents}
+
+\subsubsection{Purely Reactive Agents}
+These don't take into account the past - they only use the present to make their decisions. i.e action: $E\rightarrow Ac$
+
+Some agents map the environment to a \emph{percept}, then select an action using this internal state. These agents have a set of percepts P, and use the following: 
+    see:$E\rightarrow P$, action:$P\rightarrow Ac$. 
+
+\subsubsection{State-Based Agents}
+These agents maintain an internal state I between episodes, and update this based on percepts from the environment. This state records information about previous actions and environment states.  i.e see:$E\rightarrow P$, next: $IxP\rightarrow I$, action:$I \rightarrow Ac$
+
+\subsection{Utility-Based Task Specification}
+Agents are built to fulfil tasks we specify, but we don't want to tell agents exactly how to complete them (as in a lookup table). 
+
+\subsubsection{State Utility Functions}
+One method is to assign each state $\in$ E a utility, and tell the agent to maximise its utility. e.g u(e) = profit made by the agent in state e
+
+This gives the agent a target, but doesn't give a guide for the method - it's difficult to give the agent a long term view with individual utilities.
+
+\subsubsection{Run Utility Functions}
+Assigning a utility to a run forces the agent to take a long term view. e.g u(r) = (profit in final state * number of states not in debt) \\
+
+If the agent Ag is non-deterministic, then we can say the probability of run r occurring in environment env is $P(R|env,Ag)$. The expected utility of this run is $u(R) \cdot P(R|env,Ag)$.\\ 
+
+An optimal agent is one that maximises the expected utility over all possible runs. i.e.
+
+\[
+    \argmax_{Ag\in Agents} \sum_{r\in R(Ag,Env)} u(R) \cdot P(R|env,Ag)
+\]
+
+\subsubsection{Bounded Optimality}
+Since we don't have infinite processing power, we can't always have a perfectly optimal agent: instead, we choose the best agent that can run on our machine ($AG_m$).
+
+\subsubsection{Problems with Utility}
+\begin{enumerate}
+    \item Not all systems are easy to define in terms of numbers. e.g. financial systems are easy, preference systems are mostly arbitrary
+    \item Humans don't usually think in terms of utilities
+    \item It's hard to define specific tasks with utilities - we can give a final state to achieve, but not the tasks to complete on the way
+\end{enumerate}
+
+\subsection{Predicate Task Specification}
+Runs are assigned a utility of 0(fail) or 1(pass) - $\Psi:R\rightarrow {0,1}$. A task environment is defined as $<\Psi, Env>$ - the properties of the system + the criteria for fail/success. \\
+
+$R^\Psi (Ag,Env)$ is the set of runs by Ag in Env that pass - an agent succeeds in a task environment if 
+\[R^\Psi (Ag,Env) = R(Ag,Env) \]
+
+i.e all terminating runs succeed.
+For a non-deterministic agent, the probability of success is simply $ \forall r \in R^\Psi (Ag,Env) \: \sum P(r|Ag,Env) $.  
+
+\subsubsection{Achievement Tasks}
+The agent must achieve one of a given set of goal states G - it doesn't matter which. The agent succeeds if $\forall r \in R(Ag,Env) \: \exists e_i \text{ such that } e_i \in r \text{ and } e_i \in G$
+
+\subsubsection{Maintenance Tasks}
+The agent must never enter a set of 'bad' states B .i.e $\forall r \in R(Ag,Env) \enspace \neg\exists e_i \text{ such that } e_i \in r \text{ and } e_i \in B$

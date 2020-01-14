@@ -1,0 +1,44 @@
+\section{Introduction}
+
+Computer vision is the extracting of useful information from images. 
+
+\subsection{Related Disciplines:}
+\begin{description}
+    \item[Image Processing] Manipulating images
+    \item[Computer Graphics] Synthesising images
+    \item[Pattern Recognition] Recognising and classifying info from datasets/images
+    \item[Photogrammetry] Obtaining measurements (e.g height) from images
+    \item[Biological Vision] Understanding visual perception in humans/animals \\ \quad \quad  (combines neuroscience, psychology and biology)
+\end{description}
+
+\subsection{Difficulties}
+Vision exists for specific domains (e.g. the Hawkeye tennis system), but making a general system that works in any environment is an ongoing problem.  
+
+\begin{enumerate}
+    \item To a machine, images are an X by Y grid of numbers - even humans would have difficulty
+    \item Understanding a 2d image of a 3d object is an ill-posed problem
+    \item A single 3d object can have an exponential number of different images (viewpoints, scale, colour,...)
+\end{enumerate}
+
+\subsubsection{Ill-Posed Problem}
+An \emph{ill-posed problem} is one with more than one potential answer/no answer/no direct relationship between the answer and initial conditions. \\
+
+Converting a 3d image to 2d is well-posed (e.g. looking at a cube head on makes it a square). Converting a 2d to 3d is an inverse problem, so is ill-posed - a single 2d image could have come from multiple different sources (e.g. a square could be one face of a cube or the base of a square pyramid).\\
+
+By using prior knowledge/context, we can interpret the most likely object for an image.
+
+\subsubsection{Exponential images}
+For any object in an image, it can appear at any position/scale/orientation/colour/deformation/etc. so there are an exponential number of possible images for an object.\\
+Illumination can greatly vary the object's appearance, even if the object itself hasn't changed. There can also be multiple types of the same object (e.g. smartphones), or different classes of objects can look very similar (e.g. calculators and remotes).\\
+In more complex images, multiple objects can occlude/cover parts of each other - this not only deforms the object, but provides lots of background noise. 
+
+\subsection{Prior Assumptions}
+Using invariant prior knowledge, we can apply these to images to make better sense of them. The brain has a number of prior assumptions (e.g. the effect of shadows and illumination) that it uses to process images. 
+
+Some other priors the brains uses are: perspective, context, prior knowledge and temporal context. We can classify these as:
+\begin{enumerate}
+    \item Familiarity - general knowledge. e.g if something is further away, we compensate the fact that it looks smaller
+    \item Priming - the immediately preceding sensory input. e.g if we just saw a vase on the table, we expect it to be there
+    \item Context - information about the surrounding scene. e.g. if we see a keyboard and mouse, we expect to see a monitor nearby
+\end{enumerate}
+There are visual illusions that show us some of the assumptions that human vision makes - these are usually correct, and have been applied to many specialised vision systems. 

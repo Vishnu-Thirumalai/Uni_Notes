@@ -1,0 +1,33 @@
+\section{Argumentation and Communication}
+\emph{Argumentation} is a form of non-montonic logic that allows multiple agents to contribute in reasoning. It's also more similar to human reasoning, so is more understandable to us.
+
+Non-monotonic logic involves choosing between conflicting inferences/conclusions (in beliefs, desires, or actions). Being able to rationally choose between these is the sign of an intelligent agent - it's able to argue or debate about the answer. 
+
+\subsection{Basic definitions}
+An \emph{argument} consists of (premises, claim), where the claim is a logical inference from the premises. e.g. (\{a, a$\rightarrow$b\}, b) Multiple arguments can 'attack' each other if they come to opposing claims (e.g. another argument that infers $\neg b$). \\
+
+Preferences are used to strengthen arguments, so we can extract a model from conflicting information. One such is the \emph{specificity principle}, that states that specific cases beat general cases (e.g. penguins can't fly beats birds can fly). These preferences/principles can be updated, and thus the system can represent different models.
+
+\subsection{Argument Framework}
+The argument framework consists of $<arguments,attacks>$ where attacks details which argument attacks which (two arguments can both attack each other, or it can be a one-sided attack).\\
+A set E (Extension) is the set of acceptable/winning arguments with respect to attack set A if:
+\begin{enumerate}
+    \item $\forall X,Y \in E, (X,Y) \notin A$\\
+        \qquad (There are no internal attacks in E) 
+    \item $\forall X \in E, \forall a | ((a,x)\in A), \exists y \in E | (y,a) in A$ \\
+        \qquad (For every attacked argument in E, an argument in E defends it (attacks the attacker))
+\end{enumerate}
+
+\emph{Preferred extensions} allow arguments to self-defend, while \emph{Grounded extensions} don't. Both are the \emph{maximal}(largest) set that follow these rules - there is only ever one grounded extension.\\
+The preferred extension gives us more information to work with, which is why it's called the preferred.
+
+\subsection{Argument Games}
+A framework used to decide if an argument (X) is part of an extension or not. An agent in turn takes the roles of the \emph{proponent}(P) and \emph{opponent}(O) - P proposes X, then O and P take turns attacking the newly proposed argument - the attacks allowed are based on the type of extension to be checked. If P wins the game (O doesn't have a responding attack), then X is part of the extension. P only has to win once, no matter how many different paths there are in the game tree.\\
+
+For the grounded extension, P can't repeat arguments in one path from the root to the end of the game (a \emph{dispute}) (O is free to repeat). For the preferred extension, O can't repeat arguments but P can.\\
+
+\subsection{Public Semantics}
+Argument games can be expanded to multiple agents - this allows joint reasoning, and information from multiple sources. A model/dialogue is in favour of X if X is an extension in the framework of the publicly communicated ideas in the dialogue. These obtained arguments can be considered knowledge as opposed to beliefs, as all arguments to prove the contrary have failed or been defended against. \\
+
+However, argument dialogues don't provide any information of the private knowledge bases of the participating agents beyond what they choose to share in the dialogue.
+
